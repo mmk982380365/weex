@@ -168,6 +168,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private  WXComponent keepPositionCell = null;
   private  Runnable keepPositionCellRunnable = null;
   private  long keepPositionLayoutDelay = 150;
+  private  Boolean disableAppearBubble = false;
 
   private ListSnapHelper mListSnapHelper;
   private Boolean enableScrollSnap = false;
@@ -552,6 +553,11 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     } else {
       getHostView().getInnerView().setHorizontalScrollBarEnabled(show);
     }
+  }
+
+  @WXComponentProp(name = Constants.Name.DISABLE_APPEAR_BUBBLE)
+  public void setDisableAppearBubble(boolean flag) {
+      disableAppearBubble = flag;
   }
 
   @Override
@@ -1351,6 +1357,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       }
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d("appear", "item " + item.getCellPositionINScollable() + " result " + result);
+      }
+      if(component instanceof WXVContainer){
+        ((WXVContainer) component).setDisableAppearBubble(disableAppearBubble);
       }
       component.notifyAppearStateChange(result == AppearanceHelper.RESULT_APPEAR ? Constants.Event.APPEAR : Constants.Event.DISAPPEAR, direction);
     }

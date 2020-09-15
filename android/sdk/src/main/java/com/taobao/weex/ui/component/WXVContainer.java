@@ -48,6 +48,7 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
   private static final String TAG = "WXVContainer";
   protected ArrayList<WXComponent> mChildren = new ArrayList<>();
   private BoxShadowHost mBoxShadowHost;
+  private Boolean disableAppearBubble = false;
 
   @Deprecated
   public WXVContainer(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
@@ -74,6 +75,9 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
       host.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
       host.requestFocus();
     }
+  }
+  public void setDisableAppearBubble(boolean flag){
+    this.disableAppearBubble = flag;
   }
 
   /**
@@ -357,11 +361,13 @@ public abstract class WXVContainer<T extends ViewGroup> extends WXComponent<T> {
     if (getHostView() == null || mChildren == null) {
       return;
     }
-    for (WXComponent component : mChildren) {
-      if (component.getHostView() != null && !(component.getHostView().getVisibility() == View.VISIBLE)) {
-        wxEventType = Constants.Event.DISAPPEAR;
+    if(!disableAppearBubble) {
+      for (WXComponent component : mChildren) {
+        if (component.getHostView() != null && !(component.getHostView().getVisibility() == View.VISIBLE)) {
+          wxEventType = Constants.Event.DISAPPEAR;
+        }
+        component.notifyAppearStateChange(wxEventType, direction);
       }
-      component.notifyAppearStateChange(wxEventType, direction);
     }
   }
 
