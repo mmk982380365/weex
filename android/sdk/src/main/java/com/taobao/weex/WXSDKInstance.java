@@ -26,6 +26,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -60,7 +61,6 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXEaglePlugin;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.bridge.WXParams;
-import com.taobao.weex.bridge.WXReactorPage;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.OnWXScrollListener;
@@ -244,16 +244,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private volatile WXEaglePlugin mEaglePlugin;
 
-  private WXReactorPage mReactorPage;
-
-  private String mReactorAppId;
-
-  public void setReactorAppId(String appId){
-    mReactorAppId = appId;
-  }
-  public String getReactorAppId(){
-    return mReactorAppId;
-  }
+  private WXReactorPageManager mReactorPageManager;
 
   public  List<JSONObject> getComponentsExceedGPULimit(){return componentsInfoExceedGPULimit;}
   @RestrictTo(Scope.LIBRARY)
@@ -1049,7 +1040,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
             return;
           }
 
-          if(mReactorPage != null) {
+          if(mReactorPageManager != null) {
             return;
           }
 
@@ -1237,8 +1228,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if(!isUsingReactorPage()){
       return;
     }
-    if (mReactorPage != null) {
-      mReactorPage.setPageContext(context);
+    if (mReactorPageManager != null) {
+      mReactorPageManager.setPageContext(context);
     }
     render("reactorPage", template, null, data, mRenderStrategy);
   }
@@ -2014,15 +2005,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public synchronized void destroy() {
     if(!isDestroy()) {
-      WXBridgeManager.getInstance().post(new Runnable() {
-        @Override
-        public void run() {
-          if (mReactorPage != null) {
-            mReactorPage.unregisterJSContext();
-          }
-        }
-      });
-
+      if(mReactorPageManager != null){
+         mReactorPageManager.unregisterJSContext();
+         mReactorPageManager = null;
+      }
       if (mInstanceRecorder != null && mInstanceRecorder.needRecord()) {
         mInstanceRecorder.uploadRecord();
       }
@@ -2705,25 +2691,25 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     return reactorPageFlag;
   }
 
-
-  public void registerReactorJSContext(final long v8_isolate) {
+  public void registerReactorPageManager(final long v8_isolate,final Handler handler,final String appId){
     if(!isUsingReactorPage()){
       return;
     }
-    if (WXBridgeManager.getInstance().getJSLooper() == Looper.myLooper()) {
-      mReactorPage = WXReactorPluginManager.getInstance().createPage(v8_isolate, getInstanceId());
-    } else {
-      WXBridgeManager.getInstance().post(new Runnable() {
+    if(handler.getLooper() == Looper.myLooper()) {
+      mReactorPageManager = WXReactorPluginManager.getInstance().createReactorPageManager(v8_isolate, getInstanceId(), handler, appId);
+    }else {
+      handler.post(new Runnable() {
         @Override
         public void run() {
-          mReactorPage = WXReactorPluginManager.getInstance().createPage(v8_isolate, getInstanceId());
+          mReactorPageManager = WXReactorPluginManager.getInstance().createReactorPageManager(v8_isolate, getInstanceId(), handler, appId);
         }
       });
     }
+
   }
 
-  public WXReactorPage getReactorPage() {
-    return mReactorPage;
+  public WXReactorPageManager getReactorPageManager() {
+    return mReactorPageManager;
   }
 
   private ConcurrentHashMap<String,ModuleIntercept> mModuleInterceptMap = new ConcurrentHashMap();

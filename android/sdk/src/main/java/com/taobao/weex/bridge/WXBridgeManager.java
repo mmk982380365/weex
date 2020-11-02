@@ -1353,25 +1353,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         return;
       }
       //assert mode == WXEaglePlugin.EAGLE_AND_SCRIPT
-    } else if(instance != null && instance.getReactorPage() != null) {
+    } else if(instance != null && instance.getReactorPageManager() != null) {
       final HashMap<String, String> ret = new HashMap<>();
       if(data != null && !data.isEmpty()) {
         for (Map.Entry<String, Object> item : data.entrySet()) {
           ret.put(item.getKey(), String.valueOf(item.getValue()));
         }
       }
-      if (WXBridgeManager.getInstance().getJSLooper() == Looper.myLooper()) {
-        instance.getReactorPage().fireEvent(ref, type, ret,
+      instance.getReactorPageManager().fireEvent(ref, type, ret,
                 (domChanges == null || domChanges.isEmpty()) ? "{}" : JSON.toJSONString(domChanges));
-      } else {
-        WXBridgeManager.getInstance().post(new Runnable() {
-          @Override
-          public void run() {
-            instance.getReactorPage().fireEvent(ref, type, ret,
-                    (domChanges == null || domChanges.isEmpty()) ? "{}" : JSON.toJSONString(domChanges));
-          }
-        });
-      }
       return;
     }
 
@@ -1473,20 +1463,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         return;
       }
       //assert mode == WXEaglePlugin.EAGLE_AND_SCRIPT
-    } else if(instance != null && instance.getReactorPage() != null) {
-      if (WXBridgeManager.getInstance().getJSLooper() == Looper.myLooper()) {
-        instance.getReactorPage().invokeCallBack(callback, JSON.toJSONString(data));
-      } else {
-        WXBridgeManager.getInstance().post(new Runnable() {
-          @Override
-          public void run() {
-            instance.getReactorPage().invokeCallBack(callback, JSON.toJSONString(data));
-          }
-        });
-      }
+    } else if(instance != null && instance.getReactorPageManager() != null) {
+        instance.getReactorPageManager().invokeCallBack(callback, JSON.toJSONString(data));
     }
-
-
     addJSTask(METHOD_CALLBACK, instanceId, callback, data, keepAlive);
     sendMessage(instanceId, WXJSBridgeMsgType.CALL_JS_BATCH);
   }
@@ -1872,21 +1851,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           return;
         }
-        if (instance.getReactorPage() != null) {
-          if (WXBridgeManager.getInstance().getJSLooper() == Looper.myLooper()) {
-            instance.getReactorPage().render(template.getContent(), data);
+        if (instance != null && instance.getReactorPageManager() != null ) {
+            instance.getReactorPageManager().render(template.getContent(), data);
             return;
-          } else {
-            if (instance != null && instance.getReactorPage() != null) {
-              WXBridgeManager.getInstance().post(new Runnable() {
-                @Override
-                public void run() {
-                  instance.getReactorPage().render(template.getContent(), data);
-                }
-              });
-            }
-            return;
-          }
         }
 
         if (type == BundType.Vue || type == BundType.Rax

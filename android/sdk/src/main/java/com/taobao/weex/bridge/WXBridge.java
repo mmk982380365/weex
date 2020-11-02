@@ -395,7 +395,7 @@ public class WXBridge implements IWXBridge {
       if (arguments != null){
         // TODO use a better way
         if (instance!=null && (instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER
-                || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY || instance.getReactorPage() != null)) {
+                || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY || instance.getReactorPageManager() != null)) {
           try {
             argArray = (JSONArray) JSON.parse(new String(arguments, "UTF-8"));
           } catch (Exception e) {
@@ -443,7 +443,7 @@ public class WXBridge implements IWXBridge {
 
       recordNativeModuleEnd(instance, record);
       if (instance!=null && (instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER
-          || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY || instance.getReactorPage() != null)){
+          || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY || instance.getReactorPageManager() != null)){
         try {
           if(object == null){
             return new WXJSObject(null);
@@ -484,7 +484,7 @@ public class WXBridge implements IWXBridge {
       if (arguments != null){
         // TODO use a better way
         if (instance!=null && (instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER
-            || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY || instance.getReactorPage() != null)){
+            || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY || instance.getReactorPageManager() != null)){
           try {
             argArray = (JSONArray) JSON.parse(new String(arguments, "UTF-8"));
           } catch (Exception e) {

@@ -18,10 +18,10 @@
  */
 package com.taobao.weex;
 
+import android.os.Handler;
+
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.bridge.WXReactorPage;
 import com.taobao.weex.bridge.WXReactorPlugin;
-import com.taobao.weex.utils.WXSoInstallMgrSdk;
 
 public class WXReactorPluginManager {
     private static WXReactorPluginManager instance;
@@ -54,10 +54,10 @@ public class WXReactorPluginManager {
         }
     }
 
-    public WXReactorPage createPage(long v8_isolate, String instanceId) {
+    public WXReactorPageManager createReactorPageManager(long v8_isolate, String instanceId, Handler handler, String appId) {
         if (plugin == null) {
             return null;
         }
-        return plugin.createPage(v8_isolate, instanceId);
+        return new WXReactorPageManager(plugin.createPage(v8_isolate, instanceId), handler, appId);
     }
 }

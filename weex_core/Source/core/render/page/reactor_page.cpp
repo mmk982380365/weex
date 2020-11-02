@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <base/make_copyable.h>
 #include "core/render/page/reactor_page.h"
 
 #include "third_party/json11/json11.hpp"
@@ -32,7 +33,13 @@ void PostTaskOnComponentThread(const std::function<void()>& callback) {
 #if OS_IOS
      WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->PostTaskOnComponentThread(callback);
 #else
-    callback();
+     if(WeexCoreManager::Instance()->script_thread() != nullptr) {
+         WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+                 weex::base::MakeCopyable([func = callback] {
+                     func();
+                 }));
+     }
+  //  callback();
 #endif
 }
 
