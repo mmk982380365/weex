@@ -225,6 +225,17 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     if ((observer = getInstance().getComponentObserver()) != null) {
       observer.onCreate(this);
     }
+    updateUseGCanvasModuleStatus();
+  }
+
+  private void updateUseGCanvasModuleStatus(){
+    String clazzName = this.getClass().getName();
+    boolean isGCanvasComponent = clazzName.contains("WXGCanvasLigntningComponent");
+    boolean isCanvasComponent = clazzName.toLowerCase().contains("canvas");
+    if (isGCanvasComponent || isCanvasComponent){
+      getInstance().getApmForInstance().addProperty(WXInstanceApm.KEY_PAGE_PROPERTIES_USE_GCANVAS_MODULE,1);
+      getInstance().getApmForInstance().addProperty(WXInstanceApm.KEY_PAGE_PROPERTIES_CANVAS_MODULE_NAME,this.getClass().getName());
+    }
   }
 
 

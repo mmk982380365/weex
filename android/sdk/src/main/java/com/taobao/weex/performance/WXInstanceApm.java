@@ -62,6 +62,8 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_PROPERTIES_BUNDLE_TYPE = "wxBundleType";
     public static final String KEY_PAGE_PROPERTIES_RENDER_TYPE = "wxRenderType";
     public static final String KEY_PAGE_PROPERTIES_UIKIT_TYPE = "wxUIKitType";
+    public static final String KEY_PAGE_PROPERTIES_USE_GCANVAS_MODULE = "wxUseGCanvasModule";
+    public static final String KEY_PAGE_PROPERTIES_CANVAS_MODULE_NAME = "wxCanvasModuleName";
 
     /************** stages *****************/
     public static final String KEY_PAGE_STAGES_CONTAINER_READY = "wxContainerReady";
