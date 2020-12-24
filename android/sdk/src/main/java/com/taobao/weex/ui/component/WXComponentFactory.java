@@ -24,6 +24,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.action.BasicComponentData;
@@ -43,6 +44,9 @@ public class WXComponentFactory {
   public static WXComponent newInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
     if (instance == null || TextUtils.isEmpty(basicComponentData.mComponentType)) {
       return null;
+    }
+    if ("gcanvas".equals(basicComponentData.mComponentType)){
+      updateUseGCanvasModuleStatus(instance);
     }
 
     IFComponentHolder holder = WXComponentRegistry.getComponent(basicComponentData.mComponentType);
@@ -69,5 +73,14 @@ public class WXComponentFactory {
     }
 
     return null;
+  }
+
+  private static void updateUseGCanvasModuleStatus(WXSDKInstance instance){
+    try{
+      instance.getApmForInstance().addProperty(WXInstanceApm.KEY_PAGE_PROPERTIES_USE_GCANVAS_MODULE,1);
+      instance.getApmForInstance().addProperty(WXInstanceApm.KEY_PAGE_PROPERTIES_CANVAS_MODULE_NAME,"gcanvas");
+    }catch (Exception e){
+      e.printStackTrace();
+    }
   }
 }
