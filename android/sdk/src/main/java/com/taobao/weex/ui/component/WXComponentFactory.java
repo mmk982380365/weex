@@ -79,6 +79,7 @@ public class WXComponentFactory {
     try{
       instance.getApmForInstance().addProperty(WXInstanceApm.KEY_PAGE_PROPERTIES_USE_GCANVAS_MODULE,1);
       instance.getApmForInstance().addProperty(WXInstanceApm.KEY_PAGE_PROPERTIES_CANVAS_MODULE_NAME,"gcanvas");
+      WXLogUtils.e("find gcanvas component was created");
     }catch (Exception e){
       e.printStackTrace();
     }
