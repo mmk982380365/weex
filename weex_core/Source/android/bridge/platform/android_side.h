@@ -42,6 +42,7 @@ class AndroidSide : public PlatformBridge::PlatformSide {
   void SetJSVersion(const char* version) override;
   void ReportException(const char* page_id, const char* func,
                        const char* exception_string) override;
+  void CompileQuickJSCallback(const char* key, const char* bytecode, int length) override ;
   void ReportServerCrash(const char* instance_id) override;
   void ReportNativeInitStatus(const char* status_code,
                               const char* error_msg) override;

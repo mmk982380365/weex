@@ -21,9 +21,12 @@
 #define CORE_BRIDGE_SCRIPT_BRIDGE_H
 
 #include <memory>
+#include "base/thread/thread_local.h"
+#include "base/thread/thread.h"
 #include "base/common.h"
 #include "include/WeexApiHeader.h"
 #include "base/log_defines.h"
+#include "core/runtime/weex_runtime_manager.h"
 
 namespace WeexCore {
 class ScriptBridge {
@@ -85,15 +88,16 @@ class ScriptBridge {
     virtual void OnReceivedResult(long callback_id,
                                   std::unique_ptr<WeexJSResult> &result) = 0;
 
-    virtual void UpdateComponentData(const char* page_id,
-                                     const char* cid,
-                                     const char* json_data) = 0;
-
+    virtual void UpdateComponentData(const char *page_id,
+                                     const char *cid,
+                                     const char *json_data) = 0;
 
     virtual bool Log(int level, const char *tag,
                      const char *file,
                      unsigned long line,
                      const char *log) = 0;
+
+    virtual void CompileQuickJSCallback(const char *key, const char *bytecode, int length) = 0;
 
     inline ScriptBridge *bridge() { return bridge_; }
 
@@ -110,17 +114,17 @@ class ScriptBridge {
     virtual ~ScriptSide() {}
 
     virtual int InitFramework(const char *script,
-                              std::vector<INIT_FRAMEWORK_PARAMS *> &params) = 0;
+                              std::vector<std::pair<std::string, std::string>> params) = 0;
 
     virtual int InitAppFramework(
         const char *instanceId, const char *appFramework,
-        std::vector<INIT_FRAMEWORK_PARAMS *> &params) = 0;
+        std::vector<std::pair<std::string, std::string>> params) = 0;
 
     virtual int CreateAppContext(const char *instanceId,
                                  const char *jsBundle) = 0;
 
-    virtual std::unique_ptr<WeexJSResult>  ExecJSOnAppWithResult(const char *instanceId,
-                                        const char *jsBundle) = 0;
+    virtual std::unique_ptr<WeexJSResult> ExecJSOnAppWithResult(const char *instanceId,
+                                                                const char *jsBundle) = 0;
 
     virtual int CallJSOnAppContext(const char *instanceId, const char *func,
                                    std::vector<VALUE_WITH_TYPE *> &params) = 0;
@@ -133,9 +137,9 @@ class ScriptBridge {
 
     virtual int ExecJS(const char *instanceId, const char *nameSpace,
                        const char *func,
-                       std::vector<VALUE_WITH_TYPE *> &params) = 0;
+                       const std::vector<VALUE_WITH_TYPE *> &params) = 0;
 
-    virtual std::unique_ptr<WeexJSResult>  ExecJSWithResult(
+    virtual std::unique_ptr<WeexJSResult> ExecJSWithResult(
         const char *instanceId, const char *nameSpace, const char *func,
         std::vector<VALUE_WITH_TYPE *> &params) = 0;
 
@@ -144,27 +148,31 @@ class ScriptBridge {
                                     std::vector<VALUE_WITH_TYPE *> &params,
                                     long callback_id) = 0;
 
-    virtual int CreateInstance(const char *instanceId, const char *func,
-                               const char *script, const char *opts,
+    virtual int CreateInstance(const char *instanceId,
+                               const char *func,
+                               const char *script,
+                               const int script_size,
+                               const char *opts,
                                const char *initData,
-                               const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params) = 0;
+                               const char *extendsApi,
+                               std::vector<std::pair<std::string, std::string>> params) = 0;
 
-    virtual std::unique_ptr<WeexJSResult>  ExecJSOnInstance(const char *instanceId,
-                                   const char *script,int type) = 0;
+    virtual std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char *instanceId,
+                                                           const char *script,
+                                                           const int script_size,
+                                                           int type) = 0;
 
     virtual int DestroyInstance(const char *instanceId) = 0;
 
     virtual int UpdateGlobalConfig(const char *config) = 0;
 
-    virtual int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) = 0;
+    virtual int UpdateInitFrameworkParams(const std::string &key,
+                                          const std::string &value,
+                                          const std::string &desc) = 0;
 
     virtual void SetLogType(const int logLevel, const bool isPerf) = 0;
-
-    virtual int64_t JsAction(long ctxContainer, int32_t jsActionType, const char *arg) = 0;
-
+    virtual void CompileQuickJSBin(const char *key, const char *script) = 0;
     inline ScriptBridge *bridge() { return bridge_; }
-
-
 
    private:
     ScriptBridge *bridge_;

@@ -29,10 +29,10 @@ namespace script {
 class ScriptSideInMultiProcess : public ScriptBridge::ScriptSide {
  public:
   int InitFramework(const char *script,
-                    std::vector<INIT_FRAMEWORK_PARAMS *> &params) override;
+                    std::vector<std::pair<std::string, std::string>>params) override;
 
   int InitAppFramework(const char *instanceId, const char *appFramework,
-                       std::vector<INIT_FRAMEWORK_PARAMS *> &params) override;
+                       std::vector<std::pair<std::string, std::string>>params) override;
 
   int CreateAppContext(const char *instanceId, const char *jsBundle) override;
 
@@ -49,7 +49,7 @@ class ScriptSideInMultiProcess : public ScriptBridge::ScriptSide {
   int ExecTimeCallback(const char *source) override;
 
   int ExecJS(const char *instanceId, const char *nameSpace, const char *func,
-             std::vector<VALUE_WITH_TYPE *> &params) override;
+             const std::vector<VALUE_WITH_TYPE *> &params) override;
 
   std::unique_ptr<WeexJSResult> ExecJSWithResult(const char *instanceId, const char *nameSpace,
                                 const char *func,
@@ -61,10 +61,10 @@ class ScriptSideInMultiProcess : public ScriptBridge::ScriptSide {
                           long callback_id) override;
 
   int CreateInstance(const char *instanceId, const char *func,
-                     const char *script, const char *opts, const char *initData,
-                     const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params) override;
+                               const char *script, const int script_size, const char *opts, const char *initData,
+                     const char *extendsApi, std::vector<std::pair<std::string, std::string>> params) override;
 
-  std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char *instanceId, const char *script,int type) override;
+  std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char *instanceId, const char *script, const int script_size, int type) override;
 
   int DestroyInstance(const char *instanceId) override;
 
@@ -73,8 +73,7 @@ class ScriptSideInMultiProcess : public ScriptBridge::ScriptSide {
   int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) override;
 
   void SetLogType(const int logLevel, const bool isPerf) override;
-
-  virtual int64_t JsAction(long ctxContainer, int32_t jsActionType, const char *arg) override;
+  void CompileQuickJSBin(const char *key, const char *script) override;
 
     ScriptSideInMultiProcess();
 

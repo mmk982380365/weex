@@ -16,15 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#include "android/wrap/js_context.h"
-#include "android/wrap/js_processer.h"
-#include "base/android/jsengine_ptr_container.h"
 #include "base/log_defines.h"
 #include "script_bridge_in_multi_process.h"
 
 #include "android/utils/params_utils.h"
 #include "android/base/string/string_utils.h"
-#include "android/bridge/multi_process_and_so_initializer.h"
+#include "android/bridge/multi_process_initializer.h"
 #include "android/bridge/script/script_side_in_multi_process.h"
 #include "android/multiprocess/weex_js_connection.h"
 #include "android/utils/ipc_string_result.h"
@@ -96,9 +93,6 @@ static std::unique_ptr<IPCResult> HandleCallNativeLog(IPCArguments *arguments) {
             str_array.get());
       }));
 
-  //  const char *str_array = getArumentAsCStr(arguments, 0);
-  //  WeexCoreManager::Instance()->script_bridge()->core_side()->NativeLog(
-  //      str_array);
   return createInt32Result(static_cast<int32_t>(true));
 }
 
@@ -111,24 +105,6 @@ static std::unique_ptr<IPCResult> HandleSetTimeout(IPCArguments *arguments) {
         WeexCoreManager::Instance()->script_bridge()->core_side()->SetTimeout(
             callbackID.get(), time.get());
       }));
-
-  //  char *callbackID = getArumentAsCStr(arguments, 0);
-  //  char *time = getArumentAsCStr(arguments, 1);
-  //
-  //  if (callbackID == nullptr || time == nullptr)
-  //    return createInt32Result(static_cast<int32_t>(false));
-  //
-  //  WeexCoreManager::Instance()->script_bridge()->core_side()->SetTimeout(
-  //      callbackID, time);
-  //
-  //  if (callbackID != nullptr) {
-  //    delete[] callbackID;
-  //    callbackID = nullptr;
-  //  }
-  //  if (time != nullptr) {
-  //    delete[] time;
-  //    time = nullptr;
-  //  }
   return createInt32Result(static_cast<int32_t>(true));
 }
 
@@ -143,32 +119,6 @@ static std::unique_ptr<IPCResult> HandleSetInterval(IPCArguments *arguments) {
         WeexCoreManager::Instance()->script_bridge()->core_side()->SetInterval(
             pageId.get(), callbackID.get(), time.get());
       }));
-
-  //  const char *pageId = getArumentAsCStr(arguments, 0);
-  //  const char *callbackID = getArumentAsCStr(arguments, 1);
-  //  const char *_time = getArumentAsCStr(arguments, 2);
-  //  if (pageId == nullptr || callbackID == nullptr || _time == nullptr)
-  //    return createInt32Result(-1);
-  //
-  //  long time_ = atoi(_time);
-  //  int _timerId =
-  //      WeexCoreManager::Instance()->script_bridge()->core_side()->SetInterval(
-  //          pageId, callbackID, _time);
-  //
-  //  if (pageId != nullptr) {
-  //    delete[] pageId;
-  //    pageId = nullptr;
-  //  }
-  //  if (callbackID != nullptr) {
-  //    delete[] callbackID;
-  //    callbackID = nullptr;
-  //  }
-  //  if (_time != nullptr) {
-  //    delete[] _time;
-  //    _time = nullptr;
-  //  }
-
-  // TODO timerId
   return createInt32Result(1);
 }
 
@@ -228,20 +178,6 @@ static std::unique_ptr<IPCResult> HandleCallGCanvasLinkNative(
   event.Wait();
 
   JNIEnv *env = base::android::AttachCurrentThread();
-//  jstring jPageId = getArgumentAsJString(env, arguments, 0);
-//  const char *pageId = env->GetStringUTFChars(jPageId, NULL);
-//  int type = getArgumentAsInt32(env, arguments, 1);
-//  jstring val = getArgumentAsJString(env, arguments, 2);
-//  const char *args = env->GetStringUTFChars(val, NULL);
-//
-//#if JSAPI_LOG
-//      LOGD("[ExtendJSApi] HandleCallGCanvasLinkNative >>>> pageId: %s, type:
-//      %d, args: %s", pageId, type, args);
-//#endif
-//      const char *retVal = NULL;
-//    retVal = WeexCoreManager::Instance()->script_bridge()->core_side()->CallGCanvasLinkNative(pageId, type,
-//                                                                                     args);
-
   std::unique_ptr<IPCResult> ret = createVoidResult();
   if (retVal) {
     jstring jDataStr = env->NewStringUTF(retVal);
@@ -250,8 +186,6 @@ static std::unique_ptr<IPCResult> HandleCallGCanvasLinkNative(
     env->DeleteLocalRef(jDataStr);
     retVal = NULL;
   }
-//      env->DeleteLocalRef(jPageId);
-//      env->DeleteLocalRef(val);
   return ret;
 }
 
@@ -277,18 +211,10 @@ static std::unique_ptr<IPCResult> HandleT3DLinkNative(IPCArguments *arguments) {
   event.Wait();
 
   JNIEnv *env = base::android::AttachCurrentThread();
-//  int type = getArgumentAsInt32(env, arguments, 0);
-//  jstring val = getArgumentAsJString(env, arguments, 1);
-//  const char *args = env->GetStringUTFChars(val, NULL);
 
 #if JSAPI_LOG
   LOGD("[ExtendJSApi] handleT3DLinkNative >>>> type: %d, args: %s", type, args);
 #endif
-//  const char *retVal = NULL;
-//  retVal = WeexCoreManager::Instance()
-//               ->script_bridge()
-//               ->core_side()
-//               ->CallT3DLinkNative(type, args);
 
   std::unique_ptr<IPCResult> ret = createVoidResult();
   if (retVal) {
@@ -366,9 +292,6 @@ static std::unique_ptr<IPCResult> HandleCallNativeModule(
     default:result = createVoidResult();
       break;
   }
-  // Need to free
-  //  freeValueWithType(ret.get());
-
   return result;
 }
 
@@ -402,46 +325,6 @@ static std::unique_ptr<IPCResult> HandleCallNativeComponent(
                                         optionsData.get(), l2);
             }
           }));
-
-  //  if (pageId != nullptr && ref != nullptr && method != nullptr) {
-  //#if JSAPI_LOG
-  //    LOGD("[ExtendJSApi] handleCallNativeComponent >>>> pageId: %s, ref:
-  //             % s,
-  //         method
-  //         : % s, arg
-  //         : % s, opt
-  //         : % s ",
-  //               pageId,
-  //           ref, method, argString, optString);
-  //#endif
-  //    WeexCoreManager::Instance()
-  //        ->script_bridge()
-  //        ->core_side()
-  //        ->CallNativeComponent(pageId, ref, method, argumentsData,
-  //                              argumentsDataLength, optionsData,
-  //                              optionsDataLength);
-  //  }
-  //
-  //  if (pageId != nullptr) {
-  //    delete[] pageId;
-  //    pageId = nullptr;
-  //  }
-  //  if (ref != nullptr) {
-  //    delete[] ref;
-  //    ref = nullptr;
-  //  }
-  //  if (method != nullptr) {
-  //    delete[] method;
-  //    method = nullptr;
-  //  }
-  //  if (argumentsData != nullptr) {
-  //    delete[] argumentsData;
-  //    argumentsData = nullptr;
-  //  }
-  //  if (optionsData != nullptr) {
-  //    delete[] optionsData;
-  //    optionsData = nullptr;
-  //  }
   return createInt32Result(static_cast<int32_t>(true));
 }
 
@@ -455,17 +338,6 @@ static std::unique_ptr<IPCResult> FunctionCallCreateBody(
         WeexCoreManager::Instance()->script_bridge()->core_side()->CreateBody(
             page_id.get(), dom_str.get(), strlen(dom_str.get()));
       }));
-
-  //  auto page_id = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-  //  auto dom_str = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-  //  int dom_str_len = getArumentAsCStrLen(arguments, 1);
-  //
-  //  if (page_id.get() == nullptr || dom_str == nullptr)
-  //    return createInt32Result(0);
-  //
-  //  WeexCoreManager::Instance()->script_bridge()->core_side()->CreateBody(
-  //      page_id.get(), dom_str.get(), dom_str_len);
-
   return createInt32Result(0);
 }
 
@@ -490,48 +362,6 @@ static std::unique_ptr<IPCResult> HandleCallAddElement(
               strlen(dom_str.get()), index_char);
         }
       }));
-
-  //  char *pageId = getArumentAsCStr(arguments, 0);
-  //  char *parentRef = getArumentAsCStr(arguments, 1);
-  //  char *dom_str = getArumentAsCStr(arguments, 2);
-  //  char *index_cstr = getArumentAsCStr(arguments, 3);
-  //  LOGE("AddRenderObject in Handle %s", dom_str);
-  //  const char *indexChar = index_cstr == nullptr ? "\0" : index_cstr;
-  //
-  //  int index = atoi(indexChar);
-  //  if (pageId != nullptr && parentRef != nullptr && dom_str != nullptr &&
-  //      index >= -1) {
-  //#if JSAPI_LOG
-  //
-  //    std::string log = "";
-  //    log.append("pageId: ").append(pageId).append(", parentRef:
-  //    ").append(parentRef).append(", dom_str: ").append(dom_str); int
-  //    log_index = 0; int maxLength = 800; std::string sub; while (log_index <
-  //    log.length()) {
-  //      if (log.length() <= log_index + maxLength) {
-  //        sub = log.substr(log_index);
-  //      } else {
-  //        sub = log.substr(log_index, maxLength);
-  //      }
-  //
-  //      if (log_index == 0)
-  //        LOGD("[ExtendJSApi] functionCallAddElement >>>> %s", sub.c_str());
-  //      else
-  //        LOGD("      [ExtendJSApi] functionCallAddElement >>>> %s",
-  //        sub.c_str());
-  //
-  //      log_index += maxLength;
-  //    }
-  //#endif
-  //        WeexCoreManager::Instance()->script_bridge()->core_side()->AddElement(
-  //          pageId, parentRef, dom_str, getArumentAsCStrLen(arguments, 2),
-  //          indexChar);
-  //  }
-  //
-  //  delete[] pageId;
-  //  delete[] parentRef;
-  //  delete[] dom_str;
-  //  delete[] index_cstr;
   return createInt32Result(0);
 }
 
@@ -549,21 +379,6 @@ static std::unique_ptr<IPCResult> FunctionCallRemoveElement(
                 ->core_side()
                 ->RemoveElement(pageId.get(), ref.get());
           }));
-
-  //  char *pageId = getArumentAsCStr(arguments, 0);
-  //  char *ref = getArumentAsCStr(arguments, 1);
-  //
-  //  if (pageId == nullptr || ref == nullptr) return createInt32Result(0);
-  //
-  //#if JSAPI_LOG
-  //  LOGD("[ExtendJSApi] functionCallRemoveElement >>>> pageId: %s, ref: %s",
-  //       pageId, ref);
-  //#endif
-  //  WeexCoreManager::Instance()->script_bridge()->core_side()->RemoveElement(
-  //      pageId, ref);
-  //
-  //  delete[] pageId;
-  //  delete[] ref;
   return createInt32Result(0);
 }
 
@@ -583,24 +398,6 @@ static std::unique_ptr<IPCResult> FunctionCallMoveElement(
         WeexCoreManager::Instance()->script_bridge()->core_side()->MoveElement(
             pageId.get(), ref.get(), parentRef.get(), index);
       }));
-
-  //  char *pageId = getArumentAsCStr(arguments, 0);
-  //  char *ref = getArumentAsCStr(arguments, 1);
-  //  char *parentRef = getArumentAsCStr(arguments, 2);
-  //  char *index_str = getArumentAsCStr(arguments, 3);
-  //  int index = atoi(index_str);
-  //
-  //  if (pageId == nullptr || ref == nullptr || parentRef == nullptr ||
-  //      index_str == nullptr || index < -1)
-  //    return createInt32Result(0);
-  //
-  //  WeexCoreManager::Instance()->script_bridge()->core_side()->MoveElement(
-  //      pageId, ref, parentRef, index);
-  //
-  //  delete[] pageId;
-  //  delete[] ref;
-  //  delete[] parentRef;
-  //  delete[] index_str;
   return createInt32Result(0);
 }
 
@@ -617,20 +414,6 @@ static std::unique_ptr<IPCResult> FunctionCallAddEvent(
         WeexCoreManager::Instance()->script_bridge()->core_side()->AddEvent(
             pageId.get(), ref.get(), event.get());
       }));
-
-  //  char *pageId = getArumentAsCStr(arguments, 0);
-  //  char *ref = getArumentAsCStr(arguments, 1);
-  //  char *event = getArumentAsCStr(arguments, 2);
-  //
-  //  if (pageId == nullptr || ref == nullptr || event == nullptr)
-  //    return createInt32Result(0);
-  //
-  //  WeexCoreManager::Instance()->script_bridge()->core_side()->AddEvent(
-  //      pageId, ref, event);
-  //
-  //  delete[] pageId;
-  //  delete[] ref;
-  //  delete[] event;
   return createInt32Result(0);
 }
 
@@ -648,19 +431,6 @@ static std::unique_ptr<IPCResult> FunctionCallRemoveEvent(
             pageId.get(), ref.get(), event.get());
       }));
 
-  //  char *pageId = getArumentAsCStr(arguments, 0);
-  //  char *ref = getArumentAsCStr(arguments, 1);
-  //  char *event = getArumentAsCStr(arguments, 2);
-  //
-  //  if (pageId == nullptr || ref == nullptr || event == nullptr)
-  //    return createInt32Result(0);
-  //
-  //  WeexCoreManager::Instance()->script_bridge()->core_side()->RemoveEvent(
-  //      pageId, ref, event);
-  //
-  //  delete[] pageId;
-  //  delete[] ref;
-  //  delete[] event;
   return createInt32Result(0);
 }
 
@@ -681,19 +451,6 @@ static std::unique_ptr<IPCResult> FunctionCallUpdateStyle(
         WeexCoreManager::Instance()->script_bridge()->core_side()->UpdateStyle(
             page_id.get(), ref.get(), data.get(), strlen(data.get()));
       }));
-  //  char *pageId = getArumentAsCStr(arguments, 0);
-  //  char *ref = getArumentAsCStr(arguments, 1);
-  //  char *data = getArumentAsCStr(arguments, 2);
-  //  int data_length = getArumentAsCStrLen(arguments, 2);
-  //  if (pageId == nullptr || ref == nullptr || data == nullptr)
-  //    return createInt32Result(0);
-  //
-  //  WeexCoreManager::Instance()->script_bridge()->core_side()->UpdateStyle(
-  //      pageId, ref, data, data_length);
-  //
-  //  delete[] pageId;
-  //  delete[] ref;
-  //  delete[] data;
   return createInt32Result(0);
 }
 
@@ -712,19 +469,6 @@ static std::unique_ptr<IPCResult> FunctionCallUpdateAttrs(
         WeexCoreManager::Instance()->script_bridge()->core_side()->UpdateAttrs(
             page_id.get(), ref.get(), data.get(), strlen(data.get()));
       }));
-  //  char *pageId = getArumentAsCStr(arguments, 0);
-  //  char *ref = getArumentAsCStr(arguments, 1);
-  //  char *data = getArumentAsCStr(arguments, 2);
-  //  int data_length = getArumentAsCStrLen(arguments, 2);
-  //  if (pageId == nullptr || ref == nullptr || data == nullptr)
-  //    return createInt32Result(0);
-  //
-  //  WeexCoreManager::Instance()->script_bridge()->core_side()->UpdateAttrs(
-  //      pageId, ref, data, data_length);
-  //
-  //  delete[] pageId;
-  //  delete[] ref;
-  //  delete[] data;
   return createInt32Result(0);
 }
 
@@ -738,14 +482,6 @@ static std::unique_ptr<IPCResult> FunctionCallCreateFinish(
         WeexCoreManager::Instance()->script_bridge()->core_side()->CreateFinish(
             page_id.get());
       }));
-  //  char *pageId = getArumentAsCStr(arguments, 0);
-  //
-  //  if (pageId == nullptr) return createInt32Result(0);
-  //
-  //  WeexCoreManager::Instance()->script_bridge()->core_side()->CreateFinish(
-  //      pageId);
-  //
-  //  delete[] pageId;
   return createInt32Result(0);
 }
 
@@ -768,35 +504,6 @@ static std::unique_ptr<IPCResult> FunctionCallUpdateFinish(
       }));
   event.Wait();
   return createInt32Result(result);
-
-  //  char *pageId = getArumentAsCStr(arguments, 0);
-  //  char *task = getArumentAsCStr(arguments, 1);
-  //  int task_length = getArumentAsCStrLen(arguments, 1);
-  //  char *callback = getArumentAsCStr(arguments, 2);
-  //  int callback_length = getArumentAsCStrLen(arguments, 2);
-  //
-  //  int flag = 0;
-  //
-  //  if (pageId == nullptr || task == nullptr) return createInt32Result(flag);
-  //
-  //  flag =
-  //      WeexCoreManager::Instance()->script_bridge()->core_side()->UpdateFinish(
-  //          pageId, task, task_length, callback, callback_length);
-  //
-  //  if (pageId != nullptr) {
-  //    delete[] pageId;
-  //    pageId = nullptr;
-  //  }
-  //  if (task != nullptr) {
-  //    delete[] task;
-  //    task = nullptr;
-  //  }
-  //  if (callback != nullptr) {
-  //    delete[] callback;
-  //    callback = nullptr;
-  //  }
-  // todo result
-  //  return createInt32Result(1);
 }
 
 static std::unique_ptr<IPCResult> FunctionCallRefreshFinish(
@@ -814,39 +521,10 @@ static std::unique_ptr<IPCResult> FunctionCallRefreshFinish(
             ->RefreshFinish(pageId.get(), task.get(), callback.get());
       }));
 
-  //  char *pageId = getArumentAsCStr(arguments, 0);
-  //  char *task = getArumentAsCStr(arguments, 1);
-  //  char *callback = getArumentAsCStr(arguments, 2);
-  //
-  //  int flag = 0;
-  //
-  //  if (pageId == nullptr) return createInt32Result(flag);
-  //
-  //  flag =
-  //      WeexCoreManager::Instance()->script_bridge()->core_side()->RefreshFinish(
-  //          pageId, task, callback);
-  //
-  //  if (pageId != nullptr) {
-  //    delete[] pageId;
-  //    pageId = nullptr;
-  //  }
-  //  if (task != nullptr) {
-  //    delete[] task;
-  //    task = nullptr;
-  //  }
-  //  if (callback != nullptr) {
-  //    delete[] callback;
-  //    callback = nullptr;
-  //  }
-  // todo result
   return createInt32Result(1);
 }
 
 static std::unique_ptr<IPCResult> HandlePostMessage(IPCArguments *arguments) {
-  //  char *jData = getArumentAsCStr(arguments, 0);
-  //  char *jVmId = getArumentAsCStr(arguments, 1);
-  //  WeexCoreManager::Instance()->script_bridge()->core_side()->PostMessage(jVmId,
-  //                                                                         jData);
   int i = getArumentAsCStrLen(arguments, 0);
   WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
       weex::base::MakeCopyable([jData = std::unique_ptr<char[]>(
@@ -861,12 +539,6 @@ static std::unique_ptr<IPCResult> HandlePostMessage(IPCArguments *arguments) {
 }
 
 std::unique_ptr<IPCResult> HandleDispatchMessage(IPCArguments *arguments) {
-  //  char *jClientId = getArumentAsCStr(arguments, 0);
-  //  char *jData = getArumentAsCStr(arguments, 1);
-  //  char *jCallback = getArumentAsCStr(arguments, 2);
-  //  char *jVmId = getArumentAsCStr(arguments, 3);
-  //  WeexCoreManager::Instance()->script_bridge()->core_side()->DispatchMessage(
-  //      jClientId, jVmId, jData, jCallback);
   int i = getArumentAsCStrLen(arguments, 1);
   WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
       weex::base::MakeCopyable(
@@ -965,54 +637,6 @@ std::unique_ptr<IPCResult> HeartBeat(IPCArguments *arguments) {
   return createInt32Result(static_cast<int32_t>(true));
 }
 
-std::unique_ptr<IPCResult> HandleJSActionCallBack(IPCArguments *arguments) {
-  char *string_ptr = getArumentAsCStr(arguments, 0);
-  char *str_type = getArumentAsCStr(arguments, 1);
-  int callBackType = atoi(str_type);
-  long ptr = atol(string_ptr);
-  if (ptr == 0) {
-    return createVoidResult();
-  }
-
-  if (callBackType == static_cast<uint32_t>(JSCALLBACK::INVOKE)) {
-    auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-    auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 3));
-    weex::base::WaitableEvent event;
-    char *ret = nullptr;
-    WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
-        weex::base::MakeCopyable(
-            [method = std::move(arg1), arg = std::move(arg2), result = &ret, e = &event,
-                cptr = ptr]() {
-              WeexCore::JSContext *ctx = android::JSContainerProcesser::ExtraJsContext(cptr);
-              if (ctx != nullptr) {
-                *result = ctx->JsActionCallBack(method.get(), arg.get());
-              } else {
-                LOGD_TAG("JSEngine",
-                         "ctx %ld has been Released, CallBack in WeexCore %s -> %s",
-                         cptr,
-                         method.get(),
-                         arg.get());
-              }
-              e->Signal();
-            }));
-    event.Wait();
-    if (ret != nullptr) {
-      return createCharArrayResult(ret);
-    }
-  } else if (callBackType == static_cast<uint32_t>(JSCALLBACK::EXCEPTION)) {
-    auto exception = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-    WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
-        weex::base::MakeCopyable(
-            [e = std::move(exception), cptr = ptr]() {
-              WeexCore::JSContext *ctx = android::JSContainerProcesser::ExtraJsContext(cptr);
-              if (ctx != nullptr) {
-                ctx->JsActionException(e.get());
-              }
-            }));
-  }
-  return createVoidResult();
-}
-
 std::unique_ptr<IPCResult> HandleLogDetail(IPCArguments *arguments) {
   auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
   auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
@@ -1034,6 +658,23 @@ std::unique_ptr<IPCResult> HandleLogDetail(IPCArguments *arguments) {
                                                     file_ptr.get(),
                                                     line,
                                                     log_ptr.get());
+          }));
+  return createInt32Result(static_cast<int32_t>(true));
+}
+
+std::unique_ptr<IPCResult> CompileQuickJSBinCallback(IPCArguments *arguments) {
+  int length = getArumentAsCStrLen(arguments, 1);
+
+  auto key = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  auto script = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+
+  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+      weex::base::MakeCopyable(
+          [key_s = std::move(key), script_s = std::move(script),
+              script_l = length]() {
+            WeexCoreManager::Instance()
+                ->script_bridge()
+                ->core_side()->CompileQuickJSCallback(key_s.get(), script_s.get(), script_l);
           }));
   return createInt32Result(static_cast<int32_t>(true));
 }
@@ -1130,9 +771,8 @@ void ScriptBridgeInMultiProcess::RegisterIPCCallback(IPCHandler *handler) {
                            HeartBeat);
   handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::POSTLOGDETAIL),
                            HandleLogDetail);
-
-  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::JSACTIONCALLBACK),
-                           HandleJSActionCallBack);
+  handler->registerHandler(static_cast<uint32_t>(IPCProxyMsg::COMPILEQUICKJSBINCALLBACK),
+                           CompileQuickJSBinCallback);
 }
 
 }  // namespace WeexCore

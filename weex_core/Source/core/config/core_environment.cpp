@@ -33,11 +33,7 @@ namespace WeexCore {
     if (platformName.empty())
       return false;
     this->mPlatformName = platformName;
-    if (platformName == OS_Android || platformName == OS_iOS) {
-      return true;
-    } else {
-      return false;
-    }
+    return platformName == OS_Android || platformName == OS_iOS;
   }
 
   bool WXCoreEnvironment::IsAndroid() {
@@ -71,7 +67,7 @@ namespace WeexCore {
   }
 
   const std::string WXCoreEnvironment::GetOption(const std::string &key) {
-    std::map<std::string, std::string>::iterator iter = mOptions.find(key);
+    auto iter = mOptions.find(key);
     if (iter != mOptions.end()) {
       return iter->second;
     } else {

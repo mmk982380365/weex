@@ -29,22 +29,18 @@ namespace WeexCore {
 
 WeexByteArray* genWeexByteArray(const char* str, size_t strLen);
 
-INIT_FRAMEWORK_PARAMS* genInitFrameworkParams(const char* type,
-                                              const char* value);
-
 WeexString* genWeexString(const uint16_t* str, size_t length);
 
 WeexString* jstring2WeexString(JNIEnv* env, jstring fromJString);
 
 VALUE_WITH_TYPE* getValueWithTypePtr();
 void addParamsToIPCSerializer(IPCSerializer *serializer, VALUE_WITH_TYPE* param);
-std::vector<INIT_FRAMEWORK_PARAMS*> initFromParam(
+std::vector<std::pair<std::string, std::string>> initFromParam(
     JNIEnv* env, jobject params,
     const std::function<void(const char*, const char*)>&
         ReportNativeInitStatus);
 
 bool isSingleProcess();
-
 jstring getJsonData(JNIEnv* env, jobjectArray jargs, int index);
 
 void addParamsFromJArgs(std::vector<VALUE_WITH_TYPE*>& params,
@@ -52,7 +48,6 @@ void addParamsFromJArgs(std::vector<VALUE_WITH_TYPE*>& params,
                         std::unique_ptr<WXJSObject>& wx_js_object);
 void freeValueWithType(VALUE_WITH_TYPE* params);
 void freeParams(std::vector<VALUE_WITH_TYPE*>& params);
-void freeParams(std::vector<InitFrameworkParams*>& params);
 }  // namespace WeexCore
 
 #endif  // WEEX_PROJECT_PARAMS_UTILS_H

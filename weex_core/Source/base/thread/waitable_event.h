@@ -22,6 +22,7 @@
 
 #include <condition_variable>
 #include <mutex>
+#include "base/common.h"
 
 namespace weex {
 namespace base {

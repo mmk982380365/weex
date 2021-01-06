@@ -31,10 +31,10 @@
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
+#include <IPCHandler.h>
 #include <dlfcn.h>
 #include "android/weex_extend_js_api.h"
 #include "android/utils/so_utils.h"
-#include "android/bridge/platform/android_bridge_in_multi_process.h"
 #include "android/bridge/script_bridge_in_multi_process.h"
 #include "base/android/jni/android_jni.h"
 #include "base/android/log_utils.h"
@@ -280,7 +280,7 @@ IPCSender *WeexJSConnection::start(bool reinit) {
   } else if (child == 0) {
     __android_log_print(ANDROID_LOG_ERROR,"weex","weexcore fork child success\n");
     // the child
-    closeAllButThis(client_->ipcFd, server_->ipcFd);
+//    closeAllButThis(client_->ipcFd, server_->ipcFd);
     // implements close all but handles[1]
     // do exec
     doExec(client_->ipcFd, server_->ipcFd, true, startupPie);
@@ -423,8 +423,8 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
   }
 //  if(g_jssSoPath != nullptr) {
 //    executablePath = g_jssSoPath;
-  if(SoUtils::jss_so_path() != nullptr) {
-    executablePath = SoUtils::jss_so_path();
+  if(SoUtils::jsb_so_path() != nullptr) {
+    executablePath = SoUtils::jsb_so_path();
   } else {
     executablePath = SoUtils::FindLibJssSoPath();
   }
@@ -439,6 +439,7 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
   pos = executablePath.find(libName);
   if (pos != std::string::npos) {
     executablePath.replace(pos, libName.length(), "");
+}
 
   if (executablePath.empty()) {
     __android_log_print(ANDROID_LOG_ERROR,"weex","executablePath is empty");
@@ -450,7 +451,9 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
     return;
   } else {
     __android_log_print(ANDROID_LOG_ERROR,"weex","executablePath is %s", executablePath.c_str());
-  }}
+  }
+
+
   if (icuDataPath.empty()) {
     __android_log_print(ANDROID_LOG_ERROR,"weex","icuDataPath is empty");
 #if PRINT_LOG_CACHEFILE
@@ -538,6 +541,7 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
       mcfile << "jsengine WeexJSConnection::doExec start execve so name:" << executableName
              << std::endl;
 #endif
+      __android_log_print(ANDROID_LOG_ERROR,"weex","executablePath111 is %s", executablePath.c_str());
       const char *argv[] = {executableName.c_str(), fdStr, fdServerStr, traceEnable ? "1" : "0", g_crashFileName.c_str(), nullptr};
       if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                        const_cast<char *const *>(envp.get()))) {
@@ -693,7 +697,7 @@ int WeexConnInfo::memfd_create_below_androidR(const char *name, size_t size) {
 
 int WeexConnInfo::memfd_create_androidR(const char *name, size_t size) {
   JNIEnv *env = base::android::AttachCurrentThread();
-  jclass wx_env = env->FindClass("org/apache/weex/WXEnvironment");
+  jclass wx_env = env->FindClass("com/taobao/weex/WXEnvironment");
   if (wx_env) {
     jmethodID m_memfd_create_id =
         env->GetStaticMethodID(wx_env, "memfd_create", "(Ljava/lang/String;I)I");

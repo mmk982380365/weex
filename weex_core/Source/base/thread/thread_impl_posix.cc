@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include "base/log_defines.h"
 #include "base/thread/thread_impl_posix.h"
 #include "base/message_loop/message_loop.h"
 #include "base/thread/waitable_event.h"
@@ -26,21 +27,20 @@ namespace base {
 
 struct StartupData {
   WaitableEvent event;
-  MessageLoop* message_loop;
-
-  explicit StartupData(MessageLoop* p_message_loop)
-      : event(), message_loop(p_message_loop) {}
+  MessageLoop *message_loop;
+  explicit StartupData(MessageLoop *p_message_loop)
+      : event(), message_loop(p_message_loop){}
 };
 
-void* ThreadFunc(void* params) {
-  StartupData* data = static_cast<StartupData*>(params);
-  MessageLoop* message_loop = data->message_loop;
+void *ThreadFunc(void *params) {
+  StartupData *data = static_cast<StartupData *>(params);
+  MessageLoop *message_loop = data->message_loop;
   data->event.Signal();
   message_loop->Run();
   return NULL;
 }
 
-ThreadImplPosix::ThreadImplPosix(const ThreadParams& params)
+ThreadImplPosix::ThreadImplPosix(const ThreadParams &params)
     : ThreadImpl(params) {}
 
 ThreadImplPosix::~ThreadImplPosix() {}

@@ -39,6 +39,7 @@ class MessagePumpPosix : public MessagePump {
  private:
   bool stop_request_;
   std::condition_variable condition_;
+  bool signaled_;
   std::mutex mutex_;
   TimeUnit delayed_time_;
   DISALLOW_COPY_AND_ASSIGN(MessagePumpPosix);

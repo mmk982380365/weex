@@ -43,7 +43,7 @@ IPCFutexPageQueue::IPCFutexPageQueue(void* sharedMemory, size_t s, size_t id)
     , m_tid(gettid())
 {
     IPC_DCHECK(s == ipc_size);
-    IPC_LOGD("id: %zu", id);
+//    IPC_LOGD("id: %zu", id);
     for (int i = m_currentWrite; i < m_pagesCount; i += 2) {
         uint32_t* data = static_cast<uint32_t*>(getPage(i));
         data[1] |= m_finishTag;
@@ -69,7 +69,7 @@ IPCFutexPageQueue::~IPCFutexPageQueue()
 
 void IPCFutexPageQueue::stepWrite()
 {
-    IPC_LOGD("stepWrite");
+//    IPC_LOGD("stepWrite");
     clearFinishedTag();
     size_t current = m_currentWrite;
     m_currentWrite = step(m_currentWrite);
@@ -79,7 +79,7 @@ void IPCFutexPageQueue::stepWrite()
 
 void IPCFutexPageQueue::unlock(size_t id)
 {
-    IPC_LOGD("unlock: %zu", id);
+//    IPC_LOGD("unlock: %zu", id);
     volatile uint32_t* pageStart = static_cast<volatile uint32_t*>(getPage(id));
 
     uint32_t l = m_tid;
@@ -104,7 +104,7 @@ void IPCFutexPageQueue::lock(size_t id, bool checkFinish)
     volatile uint32_t* pageStart = static_cast<volatile uint32_t*>(getPage(id));
     uint32_t l = m_tid;
     uint32_t expected = 0;
-    IPC_LOGD("lock: %zu", id);
+//    IPC_LOGD("lock: %zu", id);
     // wait for the finished tag;
     if (checkFinish) {
         while (true) {
@@ -165,7 +165,7 @@ void* IPCFutexPageQueue::getPage(size_t id)
 
 void IPCFutexPageQueue::lockReadPage()
 {
-    IPC_LOGD("lockReadPage");
+//    IPC_LOGD("lockReadPage");
     uint32_t* pageStart = static_cast<uint32_t*>(getPage(m_currentRead));
     if (!*pageStart) {
         // this page should be locked.
@@ -175,7 +175,7 @@ void IPCFutexPageQueue::lockReadPage()
 
 void IPCFutexPageQueue::unlockReadPageAndStep()
 {
-    IPC_LOGD("unlockReadPageAndStep");
+//    IPC_LOGD("unlockReadPageAndStep");
     setFinishedTag();
     unlock(m_currentRead);
     m_currentRead = step(m_currentRead);
@@ -201,7 +201,7 @@ void IPCFutexPageQueue::setFinishedTag()
     uint32_t expected = 0;
     if (__atomic_compare_exchange_n(pageStart + 1, &expected, m_finishTag,
             false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
-        IPC_LOGD("setFinishedTag:waking writer");
+//        IPC_LOGD("setFinishedTag:waking writer");
         __futex(pageStart + 1, FUTEX_WAKE, 1, nullptr);
         return;
     } else {

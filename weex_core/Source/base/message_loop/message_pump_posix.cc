@@ -17,35 +17,49 @@
  * under the License.
  */
 
+#include "base/log_defines.h"
 #include "base/message_loop/message_pump_posix.h"
 
 namespace weex {
 namespace base {
 
 MessagePumpPosix::MessagePumpPosix()
-    : stop_request_(false), condition_(), delayed_time_() {}
+    : stop_request_(false), condition_(), delayed_time_(), signaled_(false) {}
 
 MessagePumpPosix::~MessagePumpPosix() {}
 
-void MessagePumpPosix::Run(Delegate* delegate) {
+void MessagePumpPosix::Run(Delegate *delegate) {
   TimeUnit zero;
   for (;;) {
-    if (stop_request_) break;
-    std::unique_lock<std::mutex> lock(mutex_);
-    if (delayed_time_ == zero) {
-      condition_.wait(lock);
-    } else {
-      condition_.wait_for(
-          lock, std::chrono::nanoseconds(delayed_time_.ToNanoseconds()));
+    if (stop_request_) { break; }
+
+    {
+      std::unique_lock<std::mutex> lock(mutex_);
+      if (delayed_time_ == zero) {
+        condition_.wait(lock, [=] { return signaled_; });
+      } else {
+        condition_.wait_for(
+            lock,
+            std::chrono::nanoseconds(delayed_time_.ToNanoseconds()),
+            [=] { return signaled_; });
+      }
+      delayed_time_ = zero;
+      signaled_ = false;
     }
-    delayed_time_ = zero;
+
     delegate->DoWork();
   }
 }
 
 void MessagePumpPosix::Stop() { stop_request_ = true; }
 
-void MessagePumpPosix::ScheduleWork() { condition_.notify_one(); }
+void MessagePumpPosix::ScheduleWork() {
+  {
+    std::lock_guard<std::mutex> locker(mutex_);
+    signaled_ = true;
+  }
+  condition_.notify_one();
+}
 
 void MessagePumpPosix::ScheduleDelayedWork(TimeUnit delayed_time) {
   // This method is only used by the same threads as MessageLoop::DoWork, so we

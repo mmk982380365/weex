@@ -104,10 +104,10 @@ class PlatformBridge {
                                 const char* func,
                                 std::vector<VALUE_WITH_TYPE*>& params) = 0;
     virtual int InitFramework(const char* script,
-                              std::vector<INIT_FRAMEWORK_PARAMS*>& params) = 0;
+                              std::vector<std::pair<std::string, std::string>> params) = 0;
     virtual int InitAppFramework(
         const char* instanceId, const char* appFramework,
-        std::vector<INIT_FRAMEWORK_PARAMS*>& params) = 0;
+        std::vector<std::pair<std::string, std::string>> params) = 0;
     virtual int CreateAppContext(const char* instanceId,
                                  const char* jsBundle) = 0;
     virtual std::unique_ptr<WeexJSResult> ExecJSOnAppWithResult(const char* instanceId,
@@ -129,10 +129,10 @@ class PlatformBridge {
                                     long callback_id) = 0;
     virtual int CreateInstance(const char* instanceId, const char* func,
                                const char* script, int script_length, const char* opts,
-                               const char* initData, const char* extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params,
+                               const char* initData, const char* extendsApi, std::vector<std::pair<std::string, std::string>> params,
                                const char* render_strategy) = 0;
     virtual std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char* instanceId,
-                                         const char* script,int type) = 0;
+                                         const char* script, const int script_size, int type) = 0;
     virtual int DestroyInstance(const char* instanceId) = 0;
 
     virtual int UpdateGlobalConfig(const char* config) = 0;
@@ -140,7 +140,8 @@ class PlatformBridge {
     virtual int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) = 0;
 
     virtual void SetLogType(const int logType, const bool isPerf) = 0;
-    virtual int64_t JsAction(long ctxContainer, int32_t jsActionType, const char *arg) = 0;
+
+    virtual void CompileQuickJSBin(const char *key, const char *script) = 0;
 
     virtual double GetLayoutTime(const char* instanceId) const {return 0;}
 
@@ -174,6 +175,9 @@ class PlatformBridge {
     virtual void SetJSVersion(const char* version) = 0;
     virtual void ReportException(const char* page_id, const char* func,
                                  const char* exception_string) = 0;
+
+    virtual void CompileQuickJSCallback(const char* key, const char* bytecode, int length) = 0;
+
     virtual void ReportServerCrash(const char* instance_id) = 0;
     virtual void ReportNativeInitStatus(const char* status_code,
                                         const char* error_msg) = 0;

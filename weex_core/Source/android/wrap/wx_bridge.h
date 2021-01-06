@@ -112,6 +112,9 @@ class WXBridge : public JNIObjectWrap {
                  const char *callback);
   void ReportException(JNIEnv *env, const char *page_id, const char *func,
                        const char *exception_string);
+
+  void CompileQuickJSCallback(JNIEnv* env, const char* key, const char* bytecode, int length);
+
   void SetJSFrmVersion(JNIEnv *env, const char *version);
   void ReportServerCrash(JNIEnv *env, const char *instance_id,
                          const char *info);

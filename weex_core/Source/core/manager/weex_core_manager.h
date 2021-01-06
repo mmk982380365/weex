@@ -32,7 +32,7 @@ class IPCFutexPageQueue;
 namespace WeexCore {
 class WeexCoreManager {
  public:
-  enum ProjectMode { MULTI_SO, MULTI_PROCESS, COMMON };
+  enum ProjectMode { MULTI_PROCESS, COMMON };
 
   static WeexCoreManager *Instance() {
     static auto s_instance = new WeexCoreManager();

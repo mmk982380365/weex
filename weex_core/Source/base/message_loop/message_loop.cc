@@ -35,22 +35,20 @@ MessageLoop::MessageLoop(Type type)
     : delayed_tasks_(), type_(type), delayed_tasks_mutex_() {
   switch (type) {
     case PLATFORM:
-#ifdef __ANDROID__ 
+#ifdef __ANDROID__
       message_pump_ = std::unique_ptr<MessagePump>(new MessagePumpAndroid());
 #elif OS_IOS
       message_pump_ = std::unique_ptr<MessagePump>(new MessagePumpDarwin());
 #endif
       break;
-    case DEFAULT:
-      message_pump_ = std::unique_ptr<MessagePump>(new MessagePumpPosix());
+    case DEFAULT:message_pump_ = std::unique_ptr<MessagePump>(new MessagePumpPosix());
       break;
-    case IO:
-      break;
+    case IO:break;
   }
 }
 MessageLoop::~MessageLoop() {}
 
-MessageLoop* MessageLoop::GetCurrent() { return s_tl_message_loop.Get(); }
+MessageLoop *MessageLoop::GetCurrent() { return s_tl_message_loop.Get(); }
 
 void MessageLoop::Run() {
   // Store in thread local stack
@@ -64,14 +62,13 @@ void MessageLoop::DoWork() {
   std::vector<Closure> closure_list;
   {
     std::lock_guard<std::mutex> lock(delayed_tasks_mutex_);
-
     if (delayed_tasks_.empty()) {
       return;
     }
 
     auto now = TimePoint::Now();
     while (!delayed_tasks_.empty()) {
-      const auto& top = delayed_tasks_.top();
+      const auto &top = delayed_tasks_.top();
       if (top.time_point > now) {
         break;
       }
@@ -83,39 +80,45 @@ void MessageLoop::DoWork() {
       message_pump_->ScheduleDelayedWork(delayed_tasks_.top().time_point - now);
     }
   }
-
-  for (const auto& closure : closure_list) {
+  for (const auto &closure : closure_list) {
     closure();
   }
 }
 
-void MessageLoop::PostTask(const Closure& closure) {
+void MessageLoop::PostTask(const Closure &closure) {
   PostDelayedTask(closure, 0);
 }
 
-void MessageLoop::PostPriorityTask(TaskPriority p, const Closure& closure) {
+void MessageLoop::PostPriorityTask(TaskPriority p, const Closure &closure) {
   PostPriorityDelayedTask(p, closure, 0);
 }
 
-void MessageLoop::PostDelayedTask(const Closure& closure, int64_t delayed_ms) {
+void MessageLoop::PostDelayedTask(const Closure &closure, int64_t delayed_ms) {
   PostPriorityDelayedTask(TaskPriority::NORMAL, closure, delayed_ms);
 }
 
 void MessageLoop::PostPriorityDelayedTask(TaskPriority p,
-                                          const Closure& closure,
+                                          const Closure &closure,
                                           int64_t delayed_ms) {
+
   TimePoint time_point =
       TimePoint::Now() + TimeUnit::FromMilliseconds(delayed_ms);
-  std::lock_guard<std::mutex> lock(delayed_tasks_mutex_);
-  // If the time of top task don't change, we don't need to reschedule.
-  if (!delayed_tasks_.empty()) {
-    auto old_top_time = delayed_tasks_.top().time_point;
-    delayed_tasks_.push({p, std::move(closure), std::move(time_point)});
-    if (old_top_time > delayed_tasks_.top().time_point) {
-      message_pump_->ScheduleWork();
+  bool shouldSchedule = false;
+  {
+    std::lock_guard<std::mutex> lock(delayed_tasks_mutex_);
+    // If the time of top task don't change, we don't need to reschedule.
+    if (!delayed_tasks_.empty()) {
+      auto old_top_time = delayed_tasks_.top().time_point;
+      delayed_tasks_.push({p, std::move(closure), std::move(time_point)});
+      if (old_top_time > delayed_tasks_.top().time_point) {
+        shouldSchedule = true;
+      }
+    } else {
+      delayed_tasks_.push({p, std::move(closure), std::move(time_point)});
+      shouldSchedule = true;
     }
-  } else {
-    delayed_tasks_.push({p, std::move(closure), std::move(time_point)});
+  }
+  if (shouldSchedule) {
     message_pump_->ScheduleWork();
   }
 }

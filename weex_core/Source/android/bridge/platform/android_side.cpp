@@ -530,4 +530,12 @@ void AndroidSide::SetPageDirty(const char *page_id, bool dirty) {
 
   wx_bridge_->SetPageDirty(env, page_id, dirty);
 }
+
+void AndroidSide::CompileQuickJSCallback(const char *key, const char *bytecode, int length) {
+  JNIEnv *env = base::android::AttachCurrentThread();
+  if (env == nullptr)
+    return;
+
+  wx_bridge_->CompileQuickJSCallback(env, key, bytecode, length);
+}
 }  // namespace WeexCore

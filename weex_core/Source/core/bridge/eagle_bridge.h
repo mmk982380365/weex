@@ -235,7 +235,7 @@ class EagleBridge {
   //Call In JSThread
   DataRenderHandler* data_render_handler(const std::string& instance_id) const;
 
-  static EagleBridge* g_instance;
+  static std::unique_ptr<EagleBridge> g_instance;
 
   std::unique_ptr<WeexCoreHandler> weex_core_handler_;
   std::map<std::string, DataRenderHandler*> plugins_;

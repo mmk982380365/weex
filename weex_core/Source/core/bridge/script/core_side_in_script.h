@@ -89,6 +89,8 @@ class CoreSideInScript : public ScriptBridge::CoreSide {
            unsigned long line,
            const char *log) override ;
 
+  void CompileQuickJSCallback(const char* key, const char* bytecode, int length) override ;
+
  private:
   DISALLOW_COPY_AND_ASSIGN(CoreSideInScript);
 };

@@ -29,7 +29,7 @@
 
 namespace WeexCore {
 
-EagleBridge* EagleBridge::g_instance = nullptr;// NOLINT(cert-err58-cpp)
+std::unique_ptr<EagleBridge> EagleBridge::g_instance;// NOLINT(cert-err58-cpp)
 
 void EagleBridge::CreatePage(const char* plugin_type,
                              const char* instanceId,
@@ -88,10 +88,10 @@ EagleBridge::DataRenderHandler* EagleBridge::get_data_render_handler(const std::
 EagleBridge* EagleBridge::GetInstance() {
   static std::once_flag s_flag;
   std::call_once(s_flag, []() {
-    g_instance = new EagleBridge();
+    g_instance.reset(new EagleBridge());
   });
 
-  return g_instance;
+  return g_instance.get();
 }
 
 EagleModeReturn EagleBridge::DestroyPage(const char* instanceId) {

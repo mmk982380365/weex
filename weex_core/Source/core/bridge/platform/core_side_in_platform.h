@@ -83,9 +83,9 @@ class CoreSideInPlatform : public PlatformBridge::CoreSide {
                       const char *func,
                       std::vector<VALUE_WITH_TYPE *> &params) override;
   int InitFramework(const char *script,
-                    std::vector<INIT_FRAMEWORK_PARAMS *> &params) override;
+                    std::vector<std::pair<std::string, std::string>>params) override;
   int InitAppFramework(const char *instanceId, const char *appFramework,
-                       std::vector<INIT_FRAMEWORK_PARAMS *> &params) override;
+                       std::vector<std::pair<std::string, std::string>>params) override;
   int CreateAppContext(const char *instanceId, const char *jsBundle) override;
   std::unique_ptr<WeexJSResult> ExecJSOnAppWithResult(const char *instanceId,
                                     const char *jsBundle) override;
@@ -104,19 +104,17 @@ class CoreSideInPlatform : public PlatformBridge::CoreSide {
                           std::vector<VALUE_WITH_TYPE *> &params,
                           long callback_id) override;
   int CreateInstance(const char *instanceId, const char *func,
-                     const char *script, int script_length, const char *opts, const char *initData,
-                     const char *extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params, const char* render_strategy) override;
+                               const char *script, int script_length, const char *opts, const char *initData,
+                     const char *extendsApi, std::vector<std::pair<std::string, std::string>> params, const char* render_strategy) override;
   std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char *instanceId,
-                               const char *script,int type) override;
+                               const char *script, const int script_size, int type) override;
   int DestroyInstance(const char *instanceId) override;
   int UpdateGlobalConfig(const char *config) override;
 
   int UpdateInitFrameworkParams(const std::string& key, const std::string& value, const std::string& desc) override;
   void SetLogType(const int logType, const bool isPerf) override;
+  void CompileQuickJSBin(const char *key, const char *script) override ;
   double GetLayoutTime(const char* instanceId) const override;
-
-  int64_t JsAction(long ctxContainer, int32_t jsActionType, const char *arg) override ;
-
 private:
   DISALLOW_COPY_AND_ASSIGN(CoreSideInPlatform);
 };

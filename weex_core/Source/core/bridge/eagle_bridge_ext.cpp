@@ -46,13 +46,10 @@ std::function<void(const char*, const char*)> CreatePageDownloadExec(const char*
                 opts_json.object_items());
         opts_map["bundleType"] = bundleType;
         std::vector<INIT_FRAMEWORK_PARAMS*> params;
-        auto bridge =         WeexCoreManager::Instance()
-                                  ->script_bridge()
-                                  ->script_side();
-        if(!bridge){
-            return;
-        }
-        bridge->CreateInstance(instanceId.c_str(), func.c_str(), result,
+        WeexCoreManager::Instance()
+            ->script_bridge()
+            ->script_side()
+            ->CreateInstance(instanceId.c_str(), func.c_str(), result,
                              opts_json.dump().c_str(), initData.c_str(),
                              strcmp("Rax", bundleType) ? "\0" : extendsApi.c_str(),
                              params);
@@ -99,11 +96,8 @@ void RefreshPageEagle(const char* page_id, const char* init_data) {
   args->value.string = genWeexString(
       reinterpret_cast<const uint16_t*>(utf16_key.c_str()), utf16_key.size());
   msg.push_back(args);
-  auto bridge = WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side();
-  if (!bridge){
-    return;
-  }
-  bridge->ExecJS(
+
+  WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side()->ExecJS(
       page_id, "", "callJS", msg);
   freeParams(msg);
 }

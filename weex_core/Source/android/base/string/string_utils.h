@@ -53,7 +53,7 @@ static inline std::string jString2Str(JNIEnv *env, const jstring &jstr) {
   env->DeleteLocalRef(strencode);
   env->DeleteLocalRef(barr);
 
-  if(rtn != NULL) {
+  if (rtn != NULL) {
     std::string stemp(rtn);
     free(rtn);
     return stemp;
@@ -62,7 +62,7 @@ static inline std::string jString2Str(JNIEnv *env, const jstring &jstr) {
   }
 }
 
-static inline std::string jString2StrFast(JNIEnv *env, const jstring &jstr){
+static inline std::string jString2StrFast(JNIEnv *env, const jstring &jstr) {
   if (jstr == nullptr)
     return std::string("");
   auto nativeString = ScopedJStringUTF8(env, jstr);
@@ -70,7 +70,7 @@ static inline std::string jString2StrFast(JNIEnv *env, const jstring &jstr){
 }
 
 static std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
-  if(barr == nullptr) {
+  if (barr == nullptr) {
     return "";
   }
 
@@ -84,7 +84,7 @@ static std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
   }
   env->ReleaseByteArrayElements(barr, ba, 0);
 
-  if(rtn != NULL){
+  if (rtn != NULL) {
     std::string stemp(rtn);
     free(rtn);
     return stemp;
@@ -94,49 +94,49 @@ static std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
 
 }
 
-static inline jbyteArray newJByteArray(JNIEnv *env, const char* data, int length) {
+static inline jbyteArray newJByteArray(JNIEnv *env, const char *data, int length) {
   jbyteArray jarray = nullptr;
   if (data == nullptr || length <= 0)
     return jarray;
   int byteSize = length;
-  jbyte *jb =  (jbyte*) data;
+  jbyte *jb = (jbyte *) data;
   jarray = env->NewByteArray(byteSize);
   env->SetByteArrayRegion(jarray, 0, byteSize, jb);
   return jarray;
 }
 
-static inline jbyteArray newJByteArray(JNIEnv *env, const char* pat) {
+static inline jbyteArray newJByteArray(JNIEnv *env, const char *pat) {
   jbyteArray jarray = nullptr;
   if (pat == nullptr)
     return jarray;
   int byteSize = strlen(pat);
-  jbyte *jb =  (jbyte*) pat;
+  jbyte *jb = (jbyte *) pat;
   jarray = env->NewByteArray(byteSize);
   env->SetByteArrayRegion(jarray, 0, byteSize, jb);
   return jarray;
 }
 
-static inline jstring newJString(JNIEnv* env, const char* pat) {
+static inline jstring newJString(JNIEnv *env, const char *pat) {
   jstring jstr = nullptr;
   if (pat == nullptr)
     return jstr;
   return env->NewStringUTF(pat);
 }
 
-static inline char* getArumentAsCStr(IPCArguments *arguments, int argument) {
-    char* ret = nullptr;
+static inline char *getArumentAsCStr(IPCArguments *arguments, int argument) {
+  char *ret = nullptr;
 
-    if (argument >= arguments->getCount())
-      return nullptr;
-    if (arguments->getType(argument) == IPCType::BYTEARRAY) {
-      const IPCByteArray *ipcBA = arguments->getByteArray(argument);
-      int strLen = ipcBA->length;
-      ret = new char[strLen+1];
-      memcpy(ret, ipcBA->content, strLen);
-      ret[strLen] = '\0';
-    }
+  if (argument >= arguments->getCount())
+    return nullptr;
+  if (arguments->getType(argument) == IPCType::BYTEARRAY) {
+    const IPCByteArray *ipcBA = arguments->getByteArray(argument);
+    int strLen = ipcBA->length;
+    ret = new char[strLen + 1];
+    memcpy(ret, ipcBA->content, strLen);
+    ret[strLen] = '\0';
+  }
 
-    return ret;
+  return ret;
 }
 
 static inline int getArumentAsCStrLen(IPCArguments *arguments, int argument) {
@@ -144,22 +144,23 @@ static inline int getArumentAsCStrLen(IPCArguments *arguments, int argument) {
     return 0;
   if (arguments->getType(argument) == IPCType::BYTEARRAY) {
     const IPCByteArray *ipcBA = arguments->getByteArray(argument);
-    return  ipcBA->length;
+    return ipcBA->length;
   }
   return 0;
 }
 
-static inline jbyteArray getArgumentAsJByteArray(JNIEnv* env, IPCArguments* arguments, size_t argument)
-{
+static inline jbyteArray getArgumentAsJByteArray(JNIEnv *env,
+                                                 IPCArguments *arguments,
+                                                 size_t argument) {
   jbyteArray ba = nullptr;
   if (argument >= arguments->getCount())
     return nullptr;
   if (arguments->getType(argument) == IPCType::BYTEARRAY) {
-    const IPCByteArray* ipcBA = arguments->getByteArray(argument);
+    const IPCByteArray *ipcBA = arguments->getByteArray(argument);
     int strLen = ipcBA->length;
     ba = env->NewByteArray(strLen);
     env->SetByteArrayRegion(ba, 0, strLen,
-                            reinterpret_cast<const jbyte*>(ipcBA->content));
+                            reinterpret_cast<const jbyte *>(ipcBA->content));
   }
   return ba;
 }
@@ -173,7 +174,7 @@ static inline jstring getArgumentAsJString(JNIEnv *env, IPCArguments *arguments,
   return ret;
 }
 
-static inline int getArgumentAsInt32(JNIEnv* env, IPCArguments* arguments, int argument) {
+static inline int getArgumentAsInt32(JNIEnv *env, IPCArguments *arguments, int argument) {
   int ret = 0;
   if (arguments->getType(argument) == IPCType::INT32) {
     const int32_t type = arguments->get<int32_t>(argument);
@@ -182,7 +183,7 @@ static inline int getArgumentAsInt32(JNIEnv* env, IPCArguments* arguments, int a
   return ret;
 }
 
-static inline int getArgumentAsInt32(IPCArguments* arguments, int argument) {
+static inline int getArgumentAsInt32(IPCArguments *arguments, int argument) {
   int ret = 0;
   if (arguments->getType(argument) == IPCType::INT32) {
     const int32_t type = arguments->get<int32_t>(argument);
@@ -191,7 +192,7 @@ static inline int getArgumentAsInt32(IPCArguments* arguments, int argument) {
   return ret;
 }
 
-static inline int64_t getArgumentAsInt64(IPCArguments* arguments, int argument) {
+static inline int64_t getArgumentAsInt64(IPCArguments *arguments, int argument) {
   int ret = 0;
   if (arguments->getType(argument) == IPCType::INT64) {
     const int64_t type = arguments->get<int64_t>(argument);
@@ -200,7 +201,7 @@ static inline int64_t getArgumentAsInt64(IPCArguments* arguments, int argument) 
   return ret;
 }
 
-static inline float getArgumentAsFloat(IPCArguments* arguments, int argument) {
+static inline float getArgumentAsFloat(IPCArguments *arguments, int argument) {
   float ret = 0;
   if (arguments->getType(argument) == IPCType::FLOAT) {
     const float type = arguments->get<float>(argument);
@@ -216,9 +217,9 @@ static inline void addString(JNIEnv *env, IPCSerializer *serializer, jstring str
   serializer->add(chars, charsLength);
 }
 static inline void addByteArrayString(JNIEnv *env, IPCSerializer *serializer, jstring str) {
-  ScopedJStringUTF8 scopedJStringUTF8(env,str);
+  ScopedJStringUTF8 scopedJStringUTF8(env, str);
   const char *string = scopedJStringUTF8.getChars();
-  serializer->add(string,strlen(string));
+  serializer->add(string, strlen(string));
 }
 
 static inline void addJSONString(JNIEnv *env, IPCSerializer *serializer, jstring str) {
@@ -228,11 +229,10 @@ static inline void addJSONString(JNIEnv *env, IPCSerializer *serializer, jstring
   serializer->addJSON(chars, charsLength);
 }
 
-static void addBinaryByteArray(JNIEnv* env, IPCSerializer* serializer, jbyteArray array)
-{
+static void addBinaryByteArray(JNIEnv *env, IPCSerializer *serializer, jbyteArray array) {
   size_t length = env->GetArrayLength(array);
-  jbyte* data = env->GetByteArrayElements(array, 0);
-  serializer->add((const char*)data, length);
+  jbyte *data = env->GetByteArrayElements(array, 0);
+  serializer->add((const char *) data, length);
   env->ReleaseByteArrayElements(array, data, 0);
 }
 }

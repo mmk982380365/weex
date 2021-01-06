@@ -123,11 +123,14 @@ void ReactorPage::CreateBody(const std::string& ref,
                              const std::map<std::string, std::string>& attrs,
                              const std::vector<std::string>& events) {
     RenderManager::GetInstance()->CreatePage(page_id_, [&] (RenderPage* page_instance) -> RenderObject* {
-#if OS_IOS
-        page_instance->set_before_layout_needed(false); // do not need before and after layout on ios platform
+      #if OS_IOS
+        page_instance->set_before_layout_needed(false); // we do not need before and after layout
         page_instance->set_after_layout_needed(false);
         page_instance->set_platform_layout_needed(true);
-#endif
+      #else
+        page_instance->set_before_layout_needed(true); // we do not need before and after layout
+        page_instance->set_after_layout_needed(true);
+      #endif
         return CreateRenderObject(ref, type, 0, styles, attrs, events, page_instance->reserve_css_styles(), nullptr);
     });
     
@@ -201,13 +204,13 @@ RenderObject* ReactorPage::CreateRenderObject(const std::string& ref,
     if (ref.empty() || type.empty()) {
         return nullptr;
     }
-
+    
     RenderObject* render_object = (RenderObject *)RenderCreator::GetInstance()->CreateRender(type, ref);
     render_object->set_page_id(page_id_);
     if (parent) {
         parent->AddRenderObject(index, render_object);
     }
-
+    
     //fill attributes, styles and events
     for (const auto& attr : attrs) {
         render_object->AddAttr(attr.first, attr.second);
@@ -218,7 +221,7 @@ RenderObject* ReactorPage::CreateRenderObject(const std::string& ref,
     for (const auto& event : events) {
         render_object->AddEvent(event);
     }
-
+    
     render_object->ApplyDefaultStyle(reserve_styles);
     render_object->ApplyDefaultAttr();
     return render_object;

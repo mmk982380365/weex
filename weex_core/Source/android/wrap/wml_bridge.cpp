@@ -32,7 +32,7 @@ static jint InitAppFramework(JNIEnv* env, jobject jcaller, jstring jinstanceid,
   ScopedJStringUTF8 id(env, jinstanceid);
   ScopedJStringUTF8 framework(env, jframwork);
   int length = jargs == NULL ? 0 : env->GetArrayLength(jargs);
-  std::vector<INIT_FRAMEWORK_PARAMS*> params;
+  std::vector<std::pair<std::string, std::string>> params;
 
   for (int i = 0; i < length; i++) {
     auto jArg = std::unique_ptr<WXJSObject>(
@@ -66,20 +66,18 @@ static jint InitAppFramework(JNIEnv* env, jobject jcaller, jstring jinstanceid,
       snprintf(charData, size, "%f", jDoubleObj);
 
       ScopedJStringUTF8 jni_key(env, jKeyStr.Get());
-      params.push_back(genInitFrameworkParams(jni_key.getChars(), charData));
+      params.emplace_back(jni_key.getChars(), charData);
       free(charData);
     } else if (jTypeInt == 2) {
       jstring jDataStr = (jstring)jDataObj.Get();
       ScopedJStringUTF8 jni_key(env, jKeyStr.Get());
       ScopedJStringUTF8 jni_data(env, jDataStr);
-      params.push_back(
-          genInitFrameworkParams(jni_key.getChars(), jni_data.getChars()));
+      params.emplace_back(std::make_pair(jni_key.getChars(), jni_data.getChars()));
     } else if (jTypeInt == 3) {
       jstring jDataStr = (jstring)jDataObj.Get();
       ScopedJStringUTF8 jni_key(env, jKeyStr.Get());
       ScopedJStringUTF8 jni_data(env, jDataStr);
-      params.push_back(
-          genInitFrameworkParams(jni_key.getChars(), jni_data.getChars()));
+      params.emplace_back(std::make_pair(jni_key.getChars(), jni_data.getChars()));
     }
   }
 
@@ -88,7 +86,6 @@ static jint InitAppFramework(JNIEnv* env, jobject jcaller, jstring jinstanceid,
           ->getPlatformBridge()
           ->core_side()
           ->InitAppFramework(id.getChars(), framework.getChars(), params);
-  freeParams(params);
   return result;
 }
 
@@ -189,7 +186,7 @@ jclass g_WMLBridge_clazz = nullptr;
 
 static JNINativeMethod gWMMethods[] = {
     {"nativeInitAppFramework",
-     "(Ljava/lang/String;Ljava/lang/String;[Lorg/apache/weex/bridge/"
+     "(Ljava/lang/String;Ljava/lang/String;[Lcom/taobao/weex/bridge/"
      "WXJSObject;)I",
      (void*)InitAppFramework},
     {"nativeCreateAppContext",
@@ -197,7 +194,7 @@ static JNINativeMethod gWMMethods[] = {
      (void*)CreateAppContext},
     {"nativeExecJsOnApp",
      "(Ljava/lang/String;Ljava/lang/String;"
-     "[Lorg/apache/weex/bridge/WXJSObject;)I",
+     "[Lcom/taobao/weex/bridge/WXJSObject;)I",
      (void*)ExecJsOnApp},
     {"nativeExecJsOnAppWithResult",
      "(Ljava/lang/String;Ljava/lang/String;"

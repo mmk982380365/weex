@@ -315,7 +315,7 @@ void IPCCommunicator::doSendBufferOnly(const void* _data, size_t length)
     // as header.
     dstLength[0] = length;
 
-    IPC_LOGD("send bytes: length: %zu", length);
+//    IPC_LOGD("send bytes: length: %zu", length);
     byteTransfered = std::min(length, pageSize - sizeof(uint32_t));
     memcpy(dstLength + 1, data, byteTransfered);
     m_futexPageQueue->stepWrite();
@@ -323,13 +323,13 @@ void IPCCommunicator::doSendBufferOnly(const void* _data, size_t length)
     if (length > byteTransfered) {
         data += byteTransfered;
         length -= byteTransfered;
-        IPC_LOGD("sent bytes: remaining length: %zu, transfered: %zu", length, byteTransfered);
+//        IPC_LOGD("sent bytes: remaining length: %zu, transfered: %zu", length, byteTransfered);
 
         while (length > 0) {
             byteTransfered = doSendBufferPage(data, length, pageSize);
             data += byteTransfered;
             length -= byteTransfered;
-            IPC_LOGD("sent bytes: remaining length: %zu, transfered: %zu", length, byteTransfered);
+//            IPC_LOGD("sent bytes: remaining length: %zu, transfered: %zu", length, byteTransfered);
         }
     }
 }
@@ -339,7 +339,7 @@ void IPCCommunicator::doRecvBufferOnly(void* _data, size_t length)
     char* data = static_cast<char*>(_data);
     size_t pageSize = m_futexPageQueue->getPageSize();
     bool firstRun = true;
-    IPC_LOGD("recv bytes: length: %zu", length);
+//    IPC_LOGD("recv bytes: length: %zu", length);
     while (true) {
         ssize_t byteTransfered;
         byteTransfered = std::min(length, pageSize);
@@ -353,7 +353,7 @@ void IPCCommunicator::doRecvBufferOnly(void* _data, size_t length)
         memcpy(data, src, byteTransfered);
         data += byteTransfered;
         length -= byteTransfered;
-        IPC_LOGD("recv bytes: remaining length: %zu, transfered: %zu", length, byteTransfered);
+//        IPC_LOGD("recv bytes: remaining length: %zu, transfered: %zu", length, byteTransfered);
         if (length > 0) {
             firstRun = false;
             m_futexPageQueue->unlockReadPageAndStep();

@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #endif
 #include "base/third_party/icu/icu_utf.h"
-
+#include "WeexApiValue.h"
 namespace weex {
 namespace base {
 
@@ -54,6 +54,10 @@ static uint32_t convert_single_char(char16_t in) {
     return kErrorCodePoint;
   }
   return in;
+}
+
+inline static const char *value_or_empty(const char *src) {
+  return src == nullptr ? "" : src;
 }
 
 inline static std::string to_utf8(uint16_t* utf16, size_t length) {
@@ -85,6 +89,41 @@ inline static std::string to_utf8(uint16_t* utf16, size_t length) {
   std::string output(dest);
   free(dest);
   return output;
+}
+
+static std::string weexString2stdString(const WeexString *weexString) {
+  if (weexString != nullptr && weexString->length > 0) {
+    return weex::base::to_utf8(const_cast<uint16_t *>(weexString->content), weexString->length);
+  }
+
+  return "";
+}
+
+static WeexString *genWeexStringSS(const uint16_t *str, size_t length){
+  size_t byteSize = length * sizeof(uint16_t);
+  auto *string = (WeexString *) malloc(byteSize + sizeof(WeexString));
+  if (string == nullptr)
+    return nullptr;
+
+  memset(string, 0, byteSize + sizeof(WeexString));
+  string->length = length;
+  memcpy(string->content, str, byteSize);
+  return string;
+}
+static WeexByteArray *genWeexByteArraySS(const char *str, size_t strLen){
+  auto *ret = (WeexByteArray *) malloc(strLen + sizeof(WeexByteArray));
+
+  if (ret == nullptr)
+    return nullptr;
+
+  memset(ret, 0, strLen + sizeof(WeexByteArray));
+
+  ret->length = strLen;
+  memcpy(ret->content, str, strLen);
+
+  ret->content[strLen] = '\0';
+
+  return const_cast<WeexByteArray *> (ret);
 }
 
 #ifdef OS_ANDROID
