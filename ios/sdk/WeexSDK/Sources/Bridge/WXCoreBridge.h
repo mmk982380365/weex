@@ -49,6 +49,7 @@ namespace WeexCore
         void ReportServerCrash(const char* instance_id) override {};
         void ReportNativeInitStatus(const char* status_code,
                                     const char* error_msg) override {};
+        void CompileQuickJSCallback(const char* key, const char* bytecode, int length) override {};
         
         int CallNative(const char* pageId, const char *task, const char *callback) override;
         

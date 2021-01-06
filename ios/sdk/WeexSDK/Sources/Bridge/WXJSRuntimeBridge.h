@@ -19,6 +19,7 @@
 
 #import "WXBridgeProtocol.h"
 
-@interface WXJSCoreBridge : NSObject <WXBridgeProtocol>
+@interface WXJSRuntimeBridge : NSObject <WXBridgeProtocol>
 
+- (instancetype)init;
 @end

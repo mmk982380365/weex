@@ -182,7 +182,7 @@ typedef enum : NSUInteger {
 {
     _debugJS = [WXDebugTool isDevToolDebug];
     
-    Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXJSCoreBridge class];
+    Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXBridgeContext bridgeClass];
     
     if (_instanceJavaScriptContext && [_instanceJavaScriptContext isKindOfClass:bridgeClass]) {
         return _instanceJavaScriptContext;
@@ -194,30 +194,21 @@ typedef enum : NSUInteger {
     }
     
     // WXDebugger is a singleton actually and should not call its init twice.
-    _instanceJavaScriptContext = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] initWithoutDefaultContext];
+    _instanceJavaScriptContext = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[bridgeClass alloc] initWithoutDefaultContext];
     if (!_debugJS) {
         id<WXBridgeProtocol> jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"bridgeCtx.jsBridge"];
         if (_useBackupJsThread) {
               jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"backupBridgeCtx.jsBridge"];
         }
-        JSContext* globalContex = jsBridge.javaScriptContext;
-        JSContextGroupRef contextGroup = JSContextGetGroup([globalContex JSGlobalContextRef]);
-        JSClassDefinition classDefinition = kJSClassDefinitionEmpty;
-        classDefinition.attributes = kJSClassAttributeNoAutomaticPrototype;
-        JSClassRef globalObjectClass = JSClassCreate(&classDefinition);
-        JSGlobalContextRef sandboxGlobalContextRef = JSGlobalContextCreateInGroup(contextGroup, globalObjectClass);
-        JSClassRelease(globalObjectClass);
-        JSContext * instanceContext = [JSContext contextWithJSGlobalContextRef:sandboxGlobalContextRef];
-        JSGlobalContextRelease(sandboxGlobalContextRef);
-        [WXBridgeContext mountContextEnvironment:instanceContext];
-        [_instanceJavaScriptContext setJSContext:instanceContext];
+        [_instanceJavaScriptContext copySandboxFromGlobalBridge:jsBridge];
     }
     
     if ([_instanceJavaScriptContext respondsToSelector:@selector(setWeexInstanceId:)]) {
         [_instanceJavaScriptContext setWeexInstanceId:_instanceId];
     }
     if (!_debugJS) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_JSCONTEXT_CREATE_NOTIFICATION object:_instanceJavaScriptContext.javaScriptContext];
+        //TODO
+//        [[NSNotificationCenter defaultCenter] postNotificationName:WX_INSTANCE_JSCONTEXT_CREATE_NOTIFICATION object:_instanceJavaScriptContext.javaScriptContext];
     }
     
     return _instanceJavaScriptContext;
