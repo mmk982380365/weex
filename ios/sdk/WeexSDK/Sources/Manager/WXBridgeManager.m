@@ -467,11 +467,11 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
     }, method.instance.instanceId);
 }
 
-- (JSValue *)callJSMethodWithResult:(WXCallJSMethod *)method
+- (NSString *)callJSMethodWithResult:(WXCallJSMethod *)method
 {
     if (!method || !method.instance) return nil;
     __weak typeof(self) weakSelf = self;
-    __block JSValue *value;
+    __block NSString *value;
     WXPerformBlockSyncOnBridgeThreadForInstance(^(){
         WXBridgeContext* context = method.instance.useBackupJsThread ? weakSelf.backupBridgeCtx :  weakSelf.bridgeCtx;
         value = [context excuteJSMethodWithResult:method];
@@ -672,7 +672,7 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
     [self callJsMethod:method];
 }
 
-- (void)callComponentHook:(NSString*)instanceId componentId:(NSString*)componentId type:(NSString*)type hook:(NSString*)hookPhase args:(NSArray*)args competion:(void (^)(JSValue * value))completion
+- (void)callComponentHook:(NSString*)instanceId componentId:(NSString*)componentId type:(NSString*)type hook:(NSString*)hookPhase args:(NSArray*)args competion:(void (^)(NSString * value))completion
 {
      __weak typeof(self) weakSelf = self;
     WXPerformBlockOnBridgeThreadForInstance(^{
@@ -689,7 +689,7 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
     }, instanceId);
 }
 
-- (JSValue *)fireEventWithResult:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges
+- (NSString *)fireEventWithResult:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params domChanges:(NSDictionary *)domChanges
 {
     if (!type || !ref) {
         WXLogError(@"Event type and component ref should not be nil");

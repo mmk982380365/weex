@@ -94,7 +94,7 @@
  **/
 - (void)executeJsMethod:(WXCallJSMethod *)method;
 
-- (JSValue *)excuteJSMethodWithResult:(WXCallJSMethod *)method;
+- (NSString *)excuteJSMethodWithResult:(WXCallJSMethod *)method;
 
 /**
  *  Register Modules Method
@@ -140,6 +140,8 @@
 - (void)resetEnvironment;
 
 + (void)mountContextEnvironment:(JSContext*)context;
-- (void)callJSMethod:(NSString *)method args:(NSArray *)args onContext:(id<WXBridgeProtocol>)bridge completion:(void (^)(JSValue * value))complection;
+- (void)callJSMethod:(NSString *)method args:(NSArray *)args onContext:(id<WXBridgeProtocol>)bridge completion:(void (^)(NSString* value))complection;
+
++ (Class)bridgeClass;
 
 @end

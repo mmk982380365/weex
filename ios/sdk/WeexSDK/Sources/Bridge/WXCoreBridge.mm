@@ -51,6 +51,7 @@
 #include "core/config/core_environment.h"
 #include "core/bridge/platform/core_side_in_platform.h"
 #include "core/bridge/script/core_side_in_script.h"
+#include "core/bridge/script/script_side_in_simple.h"
 #include "core/network/http_module.h"
 
 #import <objc/runtime.h>
@@ -1095,6 +1096,226 @@ break; \
             return true;
         }
     };
+
+
+CoreSideInScript::CoreSideInScript() {}
+
+CoreSideInScript::~CoreSideInScript() {}
+
+void CoreSideInScript::CallNative(const char *page_id, const char *task,
+                                  const char *callback) {
+    //TODO
+}
+
+std::unique_ptr<ValueWithType> CoreSideInScript::CallNativeModule(
+    const char *page_id, const char *module, const char *method,
+    const char *arguments, int arguments_length, const char *options,
+    int options_length) {
+    return WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->CallNativeModule(page_id, module, method, arguments, arguments_length, options, options_length);
+}
+
+void CoreSideInScript::CallNativeComponent(const char *page_id, const char *ref,
+                                           const char *method,
+                                           const char *arguments,
+                                           int arguments_length,
+                                           const char *options,
+                                           int options_length) {
+    WeexCoreManager::Instance()->getPlatformBridge()->platform_side()->CallNativeComponent(page_id, ref, method, arguments, arguments_length, options, options_length);
+}
+
+void CoreSideInScript::AddElement(const char *page_id, const char *parent_ref,
+                                  const char *dom_str, int dom_str_length,
+                                  const char *index_str) {
+    WXPerformBlockOnComponentThread(^{
+        [WXCoreBridge callAddElement:@(page_id) parentRef:@(parent_ref) data:[WXUtility objectFromJSON:@(dom_str)] index:atoi(index_str)];
+    });
+}
+
+void CoreSideInScript::SetTimeout(const char *callback_id, const char *time) {
+    //TODO
+}
+
+void CoreSideInScript::NativeLog(const char *str_array) {
+    //TODO
+}
+
+void CoreSideInScript::CreateBody(const char *page_id, const char *dom_str,
+                                  int dom_str_length) {
+    WXPerformBlockOnComponentThread(^{
+        [WXCoreBridge callCreateBody:@(page_id) data:[WXUtility objectFromJSON:@(dom_str)]];
+    });
+}
+
+int CoreSideInScript::UpdateFinish(const char *page_id, const char *task,
+                                   int task_length, const char *callback,
+                                   int callback_length) {
+    if (page_id == nullptr) return -1;
+    return WeexCoreManager::Instance()
+        ->getPlatformBridge()
+        ->platform_side()
+        ->RefreshFinish(page_id, task, callback);
+}
+
+void CoreSideInScript::CreateFinish(const char *page_id) {
+    WXSDKInstance *instance = [WXSDKManager instanceForID:@(page_id)];
+    [instance.apmInstance onStage:KEY_PAGE_STAGES_CREATE_FINISH];
+    WXPerformBlockOnComponentThread(^{
+        RenderManager::GetInstance()->CreateFinish(page_id);
+    });
+}
+
+int CoreSideInScript::RefreshFinish(const char *page_id, const char *task,
+                                    const char *callback) {
+    if (page_id == nullptr) return -1;
+    WXPerformBlockOnComponentThread(^{
+        WeexCoreManager::Instance()
+            ->getPlatformBridge()
+            ->platform_side()
+            ->RefreshFinish(page_id, task, callback);
+    });
+    return 0;
+}
+
+void CoreSideInScript::UpdateAttrs(const char *page_id, const char *ref,
+                                   const char *data, int data_length) {
+    WXPerformBlockOnComponentThread(^{
+        [WXCoreBridge callUpdateAttrs:@(page_id) ref:@(ref) data:[WXUtility objectFromJSON:@(data)]];
+    });
+}
+
+void CoreSideInScript::UpdateStyle(const char *page_id, const char *ref,
+                                   const char *data, int data_length) {
+    WXPerformBlockOnComponentThread(^{
+        [WXCoreBridge callUpdateStyle:@(page_id) ref:@(ref) data:[WXUtility objectFromJSON:@(data)]];
+    });
+}
+
+void CoreSideInScript::RemoveElement(const char *page_id, const char *ref) {
+    WXPerformBlockOnComponentThread(^{
+        RenderManager::GetInstance()->RemoveRenderObject(page_id, ref);
+    });
+}
+
+void CoreSideInScript::MoveElement(const char *page_id, const char *ref,
+                                   const char *parent_ref, int index) {
+    WXPerformBlockOnComponentThread(^{
+        RenderManager::GetInstance()->MoveRenderObject(page_id, ref, parent_ref,
+                                                       index);
+    });
+}
+
+void CoreSideInScript::AddEvent(const char *page_id, const char *ref,
+                                const char *event) {
+    WXPerformBlockOnComponentThread(^{
+        RenderManager::GetInstance()->AddEvent(page_id, ref, event);
+    });
+}
+
+void CoreSideInScript::RemoveEvent(const char *page_id, const char *ref,
+                                   const char *event) {
+    WXPerformBlockOnComponentThread(^{
+        RenderManager::GetInstance()->RemoveEvent(page_id, ref, event);
+    });
+}
+
+const char *CoreSideInScript::CallGCanvasLinkNative(const char *context_id,
+                                                    int type, const char *arg) {
+
+  return nullptr;
+}
+
+int CoreSideInScript::SetInterval(const char *page_id, const char *callback_id,
+                                  const char *time) {
+    //TODO
+    return 0;
+}
+
+void CoreSideInScript::ClearInterval(const char *page_id,
+                                     const char *callback_id) {
+  // do nothing
+}
+
+const char *CoreSideInScript::CallT3DLinkNative(int type, const char *arg) {
+  return nullptr;
+}
+
+void CoreSideInScript::PostMessage(const char *vm_id, const char *data, int dataLength) {
+    //TODO
+}
+
+void CoreSideInScript::DispatchMessage(const char *client_id, const char *data, int dataLength,
+                                       const char *callback,
+                                       const char *vm_id) {
+    //TODO
+}
+
+std::unique_ptr<WeexJSResult> CoreSideInScript::DispatchMessageSync(
+    const char *client_id, const char *data, int dataLength,
+    const char *vm_id) {
+    //TODO
+    return std::unique_ptr<WeexJSResult>();
+}
+
+void CoreSideInScript::ReportException(const char *page_id, const char *func,
+                                       const char *exception_string) {
+  WeexCoreManager::Instance()
+      ->getPlatformBridge()
+      ->platform_side()
+      ->ReportException(page_id, func, exception_string);
+}
+
+void CoreSideInScript::SetJSVersion(const char *js_version) {
+  WeexCoreManager::Instance()
+      ->getPlatformBridge()
+      ->platform_side()
+      ->SetJSVersion(js_version);
+}
+
+void CoreSideInScript::OnReceivedResult(long callback_id,
+                                        std::unique_ptr<WeexJSResult> &result) {
+  //TODO
+}
+
+void CoreSideInScript::UpdateComponentData(const char* page_id,
+                                           const char* cid,
+                                           const char* json_data) {
+    id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
+    if (dataRenderHandler) {
+        WXPerformBlockOnComponentThread(^{
+            long start = [WXUtility getUnixFixTimeMillis];
+            WXSDKInstance *instance = [WXSDKManager instanceForID:@(page_id)];
+            [instance.apmInstance addUpdateComponentDataTimestamp:start];
+            [dataRenderHandler callUpdateComponentData:@(page_id) componentId:@(cid) jsonData:[WXUtility objectFromJSON:@(json_data)]];
+            [instance.apmInstance addUpdateComponentDataTime:[WXUtility getUnixFixTimeMillis] - start];
+        });
+    }
+    else {
+        WXSDKInstance *instance = [WXSDKManager instanceForID:@(page_id)];
+        WXComponentManager *manager = instance.componentManager;
+        if (manager.isValid) {
+            WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
+            NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
+            WXPerformBlockOnComponentThread(^{
+                [manager renderFailed:error];
+            });
+        }
+    }
+}
+
+bool CoreSideInScript::Log(int level, const char *tag,
+         const char *file,
+         unsigned long line,
+         const char *log) {
+  //return weex::base::LogImplement::getLog()->log((LogLevel) level, tag, file, line, log);
+    return true;
+}
+
+void CoreSideInScript::CompileQuickJSCallback(const char *key, const char *bytecode, int length) {
+  WeexCoreManager::Instance()
+      ->getPlatformBridge()
+      ->platform_side()->CompileQuickJSCallback(key, bytecode, length);
+}
+
 }
 
 @interface WXCustomPageBridge()
@@ -1567,6 +1788,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         
         jsBridge = new WeexCore::ScriptBridge();
         jsBridge->set_core_side(new WeexCore::CoreSideInScript());
+        jsBridge->set_script_side(new WeexCore::bridge::script::ScriptSideInSimple());
         WeexCore::WeexCoreManager::Instance()->set_script_bridge(jsBridge);
         
         WeexCore::WeexCoreManager::Instance()->set_measure_function_adapter(new WeexCore::WXCoreMeasureFunctionBridge());

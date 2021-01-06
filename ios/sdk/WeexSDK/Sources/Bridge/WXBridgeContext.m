@@ -52,6 +52,7 @@
 #import "WXHandlerFactory.h"
 #import "WXExtendCallNativeManager.h"
 #import "WXEaglePluginManager.h"
+#import "WXJSRuntimeBridge.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -92,12 +93,17 @@ _Pragma("clang diagnostic pop") \
     return self;
 }
 
++ (Class)bridgeClass
+{
+    return [WXJSCoreBridge class];
+}
+
 - (id<WXBridgeProtocol>)jsBridge
 {
     WXAssertBridgeThread();
     _debugJS = [WXDebugTool isDevToolDebug];
     
-    Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXJSCoreBridge class];
+    Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXBridgeContext bridgeClass];
     
     if (_jsBridge && [_jsBridge isKindOfClass:bridgeClass]) {
         return _jsBridge;
@@ -109,7 +115,7 @@ _Pragma("clang diagnostic pop") \
     }
     
     // WXDebugger is a singleton actually and should not call its init twice.
-    _jsBridge = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[WXJSCoreBridge alloc] init];
+    _jsBridge = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[bridgeClass alloc] init];
     
     [self registerGlobalFunctions];
     
@@ -538,31 +544,26 @@ _Pragma("clang diagnostic pop") \
             NSDictionary* immutableOptions = [newOptions copy];
             sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@", instanceIdString, immutableOptions, data];
             //add instanceId to weexContext ,if fucn createInstanceContext failure ，then we will know which instance has problem (exceptionhandler)
-            self.jsBridge.javaScriptContext[@"wxExtFuncInfo"]= @{
-                                                                 @"func":@"createInstanceContext",
-                                                                 @"arg":@"start",
-                                                                 @"instanceId":sdkInstance.instanceId?:@"unknownId"
-                                                                };
+            self.jsBridge[@"wxExtFuncInfo"]= @{
+                @"func":@"createInstanceContext",
+                @"arg":@"start",
+                @"instanceId":sdkInstance.instanceId?:@"unknownId"
+            };
             __weak typeof(self) weakSelf = self;
             [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
-            [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, immutableOptions, data?:@[]] onContext:nil completion:^(JSValue *instanceContextEnvironment) {
-                if (sdkInstance.pageName) {
-                    [sdkInstance.instanceJavaScriptContext.javaScriptContext setName:sdkInstance.pageName];
-                }
-                weakSelf.jsBridge.javaScriptContext[@"wxExtFuncInfo"]= nil;
-                
-                NSArray* allKeys = [WXUtility extractPropertyNamesOfJSValueObject:instanceContextEnvironment];
-                sdkInstance.createInstanceContextResult = [NSString stringWithFormat:@"%@", allKeys];
-                JSGlobalContextRef instanceContextRef = sdkInstance.instanceJavaScriptContext.javaScriptContext.JSGlobalContextRef;
-                JSObjectRef instanceGlobalObject = JSContextGetGlobalObject(instanceContextRef);
-                
-                for (NSString * key in allKeys) {
-                    JSStringRef propertyName = JSStringCreateWithUTF8CString([key cStringUsingEncoding:NSUTF8StringEncoding]);
-                    if ([key isEqualToString:@"Vue"]) {
-                        JSObjectSetPrototype(instanceContextRef, JSValueToObject(instanceContextRef, [instanceContextEnvironment valueForProperty:key].JSValueRef, NULL), JSObjectGetPrototype(instanceContextRef, instanceGlobalObject));
+            [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, immutableOptions, data?:@[]] onContext:nil completion:^(NSString *instanceContextEnvironment) {
+                if (sdkInstance.pageName)
+                {
+                    if ([sdkInstance.instanceJavaScriptContext respondsToSelector:@selector(setContextName:)])
+                    {
+                        [sdkInstance.instanceJavaScriptContext setContextName:sdkInstance.pageName];
                     }
-                    JSObjectSetProperty(instanceContextRef, instanceGlobalObject, propertyName, [instanceContextEnvironment valueForProperty:key].JSValueRef, 0, NULL);
-                    JSStringRelease(propertyName);
+                }
+                weakSelf.jsBridge[@"wxExtFuncInfo"] = nil;
+               
+                if ([sdkInstance.instanceJavaScriptContext respondsToSelector:@selector(handleVueGlobalVars:env:)])
+                {
+                    [sdkInstance.instanceJavaScriptContext handleVueGlobalVars:sdkInstance env:instanceContextEnvironment];
                 }
                 
                 if (WX_SYS_VERSION_LESS_THAN(@"10.2")) {
@@ -579,8 +580,10 @@ _Pragma("clang diagnostic pop") \
 
                 if (raxAPIScript) {
                     [sdkInstance.instanceJavaScriptContext executeJavascript:raxAPIScript withSourceURL:[NSURL URLWithString:raxAPIScriptPath]];
-                    NSArray* allKeys = [WXUtility extractPropertyNamesOfJSValueObject:sdkInstance.instanceJavaScriptContext.javaScriptContext.globalObject];
-                    sdkInstance.executeRaxApiResult = [NSString stringWithFormat:@"%@", allKeys];
+                    if ([sdkInstance.instanceJavaScriptContext respondsToSelector:@selector(handleRaxResult:)])
+                    {
+                        [sdkInstance.instanceJavaScriptContext handleRaxResult:sdkInstance];
+                    }
                 }
                 
                 NSDictionary* funcInfo = @{
@@ -588,13 +591,13 @@ _Pragma("clang diagnostic pop") \
                                            @"arg":@"start",
                                            @"instanceId":sdkInstance.instanceId?:@"unknownId"
                                         };
-                sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"]= funcInfo;
+                sdkInstance.instanceJavaScriptContext[@"wxExtFuncInfo"] = funcInfo;
                 if ([NSURL URLWithString:sdkInstance.pageName] || sdkInstance.scriptURL) {
                     [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]?:sdkInstance.scriptURL];
                 } else {
                     [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
                 }
-                sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = nil;
+                sdkInstance.instanceJavaScriptContext[@"wxExtFuncInfo"] = nil;
                 [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_EXECUTE_BUNDLE_END];
                 WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
             }];
@@ -613,9 +616,9 @@ _Pragma("clang diagnostic pop") \
                                    @"arg":@"start",
                                    @"instanceId":sdkInstance.instanceId?:@"unknownId"
                                    };
-        sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = funcInfo;
+        sdkInstance.instanceJavaScriptContext[@"wxExtFuncInfo"] = funcInfo;
         [self callJSMethod:@"createInstance" args:args];
-        sdkInstance.instanceJavaScriptContext.javaScriptContext[@"wxExtFuncInfo"] = nil;
+        sdkInstance.instanceJavaScriptContext[@"wxExtFuncInfo"] = nil;
         [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_EXECUTE_BUNDLE_END];
         WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
     }
@@ -834,8 +837,8 @@ _Pragma("clang diagnostic pop") \
     
     WX_MONITOR_PERF_END(WXPTFrameworkExecute);
     
-    if ([self.jsBridge exception]) {
-        NSString *exception = [[self.jsBridge exception] toString];
+    NSString *exception = [self.jsBridge exception];
+    if (exception) {
         NSMutableString *errMsg = [NSMutableString stringWithFormat:@"[WX_KEY_EXCEPTION_SDK_INIT_JSFM_INIT_FAILED] %@",exception];
         [WXExceptionUtils commitCriticalExceptionRT:@"WX_KEY_EXCEPTION_SDK_INIT" errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_SDK_INIT] function:@"" exception:errMsg extParams:nil];
         WX_MONITOR_FAIL(WXMTJSFramework, WX_ERR_JSFRAMEWORK_EXECUTE, errMsg);
@@ -846,9 +849,9 @@ _Pragma("clang diagnostic pop") \
         
         [self executeAllJsService];
         
-        JSValue *frameworkVersion = [self.jsBridge callJSMethod:@"getJSFMVersion" args:nil];
-        if (frameworkVersion && [frameworkVersion isString]) {
-            [WXAppConfiguration setJSFrameworkVersion:[frameworkVersion toString]];
+        NSString *frameworkVersion = [self.jsBridge callJSMethod:@"getJSFMVersion" args:nil];
+        if (frameworkVersion && [frameworkVersion isKindOfClass:[NSString class]]) {
+            [WXAppConfiguration setJSFrameworkVersion:frameworkVersion];
         }
         
         if (script) {
@@ -885,7 +888,7 @@ _Pragma("clang diagnostic pop") \
     [self performSelector:@selector(_sendQueueLoop) withObject:nil];
 }
 
-- (void)callJSMethod:(NSString *)method args:(NSArray *)args onContext:(id<WXBridgeProtocol>)bridge completion:(void (^)(JSValue * value))completion
+- (void)callJSMethod:(NSString *)method args:(NSArray *)args onContext:(id<WXBridgeProtocol>)bridge completion:(void (^)(NSString* value))completion
 {
     NSMutableArray *newArg = nil;
     if (!bridge) {
@@ -893,9 +896,9 @@ _Pragma("clang diagnostic pop") \
     }
     if (self.frameworkLoadFinished) {
         WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
-        if (([bridge isKindOfClass:[WXJSCoreBridge class]]) ||
+        if (([bridge isKindOfClass:[WXBridgeContext bridgeClass]]) ||
             ([bridge isKindOfClass:NSClassFromString(@"WXDebugger") ]) ) {
-            JSValue *value = [bridge callJSMethod:method args:args];
+            NSString *value = [bridge callJSMethod:method args:args];
             if (completion) {
                 completion(value);
             }
@@ -911,7 +914,7 @@ _Pragma("clang diagnostic pop") \
     }
 }
 
-- (JSValue *)excuteJSMethodWithResult:(WXCallJSMethod *)method
+- (NSString *)excuteJSMethodWithResult:(WXCallJSMethod *)method
 {
     WXAssertBridgeThread();
     return  [self.jsBridge callJSMethod:@"callJS" args:@[method.instance.instanceId, @[[method callJSTask]]]];
@@ -932,21 +935,21 @@ _Pragma("clang diagnostic pop") \
 {
     if(self.frameworkLoadFinished) {
         WXAssert(script, @"param script required!");
-        if ([self.jsBridge respondsToSelector:@selector(javaScriptContext)]) {
+        if ([self.jsBridge respondsToSelector:@selector(setObject:forKeyedSubscript:)]) {
             NSDictionary* funcInfo = @{
                                        @"func":@"executeJsService",
                                        @"arg":name?:@"unsetScriptName"
                                        };
-            self.jsBridge.javaScriptContext[@"wxExtFuncInfo"] = funcInfo;
+            self.jsBridge[@"wxExtFuncInfo"] = funcInfo;
         }
         [self.jsBridge executeJavascript:script];
-        if ([self.jsBridge respondsToSelector:@selector(javaScriptContext)]) {
-            self.jsBridge.javaScriptContext[@"wxExtFuncInfo"] = nil;
+        if ([self.jsBridge respondsToSelector:@selector(setObject:forKeyedSubscript:)]) {
+            self.jsBridge[@"wxExtFuncInfo"] = nil;
         }
         
-        if ([self.jsBridge exception]) {
-            NSString *exception = [[self.jsBridge exception] toString];
-            NSMutableString *errMsg = [NSMutableString stringWithFormat:@"[WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE] name:%@,arg:%@,exception :$@",name,exception];
+        NSString *exceptionString = [self.jsBridge exception];
+        if (exceptionString) {
+            NSMutableString *errMsg = [NSMutableString stringWithFormat:@"[WX_KEY_EXCEPTION_INVOKE_JSSERVICE_EXECUTE] name:%@,arg:%@,exception :$@",name,exceptionString];
             [WXExceptionUtils commitCriticalExceptionRT:@"WX_KEY_EXCEPTION_INVOKE" errCode:[NSString stringWithFormat:@"%d", WX_KEY_EXCEPTION_INVOKE] function:@"executeJsService" exception:errMsg extParams:nil];
             WX_MONITOR_FAIL(WXMTJSService, WX_ERR_JSFRAMEWORK_EXECUTE, errMsg);
         }

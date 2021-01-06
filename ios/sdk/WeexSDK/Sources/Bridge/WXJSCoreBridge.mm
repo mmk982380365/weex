@@ -38,7 +38,8 @@
 #import "JSContext+Weex.h"
 #import "WXCoreBridge.h"
 #import "WXAnalyzerCenter.h"
-
+#import <objc/runtime.h>
+#import "WXSDKInstance_private.h"
 
 #import <dlfcn.h>
 
@@ -141,14 +142,25 @@
 //    }
 //}
 
-- (JSValue *)callJSMethod:(NSString *)method args:(NSArray *)args
+- (NSString *)callJSMethod:(NSString *)method args:(NSArray *)args
 {
     WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
-    WXPerformBlockOnMainThread(^{
-        [[WXBridgeManager sharedManager].lastMethodInfo setObject:method ?: @"" forKey:@"method"];
-        [[WXBridgeManager sharedManager].lastMethodInfo setObject:args ?: @[] forKey:@"args"];
-    });
-    return [[_jsContext globalObject] invokeMethod:method withArguments:[args copy]];
+//    __checkMutable(args);
+    JSValue *jval = [[_jsContext globalObject] invokeMethod:method withArguments:args];
+    NSString *ret = nil;
+    if (jval.isUndefined)
+    {
+        ret = nil;
+    }
+    else if (jval)
+    {
+        ret = jval.toString;
+    }
+    if (ret)
+    {
+        objc_setAssociatedObject(ret, "raw_jsvalue", jval, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return ret;
 }
 
 - (void)registerCallNative:(WXJSCallNative)callNative
@@ -170,14 +182,14 @@
     [_jsContext evaluateScript:script];
 }
 
-- (JSValue*)executeJavascript:(NSString *)script withSourceURL:(NSURL*)sourceURL
+- (void)executeJavascript:(NSString *)script withSourceURL:(NSURL*)sourceURL
 {
     WXAssertParam(script);
 
     if (sourceURL) {
-        return [_jsContext evaluateScript:script withSourceURL:sourceURL];
+        [_jsContext evaluateScript:script withSourceURL:sourceURL];
     } else {
-        return [_jsContext evaluateScript:script];
+        [_jsContext evaluateScript:script];
     }
 }
 
@@ -394,9 +406,39 @@
     };
 }
 
-- (JSValue*)exception
+- (void)setObject:(nullable id)object forKeyedSubscript:(nonnull NSObject <NSCopying> *)key
 {
-    return _jsContext.exception;
+    self.javaScriptContext[key] = object;
+}
+
+- (void)copySandboxFromGlobalBridge:(WXJSCoreBridge *)jsBridge
+{
+    if (![jsBridge isKindOfClass:[self class]])
+    {
+        return;
+    }
+    JSContext* globalContex = jsBridge.javaScriptContext;
+    JSContextGroupRef contextGroup = JSContextGetGroup([globalContex JSGlobalContextRef]);
+    JSClassDefinition classDefinition = kJSClassDefinitionEmpty;
+    classDefinition.attributes = kJSClassAttributeNoAutomaticPrototype;
+    JSClassRef globalObjectClass = JSClassCreate(&classDefinition);
+    JSGlobalContextRef sandboxGlobalContextRef = JSGlobalContextCreateInGroup(contextGroup, globalObjectClass);
+    JSClassRelease(globalObjectClass);
+    JSContext * instanceContext = [JSContext contextWithJSGlobalContextRef:sandboxGlobalContextRef];
+    JSGlobalContextRelease(sandboxGlobalContextRef);
+    [WXBridgeContext mountContextEnvironment:instanceContext];
+    [self setJSContext:instanceContext];
+
+}
+
+- (void)setContextName:(NSString *)name
+{
+    [self.javaScriptContext setName:name];
+}
+
+- (NSString *)exception
+{
+    return [_jsContext.exception toString];
 }
 
 - (void)resetEnvironment
@@ -440,6 +482,34 @@
     if(_intervaltimers && [_intervaltimers objectForKey:instance]){
         [_intervaltimers removeObjectForKey:instance];
     }
+}
+
+- (void)handleVueGlobalVars:(WXSDKInstance *)sdkInstance env:(NSString *)result
+{
+    //当前类中 - (id)callJSMethod:(NSString *)method args:(NSArray *)args 传入的
+    //由于 protocol 中不能暴露 JSValue，只能以这种形式解耦
+    JSValue *instanceContextEnvironment = objc_getAssociatedObject(result, "raw_jsvalue");
+    if ([instanceContextEnvironment isKindOfClass:[JSValue class]])
+    {
+        NSArray* allKeys = [WXUtility extractPropertyNamesOfJSValueObject:instanceContextEnvironment];
+        sdkInstance.createInstanceContextResult = [NSString stringWithFormat:@"%@", allKeys];
+        JSGlobalContextRef instanceContextRef = self.javaScriptContext.JSGlobalContextRef;
+        JSObjectRef instanceGlobalObject = JSContextGetGlobalObject(instanceContextRef);
+        for (NSString * key in allKeys)
+        {
+            JSStringRef propertyName = JSStringCreateWithUTF8CString([key cStringUsingEncoding:NSUTF8StringEncoding]);
+            if ([key isEqualToString:@"Vue"]) {
+                JSObjectSetPrototype(instanceContextRef, JSValueToObject(instanceContextRef, [instanceContextEnvironment valueForProperty:key].JSValueRef, NULL), JSObjectGetPrototype(instanceContextRef, instanceGlobalObject));
+            }
+            JSObjectSetProperty(instanceContextRef, instanceGlobalObject, propertyName, [instanceContextEnvironment valueForProperty:key].JSValueRef, 0, NULL);
+        }
+    }
+}
+
+- (void)handleRaxResult:(WXSDKInstance *)sdkInstance
+{
+    NSArray* allKeys = [WXUtility extractPropertyNamesOfJSValueObject:self.javaScriptContext.globalObject];
+    sdkInstance.executeRaxApiResult = [NSString stringWithFormat:@"%@", allKeys];
 }
 
 #pragma mark - Private

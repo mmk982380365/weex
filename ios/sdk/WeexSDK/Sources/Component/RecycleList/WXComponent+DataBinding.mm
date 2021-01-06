@@ -109,15 +109,16 @@ static JSContext *jsContext;
             self->_virtualComponentId = [NSString stringWithFormat:@"%@@%lu*%@", listRef, (unsigned long)__componentId % (2048*1024),templateId];
             __componentId++;
             dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:templateId type:@"lifecycle" hook:@"create" args:@[self->_virtualComponentId, newData] competion:^(JSValue *value) {
+            [[WXSDKManager bridgeMgr] callComponentHook:self.weexInstance.instanceId componentId:templateId type:@"lifecycle" hook:@"create" args:@[self->_virtualComponentId, newData] competion:^(NSString *value) {
                 [newData setObject:indexPath forKey:@"indexPath"];
                 [newData setObject:listRef forKey:@"recycleListComponentRef"];
-                if ([[value toArray][0] isKindOfClass:[NSDictionary class]]) {
-                    NSMutableDictionary *virtualComponentData = [value toArray][0];
-                    [virtualComponentData setObject:indexPath forKey:@"indexPath"];
-                    [[recycleListComponent dataManager] updateVirtualComponentData:self->_virtualComponentId data:virtualComponentData];
-                    [newData addEntriesFromDictionary:virtualComponentData];
-                }
+                //TODO
+//                if ([[value toArray][0] isKindOfClass:[NSDictionary class]]) {
+//                    NSMutableDictionary *virtualComponentData = [value toArray][0];
+//                    [virtualComponentData setObject:indexPath forKey:@"indexPath"];
+//                    [[recycleListComponent dataManager] updateVirtualComponentData:self->_virtualComponentId data:virtualComponentData];
+//                    [newData addEntriesFromDictionary:virtualComponentData];
+//                }
                 dispatch_semaphore_signal(semaphore);
             }];
             dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);

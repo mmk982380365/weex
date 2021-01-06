@@ -124,9 +124,9 @@
 
 - (BOOL)stopPropagation:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary *)params
 {
-    JSValue *value = [[WXSDKManager bridgeMgr] fireEventWithResult:instanceId ref:ref type:type params:params domChanges:nil];
+    NSString *value = [[WXSDKManager bridgeMgr] fireEventWithResult:instanceId ref:ref type:type params:params domChanges:nil];
     
-    if ([value.toString isEqualToString:@"true"]) {
+    if ([value isKindOfClass:[NSString class]] && [value isEqualToString:@"true"]) {
         return YES;
     }
     return NO;

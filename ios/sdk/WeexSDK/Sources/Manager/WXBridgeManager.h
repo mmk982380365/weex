@@ -191,7 +191,7 @@ extern "C" {
  **/
 - (void)fireEvent:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary * _Nullable)params domChanges:(NSDictionary * _Nullable)domChanges handlerArguments:(NSArray * _Nullable)handlerArguments;
 
-- (JSValue *)fireEventWithResult:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary * _Nullable)params domChanges:(NSDictionary * _Nullable)domChanges;
+- (NSString *)fireEventWithResult:(NSString *)instanceId ref:(NSString *)ref type:(NSString *)type params:(NSDictionary * _Nullable)params domChanges:(NSDictionary * _Nullable)domChanges;
 
 /**
  * componentHook
@@ -200,7 +200,7 @@ extern "C" {
  * @param type        : component hook Type, such as life-cycle
  * @param hookPhase   : hook phase
  */
-- (void)callComponentHook:(NSString*)instanceId componentId:(NSString*)componentId type:(NSString*)type hook:(NSString*)hookPhase args:(NSArray* _Nullable)args competion:(nullable void (^)(JSValue * value))complection;
+- (void)callComponentHook:(NSString*)instanceId componentId:(NSString*)componentId type:(NSString*)type hook:(NSString*)hookPhase args:(NSArray*)args competion:(void (^)(NSString * value))completion;
 /**
  *  callBack
  *
