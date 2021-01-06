@@ -59,6 +59,7 @@ import com.taobao.weex.common.WXWorkThreadManager;
 import com.taobao.weex.font.FontAdapter;
 import com.taobao.weex.performance.IApmGenerator;
 import com.taobao.weex.performance.IWXAnalyzer;
+import com.taobao.weex.performance.IWXRecorderGenerator;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
@@ -92,6 +93,7 @@ public class WXSDKManager {
   private List<IWXAnalyzer> mWXAnalyzerList;
   private IApmGenerator mApmGenerater;
   private IWXJsFileLoaderAdapter mWXJsFileLoaderAdapter;
+  private IWXRecorderGenerator mRecorderGenerator;
 
   private ICrashInfoReporter mCrashInfo;
 
@@ -366,6 +368,10 @@ public class WXSDKManager {
     return String.valueOf(sInstanceId.incrementAndGet());
   }
 
+  public IWXRecorderGenerator getRecorderGenerator() {
+    return mRecorderGenerator;
+  }
+
   public IWXUserTrackAdapter getIWXUserTrackAdapter() {
     return mIWXUserTrackAdapter;
   }
@@ -472,6 +478,7 @@ public class WXSDKManager {
     this.mWXJsFileLoaderAdapter = config.getJsFileLoaderAdapter();
     this.mWXJscProcessManager = config.getJscProcessManager();
     this.mWXFoldDeviceAdapter = config.getFoldDeviceAdapter();
+    this.mRecorderGenerator = config.getRecorderGenerator();
   }
 
   public IWXStorageAdapter getIWXStorageAdapter(){

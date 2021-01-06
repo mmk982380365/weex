@@ -33,6 +33,8 @@ import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
 import com.taobao.weex.performance.IApmGenerator;
+import com.taobao.weex.performance.IWXRecorderGenerator;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -55,6 +57,7 @@ public class InitConfig {
   private IWXJsFileLoaderAdapter jsFileLoaderAdapter;
   private IWXJscProcessManager jscProcessManager;
   private IWXFoldDeviceAdapter foldDeviceAdapter;
+  private IWXRecorderGenerator recorderGenerator;
   private List<String> nativeLibraryList;
 
   public IWXHttpAdapter getHttpAdapter() {
@@ -126,6 +129,10 @@ public class InitConfig {
     return nativeLibraryList;
   }
 
+  public IWXRecorderGenerator getRecorderGenerator() {
+    return recorderGenerator;
+  }
+
   private InitConfig() {
   }
 
@@ -142,6 +149,7 @@ public class InitConfig {
     IWebSocketAdapterFactory webSocketAdapterFactory;
     ClassLoaderAdapter classLoaderAdapter;
     IApmGenerator apmGenerater;
+    IWXRecorderGenerator recorderGenerator;
     private IWXJsFileLoaderAdapter jsFileLoaderAdapter;
     private IWXFoldDeviceAdapter foldDeviceAdapter;
     private List<String> nativeLibraryList = new LinkedList<>();
@@ -236,6 +244,11 @@ public class InitConfig {
       return this;
     }
 
+    public Builder setRecorderGenerator(IWXRecorderGenerator recorderGenerator) {
+      this.recorderGenerator = recorderGenerator;
+      return this;
+    }
+
     public InitConfig build(){
       InitConfig config =  new InitConfig();
       config.httpAdapter = this.httpAdapter;
@@ -254,6 +267,7 @@ public class InitConfig {
       config.jscProcessManager = this.jscProcessManager;
       config.nativeLibraryList = this.nativeLibraryList;
       config.foldDeviceAdapter = this.foldDeviceAdapter;
+      config.recorderGenerator = this.recorderGenerator;
       return config;
     }
   }

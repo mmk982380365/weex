@@ -35,6 +35,7 @@ import com.taobao.weex.common.WXErrorCode;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.performance.IWXInstanceRecorder;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.utils.WXExceptionUtils;
@@ -329,6 +330,49 @@ public class WXBridge implements IWXBridge {
     nativeCompileQuickJSBin(key, script);
   }
 
+  private void recordNativeModuleStart(WXSDKInstance instance, JSONObject record, String module, String method, JSONArray params) {
+    if (instance == null || !instance.needRecord() || record == null) {
+      return;
+    }
+    try {
+      record.put("module", module);
+      record.put("method", method);
+      record.put("startTimestamp", WXUtils.getFixUnixTime());
+      if (params != null) {
+        record.put("params", params);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void recordNativeModuleEnd(WXSDKInstance instance, JSONObject record) {
+    if (instance == null || !instance.needRecord() || record == null) {
+      return;
+    }
+    record.put("endTimestamp", WXUtils.getFixUnixTime());
+    instance.record(record, IWXInstanceRecorder.RecordType.NativeModuleInvoke);
+  }
+
+  private JSONArray getArgArray(byte[] arguments, WXSDKInstance instance) {
+    JSONArray argArray = null;
+    if (arguments != null){
+      // TODO use a better way
+      if (instance!=null && (instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER
+              || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY)){
+        try {
+          argArray = (JSONArray) JSON.parse(new String(arguments, "UTF-8"));
+        } catch (Exception e) {
+          // For wson use in data render mode
+          argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
+        }
+      } else {
+        argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
+      }
+    }
+    return argArray;
+  }
+
   /**
    * Bridge module Js Method
    * support Sync or Async through setting  Annotation as {@link com.taobao.weex.annotation.JSMethod }
@@ -362,6 +406,10 @@ public class WXBridge implements IWXBridge {
           argArray = (JSONArray) WXWsonJSONSwitch.parseWsonOrJSON(arguments);
         }
       }
+
+      JSONObject record = new JSONObject();
+      recordNativeModuleStart(instance, record, module, method, argArray);
+
       JSONObject optionsObj = null;
       if (options != null) {
         optionsObj = (JSONObject) WXWsonJSONSwitch.parseWsonOrJSON(options);
@@ -392,6 +440,8 @@ public class WXBridge implements IWXBridge {
             WXUtils.getFixUnixTime()-start
         );
       }
+
+      recordNativeModuleEnd(instance, record);
       if (instance!=null && (instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER
           || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY || instance.getReactorPage() != null)){
         try {
