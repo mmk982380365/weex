@@ -183,14 +183,21 @@ class ScriptBridge {
 
   inline CoreSide *core_side() { return core_side_.get(); }
   inline ScriptSide *script_side() { return script_side_.get(); }
+  inline ScriptSide *script_side_main_process_only() { return script_side_main_process_.get(); }
 
   inline void set_core_side(CoreSide *core_side) {
     core_side_.reset(core_side);
     core_side_->set_bridge(this);
   }
+
   inline void set_script_side(ScriptSide *script_side) {
     script_side_.reset(script_side);
     script_side_->set_bridge(this);
+  }
+
+  inline void set_script_side_main_process_only(ScriptSide *script_side) {
+    script_side_main_process_.reset(script_side);
+    script_side_main_process_->set_bridge(this);
   }
 
   ScriptBridge() : is_passable_(true) {}
@@ -204,6 +211,7 @@ class ScriptBridge {
  private:
   std::unique_ptr<CoreSide> core_side_;
   std::unique_ptr<ScriptSide> script_side_;
+  std::unique_ptr<ScriptSide> script_side_main_process_;
   bool is_passable_;
   DISALLOW_COPY_AND_ASSIGN(ScriptBridge);
 };

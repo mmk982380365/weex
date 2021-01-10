@@ -367,6 +367,7 @@ static jint InitFramework(JNIEnv *env, jobject object, jstring script,
       WeexCoreManager::ProjectMode::MULTI_PROCESS);
   WeexCoreManager::Instance()->set_script_bridge(
       new ScriptBridgeInMultiProcess);
+
 //
 //  // It means initialization failed when any bridge is not passable
 //  if (!WeexCoreManager::Instance()->getPlatformBridge()->is_passable() ||
@@ -669,7 +670,6 @@ static jint CreateInstanceContext(JNIEnv *env, jobject jcaller,
           env, env->GetObjectArrayElement(args, 7))
           .Get()));
 
-
   ScopedJStringUTF8 scoped_id(env, instanceId);
   ScopedJStringUTF8 scoped_func(env, function);
   ScopedJStringUTF8 scoped_opts(env, opts.Get());
@@ -828,8 +828,8 @@ static void onInteractionTimeUpdate(JNIEnv *env, jobject jcaller, jstring instan
   performance_map->Put(env, c_performance_data);
 
   jobject jni_map_performance =
-          performance_map.get() != nullptr ? performance_map->jni_object() : nullptr;
-  Java_WXBridge_onNativePerformanceDataUpdate(env,jcaller,instanceId,jni_map_performance);
+      performance_map.get() != nullptr ? performance_map->jni_object() : nullptr;
+  Java_WXBridge_onNativePerformanceDataUpdate(env, jcaller, instanceId, jni_map_performance);
 }
 
 namespace WeexCore {

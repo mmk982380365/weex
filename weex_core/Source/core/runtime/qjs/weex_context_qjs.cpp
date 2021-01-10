@@ -790,7 +790,6 @@ static void setNativeTimer(int32_t funcId,
                            WeexContextQJS *weexContext,
                            bool repeat) {
   auto *ctx = static_cast<JSContext *>(weexContext->js_context());
-  LOGE("dyyLog 222 Native Timer setNativeTimer is running timeout is %d %p", timeoutNumber, ctx);
   weex::base::MessageLoop::GetCurrent()->PostDelayedTask(
       [id = funcId,
           jsContext = weexContext,
@@ -850,7 +849,6 @@ static void setNativeTimer(int32_t funcId,
 static JSValue addNativeTimer(JSContext *ctx, JSValueConst this_val,
                               int argc, JSValueConst *argv, bool repeat) {
   void *weexContextVoid = JS_GetContextOpaque(ctx);
-  LOGE("dyyLog Native Timer will Set");
   if (weexContextVoid == nullptr) {
     return JS_FALSE;
   }
@@ -875,7 +873,6 @@ static JSValue addNativeTimer(JSContext *ctx, JSValueConst this_val,
   JS_ToInt32(ctx, &timeoutNumber, timeout);
   uint32_t funcId = weexContext->gen_timer_function_id();
   weexContext->add_timer(funcId, JS_DupValue(ctx, jsFunction));
-  LOGE("dyyLog 1111 Native Timer setNativeTimer is running timeout is %d %p", timeoutNumber, ctx);
   setNativeTimer(funcId, timeoutNumber, this_val, weexContext, repeat);
   return JS_NewInt32(ctx, funcId);
 }

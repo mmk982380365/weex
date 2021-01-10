@@ -25,7 +25,7 @@
 #include "core/bridge/script/script_side_in_simple.h"
 
 ScriptBridgeInSimple::ScriptBridgeInSimple() {
-  set_script_side(new bridge::script::ScriptSideInSimple);
+  set_script_side(new bridge::script::ScriptSideInSimple(true));
   set_core_side(new CoreSideInScript);
 }
 ScriptBridgeInSimple::~ScriptBridgeInSimple() {

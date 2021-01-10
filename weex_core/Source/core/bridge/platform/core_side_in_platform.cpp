@@ -365,7 +365,7 @@ int CoreSideInPlatform::RefreshInstance(
                                               params[1]->value.string->length);
 
   EagleModeReturn mode = EagleBridge::GetInstance()->RefreshPage(instanceId, init_data.c_str());
-  if (mode == EagleModeReturn::EAGLE_ONLY){
+  if (mode == EagleModeReturn::EAGLE_ONLY) {
     return true;
   } else {
     //mode == EagleModeReturn::EAGLE_AND_SCRIPT || mode == EagleModeReturn::NOT_EAGLE
@@ -379,10 +379,13 @@ int CoreSideInPlatform::RefreshInstance(
 
 int CoreSideInPlatform::InitFramework(
     const char *script, std::vector<std::pair<std::string, std::string>> params) {
-  return WeexCoreManager::Instance()
-      ->script_bridge()
-      ->script_side()
-      ->InitFramework(script, params);
+  const std::vector<WeexCore::ScriptBridge::ScriptSide *> &script_side_vector = GetScriptSide(
+      nullptr);
+  int ret = 0;
+  for (const auto &it : script_side_vector) {
+    ret = it->InitFramework(script, params);
+  }
+  return ret;
 }
 
 int CoreSideInPlatform::InitAppFramework(
@@ -427,42 +430,61 @@ int CoreSideInPlatform::DestroyAppContext(const char *instanceId) {
 }
 
 int CoreSideInPlatform::ExecJsService(const char *source) {
-  return WeexCoreManager::Instance()
-      ->script_bridge()
-      ->script_side()
-      ->ExecJsService(source);
+  const std::vector<WeexCore::ScriptBridge::ScriptSide *>
+      &script_side_vector = GetScriptSide(nullptr);
+  int ret = 0;
+  for (const auto &it : script_side_vector) {
+    ret = it->ExecJsService(source);
+  }
+  return ret;
 }
 
 int CoreSideInPlatform::ExecTimeCallback(const char *source) {
-  return WeexCoreManager::Instance()
-      ->script_bridge()
-      ->script_side()
-      ->ExecTimeCallback(source);
+  const std::vector<WeexCore::ScriptBridge::ScriptSide *>
+      &script_side_vector = GetScriptSide(nullptr);
+  int ret = 0;
+  for (const auto &it : script_side_vector) {
+    ret = it->ExecTimeCallback(source);
+  }
+  return ret;
 }
 
 int CoreSideInPlatform::ExecJS(const char *instanceId, const char *nameSpace,
                                const char *func,
                                std::vector<VALUE_WITH_TYPE *> &params) {
-  return WeexCoreManager::Instance()->script_bridge()->script_side()->ExecJS(
-      instanceId, nameSpace, func, params);
+
+  const std::vector<WeexCore::ScriptBridge::ScriptSide *>
+      &script_side_vector = GetScriptSide(instanceId);
+  int ret = 0;
+  for (const auto &it : script_side_vector) {
+    ret = it->ExecJS(instanceId, nameSpace, func, params);
+  }
+
+  return ret;
 }
 
 std::unique_ptr<WeexJSResult> CoreSideInPlatform::ExecJSWithResult(
     const char *instanceId, const char *nameSpace, const char *func,
     std::vector<VALUE_WITH_TYPE *> &params) {
-  return WeexCoreManager::Instance()
-      ->script_bridge()
-      ->script_side()
-      ->ExecJSWithResult(instanceId, nameSpace, func, params);
+
+  const std::vector<WeexCore::ScriptBridge::ScriptSide *>
+      &script_side_vector = GetScriptSide(instanceId);
+  std::unique_ptr<WeexJSResult> ret;
+  for (const auto &it : script_side_vector) {
+    ret = it->ExecJSWithResult(instanceId, nameSpace, func, params);
+  }
+  return ret;
 }
 
 void CoreSideInPlatform::ExecJSWithCallback(
     const char *instanceId, const char *nameSpace, const char *func,
     std::vector<VALUE_WITH_TYPE *> &params, long callback_id) {
-  WeexCoreManager::Instance()
-      ->script_bridge()
-      ->script_side()
-      ->ExecJSWithCallback(instanceId, nameSpace, func, params, callback_id);
+
+  const std::vector<WeexCore::ScriptBridge::ScriptSide *>
+      &script_side_vector = GetScriptSide(instanceId);
+  for (const auto &it : script_side_vector) {
+    it->ExecJSWithCallback(instanceId, nameSpace, func, params, callback_id);
+  }
 }
 
 int CoreSideInPlatform::CreateInstance(const char *instanceId,
@@ -477,62 +499,98 @@ int CoreSideInPlatform::CreateInstance(const char *instanceId,
 
   // First check about DATA_RENDER mode
   if (render_strategy != nullptr) {
-    if(strcmp(render_strategy, "JSON_RENDER") == 0){
+    if (strcmp(render_strategy, "JSON_RENDER") == 0) {
       JsonRenderManager::GetInstance()->CreatePage(script, instanceId, render_strategy);
       return true;
     }
 
-    EagleBridge::GetInstance()->CreatePage(render_strategy, instanceId, func, script, script_length, opts, initData ,extendsApi, 0);
+    EagleBridge::GetInstance()->CreatePage(render_strategy,
+                                           instanceId,
+                                           func,
+                                           script,
+                                           script_length,
+                                           opts,
+                                           initData,
+                                           extendsApi,
+                                           0);
     return true;
   }
 
-  return WeexCoreManager::Instance()
-      ->script_bridge()
-      ->script_side()
-      ->CreateInstance(instanceId, func, script, script_length, opts, initData, extendsApi, params);
+  std::string id(instanceId);
+  auto instanceData = WeexRuntimeManager::Instance()->create_instance(id, params);
+
+  const std::vector<WeexCore::ScriptBridge::ScriptSide *>
+      &script_side_vector = GetScriptSide(instanceId);
+  int ret = 0;
+  for (const auto &it : script_side_vector) {
+    ret = it->CreateInstance(instanceId,
+                             func,
+                             script,
+                             script_length,
+                             opts,
+                             initData,
+                             extendsApi,
+                             params);
+  }
+
+  return ret;
 }
 
 std::unique_ptr<WeexJSResult> CoreSideInPlatform::ExecJSOnInstance(const char *instanceId,
                                                                    const char *script,
                                                                    const int script_size,
                                                                    int type) {
-  return WeexCoreManager::Instance()
-      ->script_bridge()
-      ->script_side()
-      ->ExecJSOnInstance(instanceId, script, script_size, type);
+  const std::vector<WeexCore::ScriptBridge::ScriptSide *>
+      &script_side_vector = GetScriptSide(instanceId);
+  std::unique_ptr<WeexJSResult> ret;
+  for (const auto &it : script_side_vector) {
+    ret = it->ExecJSOnInstance(instanceId, script, script_size, type);
+  }
+  return ret;
 }
 
 int CoreSideInPlatform::DestroyInstance(const char *instanceId) {
-    if (JsonRenderManager::GetInstance()->ClosePage(instanceId)) {
-      return true;
-    }
-    EagleModeReturn mode = EagleBridge::GetInstance()->DestroyPage(instanceId);
-    if (mode == EagleModeReturn::EAGLE_ONLY){
-      return true;
-    } else {
-      //mode == EagleModeReturn::EAGLE_AND_SCRIPT || mode == EagleModeReturn::NOT_EAGLE
-      //continue;
-    }
-    auto script_side = WeexCoreManager::Instance()->script_bridge()->script_side();
-    if (script_side) {
-        return script_side->DestroyInstance(instanceId);
-    }
+  if (JsonRenderManager::GetInstance()->ClosePage(instanceId)) {
     return true;
+  }
+  EagleModeReturn mode = EagleBridge::GetInstance()->DestroyPage(instanceId);
+  if (mode == EagleModeReturn::EAGLE_ONLY) {
+    return true;
+  } else {
+    //mode == EagleModeReturn::EAGLE_AND_SCRIPT || mode == EagleModeReturn::NOT_EAGLE
+    //continue;
+  }
+
+  const std::vector<WeexCore::ScriptBridge::ScriptSide *>
+      &script_side_vector = GetScriptSide(instanceId);
+  int ret = 0;
+  for (const auto &it : script_side_vector) {
+    ret = it->DestroyInstance(instanceId);
+  }
+  return ret;
 }
 
 int CoreSideInPlatform::UpdateGlobalConfig(const char *config) {
-  return WeexCoreManager::Instance()
-      ->script_bridge()
-      ->script_side()
-      ->UpdateGlobalConfig(config);
+  const std::vector<WeexCore::ScriptBridge::ScriptSide *>
+      &script_side_vector = GetScriptSide(nullptr);
+  int ret = 0;
+  for (const auto &it : script_side_vector) {
+    ret = it->UpdateGlobalConfig(config);
+  }
+  return ret;
 }
 
 int CoreSideInPlatform::UpdateInitFrameworkParams(const std::string &key, const std::string &value,
                                                   const std::string &desc) {
-  return WeexCoreManager::Instance()
-      ->script_bridge()
-      ->script_side()
-      ->UpdateInitFrameworkParams(key, value, desc);
+
+  const std::vector<WeexCore::ScriptBridge::ScriptSide *>
+      &script_side_vector = GetScriptSide(nullptr);
+  int ret = 0;
+  for (const auto &it : script_side_vector) {
+    ret = it->UpdateInitFrameworkParams(key, value, desc);
+  }
+
+  return ret;
 }
 
 void CoreSideInPlatform::SetLogType(const int logType, const bool isPerf) {
@@ -553,5 +611,40 @@ void CoreSideInPlatform::CompileQuickJSBin(const char *key, const char *script) 
   WeexCoreManager::Instance()
       ->script_bridge()
       ->script_side()->CompileQuickJSBin(key, script);
+}
+
+std::vector<WeexCore::ScriptBridge::ScriptSide *> CoreSideInPlatform::GetScriptSide(const char *page_id) {
+  std::vector<WeexCore::ScriptBridge::ScriptSide *> ret;
+  bool put_script_side = false;
+  ScriptBridge::ScriptSide *script_side =
+      WeexCoreManager::Instance()
+          ->script_bridge()
+          ->script_side();
+
+  bool put_script_side_main_process_only = false;
+  ScriptBridge::ScriptSide *script_side_main_process =
+      WeexCoreManager::Instance()
+          ->script_bridge()
+          ->script_side_main_process_only();
+  if (page_id == nullptr || strlen(page_id) == 0) {
+    put_script_side = true;
+    put_script_side_main_process_only = true;
+  } else {
+    put_script_side_main_process_only =
+        WeexRuntimeManager::Instance()->is_force_in_main_process(page_id);
+    if (put_script_side_main_process_only) {
+      LOGE("instance %s is running in main process", page_id);
+    }
+    put_script_side = !put_script_side_main_process_only;
+  }
+
+  if (put_script_side && script_side != nullptr) {
+    ret.push_back(script_side);
+  }
+
+  if (put_script_side_main_process_only && script_side_main_process != nullptr) {
+    ret.push_back(script_side_main_process);
+  }
+  return ret;
 }
 }  // namespace WeexCore

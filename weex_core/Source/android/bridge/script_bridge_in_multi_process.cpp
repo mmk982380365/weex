@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include <core/bridge/script/script_side_in_simple.h>
 #include "base/log_defines.h"
 #include "script_bridge_in_multi_process.h"
 
@@ -681,6 +682,7 @@ std::unique_ptr<IPCResult> CompileQuickJSBinCallback(IPCArguments *arguments) {
 
 ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   set_script_side(new bridge::script::ScriptSideInMultiProcess);
+  set_script_side_main_process_only(new bridge::script::ScriptSideInSimple(true));
   set_core_side(new CoreSideInScript);
   std::unique_ptr<MultiProcessAndSoInitializer> initializer(
       new MultiProcessAndSoInitializer);

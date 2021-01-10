@@ -113,7 +113,7 @@ ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   task_queue_thread_ = std::make_unique<weex::base::Thread>(weex::base::MessageLoop::DEFAULT);
   task_queue_thread_->Start();
   LOGE("thread isStarted and task_queue_thread_ %u", pthread_self());
-  set_script_side(new WeexCore::bridge::script::ScriptSideInSimple());
+  set_script_side(new WeexCore::bridge::script::ScriptSideInSimple(false));
   set_core_side(new CoreSideInMultiProcess());
 }
 

@@ -29,12 +29,12 @@ namespace bridge {
 namespace script {
 class ScriptSideInSimple : public ScriptBridge::ScriptSide {
  public:
-  explicit ScriptSideInSimple();
+  explicit ScriptSideInSimple(bool main_process_only) : main_process_only_(main_process_only) {};
   int InitFramework(const char *script,
-                    std::vector<std::pair<std::string, std::string>>params) override;
+                    std::vector<std::pair<std::string, std::string>> params) override;
 
   int InitAppFramework(const char *instanceId, const char *appFramework,
-                       std::vector<std::pair<std::string, std::string>>params) override;
+                       std::vector<std::pair<std::string, std::string>> params) override;
 
   int CreateAppContext(const char *instanceId, const char *jsBundle) override;
 
@@ -69,7 +69,7 @@ class ScriptSideInSimple : public ScriptBridge::ScriptSide {
                      const char *opts,
                      const char *initData,
                      const char *extendsApi,
-                     std::vector<std::pair<std::string, std::string>>params) override;
+                     std::vector<std::pair<std::string, std::string>> params) override;
 
   std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char *instanceId,
                                                  const char *script,
@@ -86,6 +86,9 @@ class ScriptSideInSimple : public ScriptBridge::ScriptSide {
 
   void SetLogType(const int logLevel, const bool isPerf) override;
   void CompileQuickJSBin(const char *key, const char *script) override;
+
+ private:
+  bool main_process_only_;
 };
 }  // namespace script
 }  // namespace bridge

@@ -34,14 +34,14 @@ int bridge::script::ScriptSideInSimple::InitFramework(const char *script,
                                                       std::vector<std::pair<std::string,
                                                                             std::string>> params) {
   // Engine Type
-  unsigned int engine_type = WeexRuntimeManager::Instance()->supported_jsengine_type();
+  unsigned int engine_type =
+      main_process_only_ ? ENGINE_QJS : WeexRuntimeManager::Instance()->supported_jsengine_type();
   if (engine_type & ENGINE_JSC) {
     LOGE("Init JSC")
 #if OS_ANDROID
     WeexRuntimeManager::Instance()
         ->add_weex_runtime(new WeexRuntimeJSC(this->bridge(), false));
 #elif OS_IOS
-
 #endif
   }
 
@@ -132,8 +132,8 @@ void bridge::script::ScriptSideInSimple::ExecJSWithCallback(const char *instance
 
   for (auto &runtime: runtime_map) {
     runtime.second->exeJSWithCallback(weex::base::value_or_empty(instanceId),
-                                 weex::base::value_or_empty(nameSpace),
-                                 weex::base::value_or_empty(func), params, callback_id);
+                                      weex::base::value_or_empty(nameSpace),
+                                      weex::base::value_or_empty(func), params, callback_id);
   }
 }
 int bridge::script::ScriptSideInSimple::CreateInstance(const char *instanceId,
@@ -145,54 +145,28 @@ int bridge::script::ScriptSideInSimple::CreateInstance(const char *instanceId,
                                                        const char *extendsApi,
                                                        std::vector<std::pair<std::string,
                                                                              std::string>> params) {
-  bool backUpThread = false;
-  JSEngineType engine_type = ENGINE_JSC;
-  bool pre_init_mode = false;
-  for (const auto &param:params) {
-    auto type = param.first;
-    auto value = param.second;
-    if (type == "use_back_thread") {
-      if (value == "true") {
-        backUpThread = true;
-      }
-    } else if (type == "engine_type") {
-      LOGE("createInstance Set engine_type  %s", value.c_str());
-      if (value == "QJS") {
-        engine_type = ENGINE_QJS;
-      } else if (value == "QJSBin") {
-        engine_type = ENGINE_QJS_BIN;
-      } else if (value == "JSC") {
-        engine_type = ENGINE_JSC;
-      }
-    } else if (type == "pre_init_mode" && value == "true") {
-      pre_init_mode = true;
-    }
+  std::string page_id(weex::base::value_or_empty(instanceId));
+  auto instanceData = WeexRuntimeManager::Instance()->instance_engine_data(page_id);
+  if (instanceData == nullptr) {
+    instanceData = WeexRuntimeManager::Instance()->create_instance(page_id, params);
   }
 
-  std::string page_id(weex::base::value_or_empty(instanceId));
-  WeexRuntimeManager::Instance()->create_instance(page_id, engine_type);
-  if (pre_init_mode && engine_type == ENGINE_QJS_BIN) {
+  JSEngineType engine_type = instanceData->engine_type();
+  if (instanceData->pre_init_mode() && instanceData->engine_type() == ENGINE_QJS_BIN) {
     //无法控制 pre_init_mode 的 script,
     // 所以这里还是走 source code 的执行方式,
     // 但 pre_init_mode 下 exeJsOnInstance 还是要走 bytecode 模式
     engine_type = ENGINE_QJS;
   }
-  std::map<JSEngineType, WeexRuntime *>
-      runtime_map = WeexRuntimeManager::Instance()->runtime_from_page_id(instanceId);
-  for (auto &runtime: runtime_map) {
-    LOGE("createInstance in for  %d", runtime.first);
-    if ((runtime.first & engine_type) > 0) {
-      LOGE("createInstance in %d", engine_type);
-      runtime.second->createInstance(page_id,
-                                weex::base::value_or_empty(func),
-                                script,
-                                script_size,
-                                weex::base::value_or_empty(opts),
-                                weex::base::value_or_empty(initData),
-                                weex::base::value_or_empty(extendsApi),
-                                params, engine_type);
-    }
-  }
+
+  instanceData->runtime()->createInstance(page_id,
+                                          weex::base::value_or_empty(func),
+                                          script,
+                                          script_size,
+                                          weex::base::value_or_empty(opts),
+                                          weex::base::value_or_empty(initData),
+                                          weex::base::value_or_empty(extendsApi),
+                                          params, engine_type);
   return 1;
 }
 std::unique_ptr<WeexJSResult> bridge::script::ScriptSideInSimple::ExecJSOnInstance(const char *instanceId,
@@ -204,9 +178,9 @@ std::unique_ptr<WeexJSResult> bridge::script::ScriptSideInSimple::ExecJSOnInstan
 
   for (auto &runtime: runtime_map) {
     runtime.second->exeJSOnInstance(weex::base::value_or_empty(instanceId),
-                               script,
-                               script_size,
-                               runtime.first);
+                                    script,
+                                    script_size,
+                                    runtime.first);
   }
 
   return std::unique_ptr<WeexJSResult>();
@@ -259,6 +233,4 @@ void bridge::script::ScriptSideInSimple::CompileQuickJSBin(const char *key, cons
                                                   length);
   }
 
-}
-bridge::script::ScriptSideInSimple::ScriptSideInSimple() {
 }

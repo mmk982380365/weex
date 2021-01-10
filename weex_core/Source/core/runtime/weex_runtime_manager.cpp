@@ -37,11 +37,12 @@ std::map<JSEngineType,
   std::map<JSEngineType, WeexRuntime *> ret;
   auto it = page_engine_type_map_.find(id);
   if (it != page_engine_type_map_.end()) {
-    ret[it->second->engine_type_] = it->second->runtime_;
+    ret[it->second->engine_type()] = it->second->runtime();
     return ret;
   }
   return ret;
 }
+
 WeexRuntime *WeexRuntimeManager::find_runtime_from_engineType(JSEngineType engine_type) {
   if ((js_engine_type_ & engine_type) == 0) {
     return nullptr;
@@ -69,7 +70,11 @@ WeexRuntime *WeexRuntimeManager::default_runtime() {
   return it->second;
 }
 
-void WeexRuntimeManager::create_instance(std::string &page_id, JSEngineType engine_type) {
+WeexRuntimeManager::InstanceEngineData *WeexRuntimeManager::create_instance(std::string &page_id,
+                                                                            JSEngineType engine_type,
+                                                                            bool force_in_main_process,
+                                                                            bool backup_thread,
+                                                                            bool pre_init_mode) {
   JSEngineType ret = engine_type;
   LOGE("createInstance engine_type is %d", engine_type);
   WeexRuntime *runtime = find_runtime_from_engineType(engine_type);
@@ -77,5 +82,53 @@ void WeexRuntimeManager::create_instance(std::string &page_id, JSEngineType engi
     runtime = default_runtime();
     ret = runtime->engine_type();
   }
-  page_engine_type_map_[page_id] = std::make_unique<EngineData>(runtime, ret);
+
+  page_engine_type_map_[page_id] =
+      std::make_unique<InstanceEngineData>(page_id,
+                                           runtime,
+                                           ret,
+                                           force_in_main_process,
+                                           backup_thread, pre_init_mode);
+
+  return page_engine_type_map_[page_id].get();
+}
+WeexRuntimeManager::InstanceEngineData *WeexRuntimeManager::create_instance(std::string &page_id,
+                                                                            std::vector<std::pair<
+                                                                                std::string,
+                                                                                std::string>> &params) {
+  JSEngineType engine_type = ENGINE_JSC;
+  bool pre_init_mode = false;
+  bool run_in_main_process_mode = false;
+  bool run_in_backup_thread = false;
+  for (const auto &param:params) {
+    auto type = param.first;
+    auto value = param.second;
+    if (type == "use_back_thread") {
+      if (value == "true") {
+        run_in_backup_thread = true;
+      }
+    } else if (type == "engine_type") {
+      LOGE("createInstance Set engine_type  %s", value.c_str());
+      if (value == "QJS") {
+        engine_type = ENGINE_QJS;
+      } else if (value == "QJSBin") {
+        engine_type = ENGINE_QJS_BIN;
+      } else if (value == "JSC") {
+        engine_type = ENGINE_JSC;
+      }
+    } else if (type == "pre_init_mode" && value == "true") {
+      pre_init_mode = true;
+    } else if (type == "run_in_main_process" && value == "true") {
+      run_in_main_process_mode = true;
+    }
+  }
+
+  if (run_in_main_process_mode) {
+    engine_type = ENGINE_QJS;
+  }
+  return create_instance(page_id,
+                         engine_type,
+                         run_in_main_process_mode,
+                         run_in_backup_thread,
+                         pre_init_mode);
 }
