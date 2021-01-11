@@ -44,7 +44,6 @@
 #include "third_party/IPC/IPCSender.h"
 #include "third_party/IPC/IPCListener.h"
 
-static bool s_in_find_icu = false;
 static std::string g_crashFileName;
 
 static void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie);
@@ -55,52 +54,53 @@ static void closeAllButThis(int fd, int fd2);
 
 static void printLogOnFile(const char *log);
 
-static bool checkOrCreateCrashFile(const char* file) {
-    if (file == nullptr) {
-        LOGE("checkOrCreateCrashFile Pass error file name!");
-        return false;
-    }
+static bool checkOrCreateCrashFile(const char *file) {
+  if (file == nullptr) {
+    LOGE("checkOrCreateCrashFile Pass error file name!");
+    return false;
+  }
 
-    int flags = 0;
-    int mode = 0666;
-    int ret = ::access(file,F_OK);
-    if (ret < 0)
-        flags |= O_CREAT;
-    flags |= O_RDWR;
-    int fd = ::open(file, flags, mode);
-    if (fd < 0) {
-        LOGE(" checkOrCreateCrashFile failed, can not create or use crash file errno: %s \n", strerror(errno));
-        return false;
-    }
-    return true;
+  int flags = 0;
+  int mode = 0666;
+  int ret = ::access(file, F_OK);
+  if (ret < 0)
+    flags |= O_CREAT;
+  flags |= O_RDWR;
+  int fd = ::open(file, flags, mode);
+  if (fd < 0) {
+    LOGE(" checkOrCreateCrashFile failed, can not create or use crash file errno: %s \n",
+         strerror(errno));
+    return false;
+  }
+  return true;
 }
 
-static bool checkDirOrFileIsLink(const char* path) {
-    if (path == nullptr)
-        return false;
-    struct stat fileStat;
-    int st = stat(path, &fileStat);
-    if (st < 0) {
-        LOGE(" checkDirOrFileIsLink file error: %d\n", errno);
-        return false;
-    }
-    if (!S_ISLNK(fileStat.st_mode))
-        return false;
-    return true;
+static bool checkDirOrFileIsLink(const char *path) {
+  if (path == nullptr)
+    return false;
+  struct stat fileStat;
+  int st = stat(path, &fileStat);
+  if (st < 0) {
+    LOGE(" checkDirOrFileIsLink file error: %d\n", errno);
+    return false;
+  }
+  if (!S_ISLNK(fileStat.st_mode))
+    return false;
+  return true;
 }
 
-static bool getDirOrFileLink(const char* path, char* buf, size_t length) {
-    if(path == nullptr || buf == nullptr) {
-        return false;
-    }
+static bool getDirOrFileLink(const char *path, char *buf, size_t length) {
+  if (path == nullptr || buf == nullptr) {
+    return false;
+  }
 
-    int ret = readlink(path, buf, length);
-    if (ret < 0 ) {
-        return false;
-        LOGE(" checkDirOrFileIsLink check link error: %d\n", errno);
-    }
+  int ret = readlink(path, buf, length);
+  if (ret < 0) {
+    return false;
+    LOGE(" checkDirOrFileIsLink check link error: %d\n", errno);
+  }
 
-    return true;
+  return true;
 }
 
 #if PRINT_LOG_CACHEFILE
@@ -108,31 +108,31 @@ static std::string logFilePath = "/data/data/com.taobao.taobao/cache";
 #endif
 
 struct WeexJSConnection::WeexJSConnectionImpl {
-    std::unique_ptr<IPCSender> serverSender;
-    std::unique_ptr<IPCFutexPageQueue> futexPageQueue;
-    pid_t child{0};
+  std::unique_ptr<IPCSender> serverSender;
+  std::unique_ptr<IPCFutexPageQueue> futexPageQueue;
+  pid_t child{0};
 };
 
-WeexJSConnection::WeexJSConnection(WeexConnInfo* client, WeexConnInfo *server)
-        : m_impl(new WeexJSConnectionImpl) {
+WeexJSConnection::WeexJSConnection(WeexConnInfo *client, WeexConnInfo *server)
+    : m_impl(new WeexJSConnectionImpl) {
   this->client_.reset(client);
   this->server_.reset(server);
 
   if (SoUtils::crash_file_path() != nullptr) {
     if (checkDirOrFileIsLink(SoUtils::crash_file_path())) {
-        std::string tmp = SoUtils::crash_file_path();
-        size_t length = tmp.length();
-        char *buf = new char[length];
-        memset(buf, 0, length);
-        if (!getDirOrFileLink(SoUtils::crash_file_path(), buf, length)) {
-            LOGE("getDirOrFileLink filePath(%s) error\n", SoUtils::crash_file_path());
-            g_crashFileName = SoUtils::crash_file_path();
-        } else {
-            g_crashFileName = buf;
-        }
-        delete []buf;
-    } else {
+      std::string tmp = SoUtils::crash_file_path();
+      size_t length = tmp.length();
+      char *buf = new char[length];
+      memset(buf, 0, length);
+      if (!getDirOrFileLink(SoUtils::crash_file_path(), buf, length)) {
+        LOGE("getDirOrFileLink filePath(%s) error\n", SoUtils::crash_file_path());
         g_crashFileName = SoUtils::crash_file_path();
+      } else {
+        g_crashFileName = buf;
+      }
+      delete[]buf;
+    } else {
+      g_crashFileName = SoUtils::crash_file_path();
     }
     g_crashFileName += "/crash_dump.log";
   } else {
@@ -141,67 +141,67 @@ WeexJSConnection::WeexJSConnection(WeexConnInfo* client, WeexConnInfo *server)
   LOGE("WeexJSConnection g_crashFileName: %s\n", g_crashFileName.c_str());
 }
 
-
 WeexJSConnection::~WeexJSConnection() {
   end();
 }
 
 // -1 unFinish, 0 error, 1 success
 enum NewThreadStatus {
-    UNFINISH,
-    ERROR,
-    SUCCESS
+  UNFINISH,
+  ERROR,
+  SUCCESS
 };
 
 static volatile int newThreadStatus = UNFINISH;
 
 static void *newIPCServer(void *_td) {
-    WeexConnInfo  *server = static_cast<WeexConnInfo *>(_td);
-    void *base = server->base_mem_;
+  WeexConnInfo *server = static_cast<WeexConnInfo *>(_td);
+  void *base = server->base_mem_;
 
-    if (base == MAP_FAILED) {
-        LOGE("newIPCServer start map filed errno %d ", errno);
-        int _errno = errno;
-        //throw IPCException("failed to map ashmem region: %s", strerror(_errno));
-        newThreadStatus = ERROR;
-        base::android::DetachFromVM();
-        return nullptr;
-    }
-
-    IPCHandler *handler = server->handler.get();
-    std::unique_ptr<IPCFutexPageQueue> futexPageQueue(
-            new IPCFutexPageQueue(base, IPCFutexPageQueue::ipc_size, 0));
-    const std::unique_ptr<IPCHandler> &testHandler = createIPCHandler();
-    std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), handler));
-    std::unique_ptr<IPCListener> listener =std::move(createIPCListener(futexPageQueue.get(), handler)) ;
-    newThreadStatus = SUCCESS;
-    WeexCore::WeexCoreManager::Instance()->server_queue_=futexPageQueue.get();
-
-    try {
-      futexPageQueue->spinWaitPeer();
-      listener->listen();
-    } catch (IPCException &e) {
-        LOGE("IPCException server died %s",e.msg());
-        WeexCore::WeexCoreManager::Instance()->server_queue_= nullptr;
-        if (WeexCoreManager::Instance()->do_release_map()){
-            futexPageQueue.reset();
-        }
-        base::android::DetachFromVM();
-        pthread_exit(NULL);
-    }
-    WeexCore::WeexCoreManager::Instance()->server_queue_= nullptr;
-    if (WeexCoreManager::Instance()->do_release_map()){
-        futexPageQueue.reset();
-    }
-    return nullptr;
-}
-
-IPCSender *WeexJSConnection::start(bool reinit) {
-  if(client_== nullptr || client_.get() == nullptr) {
+  if (base == MAP_FAILED) {
+    LOGE("newIPCServer start map filed errno %d ", errno);
+    int _errno = errno;
+    //throw IPCException("failed to map ashmem region: %s", strerror(_errno));
+    newThreadStatus = ERROR;
+    base::android::DetachFromVM();
     return nullptr;
   }
 
-  if(server_ == nullptr || server_.get() == nullptr) {
+  IPCHandler *handler = server->handler.get();
+  std::unique_ptr<IPCFutexPageQueue> futexPageQueue(
+      new IPCFutexPageQueue(base, IPCFutexPageQueue::ipc_size, 0));
+  const std::unique_ptr<IPCHandler> &testHandler = createIPCHandler();
+  std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), handler));
+  std::unique_ptr<IPCListener>
+      listener = std::move(createIPCListener(futexPageQueue.get(), handler));
+  newThreadStatus = SUCCESS;
+  WeexCore::WeexCoreManager::Instance()->server_queue_ = futexPageQueue.get();
+
+  try {
+    futexPageQueue->spinWaitPeer();
+    listener->listen();
+  } catch (IPCException &e) {
+    LOGE("IPCException server died %s", e.msg());
+    WeexCore::WeexCoreManager::Instance()->server_queue_ = nullptr;
+    if (WeexCoreManager::Instance()->do_release_map()) {
+      futexPageQueue.reset();
+    }
+    base::android::DetachFromVM();
+    pthread_exit(NULL);
+  }
+  WeexCore::WeexCoreManager::Instance()->server_queue_ = nullptr;
+  if (WeexCoreManager::Instance()->do_release_map()) {
+    futexPageQueue.reset();
+  }
+  return nullptr;
+}
+
+IPCSender *WeexJSConnection::start(bool reinit) {
+  if (client_ == nullptr || client_.get() == nullptr) {
+    return nullptr;
+  }
+
+  if (server_ == nullptr || server_.get() == nullptr) {
     return nullptr;
   }
 
@@ -212,33 +212,34 @@ IPCSender *WeexJSConnection::start(bool reinit) {
   }
 
   std::unique_ptr<IPCFutexPageQueue> futexPageQueue(
-          new IPCFutexPageQueue(base, IPCFutexPageQueue::ipc_size, 0));
+      new IPCFutexPageQueue(base, IPCFutexPageQueue::ipc_size, 0));
   std::unique_ptr<IPCSender> sender(createIPCSender(futexPageQueue.get(), client_->handler.get()));
   m_impl->serverSender = std::move(sender);
   m_impl->futexPageQueue = std::move(futexPageQueue);
 
-  WeexCore::WeexCoreManager::Instance()->client_queue_=m_impl->futexPageQueue.get();
+  WeexCore::WeexCoreManager::Instance()->client_queue_ = m_impl->futexPageQueue.get();
   pthread_attr_t threadAttr;
   newThreadStatus = UNFINISH;
 
   pthread_attr_init(&threadAttr);
   pthread_t ipcServerThread;
   int i = pthread_create(&ipcServerThread, &threadAttr, newIPCServer, server_.get());
-  if(i != 0) {
+  if (i != 0) {
     throw IPCException("failed to create ipc server thread");
   }
   while (newThreadStatus == UNFINISH) {
     continue;
   }
 
-  if(newThreadStatus == ERROR) {
+  if (newThreadStatus == ERROR) {
     throw IPCException("failed to map ashmem region");
   }
 
   //before process boot up, we prapare a crash file for child process
   bool success = checkOrCreateCrashFile(g_crashFileName.c_str());
   if (!success) {
-    LOGE("Create crash for child process failed, if child process crashed, we can not get a crash file now");
+    LOGE(
+        "Create crash for child process failed, if child process crashed, we can not get a crash file now");
   }
 #if PRINT_LOG_CACHEFILE
   if (s_cacheDir) {
@@ -257,7 +258,7 @@ IPCSender *WeexJSConnection::start(bool reinit) {
 
 //  static bool startupPie = s_start_pie;
   static bool startupPie = SoUtils::pie_support();
-  __android_log_print(ANDROID_LOG_ERROR,"weex","startupPie :%d", startupPie);
+  __android_log_print(ANDROID_LOG_ERROR, "weex", "startupPie :%d", startupPie);
 
   pid_t child;
   if (reinit) {
@@ -278,13 +279,13 @@ IPCSender *WeexJSConnection::start(bool reinit) {
     munmap(base, IPCFutexPageQueue::ipc_size);
     throw IPCException("failed to fork: %s", strerror(myerrno));
   } else if (child == 0) {
-    __android_log_print(ANDROID_LOG_ERROR,"weex","weexcore fork child success\n");
+    __android_log_print(ANDROID_LOG_ERROR, "weex", "weexcore fork child success\n");
     // the child
-    closeAllButThis(client_->ipcFd, server_->ipcFd);
+//    closeAllButThis(client_->ipcFd, server_->ipcFd);
     // implements close all but handles[1]
     // do exec
     doExec(client_->ipcFd, server_->ipcFd, true, startupPie);
-    __android_log_print(ANDROID_LOG_ERROR,"weex","exec Failed completely.");
+    __android_log_print(ANDROID_LOG_ERROR, "weex", "exec Failed completely.");
     // failed to exec
     _exit(1);
   } else {
@@ -295,9 +296,6 @@ IPCSender *WeexJSConnection::start(bool reinit) {
     } catch (IPCException &e) {
       LOGE("WeexJSConnection catch: %s", e.msg());
       // TODO throw exception
-      if(s_in_find_icu) {
-//        WeexCore::WeexProxy::reportNativeInitStatus("-1013", "find icu timeout");
-      }
       return nullptr;
     }
   }
@@ -326,7 +324,7 @@ void WeexJSConnection::end() {
   }
 }
 
-IPCSender* WeexJSConnection::sender() {
+IPCSender *WeexJSConnection::sender() {
   return m_impl->serverSender.get();
 }
 
@@ -344,14 +342,14 @@ static void findIcuDataPath(std::string &icuDataPath) {
   if (!f) {
     return;
   }
-  fseek(f,0L,SEEK_END);
-  int size=ftell(f);
+  fseek(f, 0L, SEEK_END);
+  int size = ftell(f);
 
-    LOGD("file size is %d",size);
-    struct stat statbuf;
-    stat("/proc/self/maps",&statbuf);
-    int size1=statbuf.st_size;
-    LOGD("file size1 is %d",size1);
+  LOGD("file size is %d", size);
+  struct stat statbuf;
+  stat("/proc/self/maps", &statbuf);
+  int size1 = statbuf.st_size;
+  LOGD("file size1 is %d", size1);
   char buffer[256];
   char *line;
   while ((line = fgets(buffer, 256, f))) {
@@ -369,17 +367,17 @@ static void findIcuDataPath(std::string &icuDataPath) {
 }
 
 class EnvPBuilder {
-public:
-    EnvPBuilder();
+ public:
+  EnvPBuilder();
 
-    ~EnvPBuilder() = default;
+  ~EnvPBuilder() = default;
 
-    void addNew(const char *n);
+  void addNew(const char *n);
 
-    std::unique_ptr<const char *[]> build();
+  std::unique_ptr<const char *[]> build();
 
-private:
-    std::vector<const char *> m_vec;
+ private:
+  std::vector<const char *> m_vec;
 };
 
 EnvPBuilder::EnvPBuilder() {
@@ -413,20 +411,20 @@ std::unique_ptr<const char *[]> EnvPBuilder::build() {
 void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
   std::string executablePath;
   std::string icuDataPath;
-  if(SoUtils::jss_icu_path() != nullptr) {
-    __android_log_print(ANDROID_LOG_ERROR,"weex", "jss_icu_path not null %s",SoUtils::jss_icu_path());
+  if (SoUtils::jss_icu_path() != nullptr) {
+    __android_log_print(ANDROID_LOG_ERROR,
+                        "weex",
+                        "jss_icu_path not null %s",
+                        SoUtils::jss_icu_path());
     icuDataPath = SoUtils::jss_icu_path();
   } else {
-    s_in_find_icu = true;
     findIcuDataPath(icuDataPath);
-    s_in_find_icu = false;
   }
-//  if(g_jssSoPath != nullptr) {
-//    executablePath = g_jssSoPath;
-  if(SoUtils::jsb_so_path() != nullptr) {
-    executablePath = SoUtils::jss_so_path();
+
+  if (SoUtils::jsb_so_inner_path() != nullptr) {
+    executablePath = SoUtils::jsb_so_inner_path();
   } else {
-    executablePath = SoUtils::FindLibJssSoPath();
+    executablePath = SoUtils::jsb_so_cache_path();
   }
 #if PRINT_LOG_CACHEFILE
   std::ofstream mcfile;
@@ -434,15 +432,8 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
   mcfile << "jsengine WeexJSConnection::doExec executablePath:" << executablePath << std::endl;
   mcfile << "jsengine WeexJSConnection::doExec icuDataPath:" << icuDataPath << std::endl;
 #endif
-  std::string::size_type pos = std::string::npos;
-  std::string libName = SoUtils::jss_so_name();
-  pos = executablePath.find(libName);
-  if (pos != std::string::npos) {
-    executablePath.replace(pos, libName.length(), "");
-}
-
   if (executablePath.empty()) {
-    __android_log_print(ANDROID_LOG_ERROR,"weex","executablePath is empty");
+    __android_log_print(ANDROID_LOG_ERROR, "weex", "executablePath is empty");
 #if PRINT_LOG_CACHEFILE
     mcfile << "jsengine WeexJSConnection::doExec executablePath is empty and return" << std::endl;
     mcfile.close();
@@ -450,12 +441,11 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
 
     return;
   } else {
-    __android_log_print(ANDROID_LOG_ERROR,"weex","executablePath is %s", executablePath.c_str());
+    __android_log_print(ANDROID_LOG_ERROR, "weex", "executablePath is %s", executablePath.c_str());
   }
 
-
   if (icuDataPath.empty()) {
-    __android_log_print(ANDROID_LOG_ERROR,"weex","icuDataPath is empty");
+    __android_log_print(ANDROID_LOG_ERROR, "weex", "icuDataPath is empty");
 #if PRINT_LOG_CACHEFILE
     mcfile << "jsengine WeexJSConnection::doExec icuDataPath is empty and return" << std::endl;
     mcfile.close();
@@ -465,7 +455,7 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
   std::string ldLibraryPathEnv("LD_LIBRARY_PATH=");
   std::string icuDataPathEnv("ICU_DATA_PATH=");
   ldLibraryPathEnv.append(executablePath);
-  if(SoUtils::lib_ld_path() != nullptr && strlen(SoUtils::lib_ld_path()) != 0) {
+  if (SoUtils::lib_ld_path() != nullptr && strlen(SoUtils::lib_ld_path()) != 0) {
     ldLibraryPathEnv.append(":").append(SoUtils::lib_ld_path());
   }
 
@@ -493,59 +483,66 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
   }
 #endif
 
-  std::string start_so = "";
-  if (startupPie) {
-    start_so = "libweexjsb.so";
-  } else {
-    start_so = "libweexjst.so";
-  }
-
   {
-    std::string executableName = executablePath + '/' + start_so;
-    chmod(executableName.c_str(), 0755);
-    int result = access(executableName.c_str(), 01);
+    chmod(executablePath.c_str(), 0755);
+    int result = access(executablePath.c_str(), 01);
 
-    __android_log_print(ANDROID_LOG_ERROR,"weex", "doExec access result %d executableName %s \n", result, executableName.c_str());
+    __android_log_print(ANDROID_LOG_ERROR,
+                        "weex",
+                        "doExec access result %d executableName %s \n",
+                        result,
+                        executablePath.c_str());
 #if PRINT_LOG_CACHEFILE
     mcfile << "jsengine WeexJSConnection::doExec file exist result:"
            << result << " startupPie:" << startupPie << std::endl;
 #endif
     if (result == -1) {
-      executableName = std::string(SoUtils::jsb_so_path());
-      int result_cache = access(executableName.c_str(), 00);
-      if (result_cache == -1) {
-        std::string sourceSo = executablePath + '/' + start_so;
-        int ret = copyFile(sourceSo.c_str(), executableName.c_str());
-#if PRINT_LOG_CACHEFILE
-        mcfile << "jsengine WeexJSConnection::doExec copy so from:" << sourceSo
-               << " to:" << executableName << ", success: " << ret << std::endl;
-#endif
-      }
-      chmod(executableName.c_str(), 0755);
+      executablePath = std::string(SoUtils::jsb_so_cache_path());
+      int result_cache = access(executablePath.c_str(), 00);
+//      if (result_cache == -1) {
+//        std::string sourceSo = executablePath + '/' + start_so;
+//        int ret = copyFile(sourceSo.c_str(), executableName.c_str());
+//#if PRINT_LOG_CACHEFILE
+//        mcfile << "jsengine WeexJSConnection::doExec copy so from:" << sourceSo
+//               << " to:" << executableName << ", success: " << ret << std::endl;
+//#endif
+//      }
+      chmod(executablePath.c_str(), 0755);
 #if PRINT_LOG_CACHEFILE
       mcfile << "jsengine WeexJSConnection::doExec start path on sdcard, start execve so name:"
              << executableName << std::endl;
 #endif
-      const char *argv[] = {executableName.c_str(), fdStr, fdServerStr, traceEnable ? "1" : "0", g_crashFileName.c_str(), nullptr};
+      const char *argv[] = {executablePath.c_str(), fdStr, fdServerStr, traceEnable ? "1" : "0",
+                            g_crashFileName.c_str(), nullptr};
       if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                        const_cast<char *const *>(envp.get()))) {
-        __android_log_print(ANDROID_LOG_ERROR,"weex","execve failed errno %s \n", strerror(errno));
+        __android_log_print(ANDROID_LOG_ERROR,
+                            "weex",
+                            "execve failed errno %s \n",
+                            strerror(errno));
 #if PRINT_LOG_CACHEFILE
         mcfile << "execve failed11:" << strerror(errno) << std::endl;
 #endif
       }
     } else {
       // std::string executableName = executablePath + '/' + "libweexjsb.so";
-      chmod(executableName.c_str(), 0755);
+      chmod(executablePath.c_str(), 0755);
 #if PRINT_LOG_CACHEFILE
       mcfile << "jsengine WeexJSConnection::doExec start execve so name:" << executableName
              << std::endl;
 #endif
-      __android_log_print(ANDROID_LOG_ERROR,"weex","executablePath111 is %s", executablePath.c_str());
-      const char *argv[] = {executableName.c_str(), fdStr, fdServerStr, traceEnable ? "1" : "0", g_crashFileName.c_str(), nullptr};
+      __android_log_print(ANDROID_LOG_ERROR,
+                          "weex",
+                          "executablePath111 is %s",
+                          executablePath.c_str());
+      const char *argv[] = {executablePath.c_str(), fdStr, fdServerStr, traceEnable ? "1" : "0",
+                            g_crashFileName.c_str(), nullptr};
       if (-1 == execve(argv[0], const_cast<char *const *>(&argv[0]),
                        const_cast<char *const *>(envp.get()))) {
-        __android_log_print(ANDROID_LOG_ERROR,"weex","execve failed errno %s \n", strerror(errno));
+        __android_log_print(ANDROID_LOG_ERROR,
+                            "weex",
+                            "execve failed errno %s \n",
+                            strerror(errno));
 #if PRINT_LOG_CACHEFILE
         mcfile << "execve failed:" << strerror(errno) << std::endl;
 #endif
@@ -657,7 +654,6 @@ int WeexConnInfo::memfd_create(const char *name, size_t size) {
   if (SoUtils::android_api() <= __ANDROID_API_P__) {
     return ashmem_create_region(name, size);
   }
-
 
   int fd = 0;
   if (SoUtils::android_api() >= 29) {

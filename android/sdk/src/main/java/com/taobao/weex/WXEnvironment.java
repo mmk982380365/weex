@@ -33,7 +33,6 @@ import android.os.Environment;
 import android.system.Os;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.taobao.weex.common.WXConfig;
 import com.taobao.weex.utils.FontDO;
@@ -143,7 +142,7 @@ public class WXEnvironment {
   public static final String CORE_JSB_SO_NAME = "weexjsb";
   public static final String CORE_JST_SO_NAME = "weexjst";
   public static final String CORE_JSC_SO_NAME = "JavaScriptCore";
-  private static  String CORE_JSS_SO_PATH = null;
+  private static  String CORE_JSB_SO_INNER_PATH = null;
 
   public static  String CORE_JSS_RUNTIME_SO_PATH = null;
 
@@ -151,7 +150,7 @@ public class WXEnvironment {
 
   private static String CORE_JSC_SO_PATH = null;
 
-  public static String CORE_JSB_SO_PATH = null;
+  public static String CORE_JSB_SO_CACHE_PATH = null;
 
   private static String COPY_SO_DES_DIR = null;
 
@@ -628,17 +627,13 @@ public class WXEnvironment {
   }
 
   public static String getLibJssRealPath() {
-    if (WXEnvironment.sUseRunTimeApi && !TextUtils.isEmpty(CORE_JSS_RUNTIME_SO_PATH)){
-      WXLogUtils.d("test-> findLibJssRuntimeRealPath " + CORE_JSS_RUNTIME_SO_PATH);
-      return CORE_JSS_RUNTIME_SO_PATH;
+    if (TextUtils.isEmpty(CORE_JSB_SO_INNER_PATH)) {
+      String soName = Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN ? CORE_JST_SO_NAME : CORE_JSB_SO_NAME;
+      CORE_JSB_SO_INNER_PATH = findSoPath(soName);
+      WXLogUtils.d("test-> findLibJssRealPath " + CORE_JSB_SO_INNER_PATH);
     }
 
-    if(TextUtils.isEmpty(CORE_JSS_SO_PATH)) {
-      CORE_JSS_SO_PATH = findSoPath(CORE_JSS_SO_NAME);
-      WXLogUtils.d("test-> findLibJssRealPath " + CORE_JSS_SO_PATH);
-    }
-
-    return CORE_JSS_SO_PATH;
+    return CORE_JSB_SO_INNER_PATH;
   }
 
   public static String getLibJssIcuPath() {

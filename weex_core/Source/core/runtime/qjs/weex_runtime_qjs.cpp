@@ -243,7 +243,7 @@ std::unique_ptr<WeexJSResult> WeexRuntimeQJS::exeJSWithResult(const std::string 
       newFunc = "__WEEX_CALL_JAVASCRIPT__";
     }
   } else {
-    thisContext = weex_js_global_context<JSContext>();;
+    thisContext = weex_js_global_context<JSContext>();
   }
 
   auto thisObject = JS_GetGlobalObject(thisContext);

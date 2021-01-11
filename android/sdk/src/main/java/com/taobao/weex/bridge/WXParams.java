@@ -44,13 +44,13 @@ public class WXParams implements Serializable {
   private String cacheDir;
   private String useSingleProcess;
   private String crashFilePath;
-  private String libJssPath;
+  private String libJsbInnerPath;
   private String layoutDirection;
 
   private String libJscPath;
   private String libIcuPath;
   private String libLdPath;
-  private String libJsbPath;
+  private String libJsbCachePath;
 
   private Map<String, String> options;
 
@@ -223,19 +223,19 @@ public class WXParams implements Serializable {
   }
 
   @CalledByNative
-  public String getLibJssPath() {
-    WXLogUtils.e("getLibJssPath is running " + libJssPath);
-    return libJssPath;
+  public String getLibJsbInnerPath() {
+    WXLogUtils.e("getLibJssPath is running " + libJsbInnerPath);
+    return libJsbInnerPath;
   }
 
   @CalledByNative
-  public String getLibJsbPath() {
-    WXLogUtils.e("getLibJsbPath is running " + libJsbPath);
-    return libJsbPath;
+  public String getLibJsbCachePath() {
+    WXLogUtils.e("getLibJsbPath is running " + libJsbCachePath);
+    return libJsbCachePath;
   }
 
-  public void setLibJsbPath(String libJsbPath) {
-    this.libJsbPath = libJsbPath;
+  public void setLibJsbCachePath(String libJsbPath) {
+    this.libJsbCachePath = libJsbPath;
   }
 
   @CalledByNative
@@ -246,8 +246,8 @@ public class WXParams implements Serializable {
   public void setLibJscPath(String libJscPath) {
     this.libJscPath = libJscPath;
   }
-  public void setLibJssPath(String libJssPath) {
-    this.libJssPath = libJssPath;
+  public void setLibJsbInnerPath(String libJssPath) {
+    this.libJsbInnerPath = libJssPath;
   }
   @CalledByNative
   public String getLibIcuPath() {
@@ -283,7 +283,7 @@ public class WXParams implements Serializable {
     map.put("deviceModel", deviceModel);
     map.put("deviceWidth", deviceWidth);
     map.put("layoutDirection", layoutDirection);
-    map.put("libJssPath", libJssPath);
+    map.put("libJssPath", libJsbInnerPath);
     map.put("logLevel", logLevel);
     map.put("needInitV8", needInitV8);
     map.put("osVersion", osVersion);

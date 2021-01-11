@@ -27,35 +27,20 @@
 namespace WeexCore {
 class SoUtils {
  public:
-  static void Init(JNIEnv* env);
-  static std::string FindLibJssSoPath();
+  static void Init(JNIEnv *env);
   static void RegisterExceptionHanler(
-      const std::function<void(const char*, const char*)>&
-          ReportNativeInitStatus);
+      const std::function<void(const char *, const char *)> &
+      ReportNativeInitStatus);
 
-  inline static void set_cache_dir(char* cache_dir) { g_cache_dir = cache_dir; }
+  inline static void set_cache_dir(char *cache_dir) { g_cache_dir = cache_dir; }
 
-  inline static const char* cache_dir() { return g_cache_dir; }
+  inline static const char *cache_dir() { return g_cache_dir; }
 
-  inline static void set_crash_file_path(char* crash_file_path) {
+  inline static void set_crash_file_path(char *crash_file_path) {
     g_crash_file_path = crash_file_path;
   }
 
-  inline static const char* crash_file_path() { return g_crash_file_path; }
-
-  inline static void set_jsc_so_path(char* jss_so_path) {
-    g_jsc_so_path = jss_so_path;
-  }
-
-  inline static const char* jsc_so_path() { return g_jsc_so_path; }
-
-  inline static void set_jss_so_path(char* jss_so_path) {
-    g_jss_so_path = jss_so_path;
-  }
-
-  inline static const char* jss_so_path() { return g_jss_so_path; }
-
-  inline static const char* jss_so_name() { return g_jss_so_name; }
+  inline static const char *crash_file_path() { return g_crash_file_path; }
 
   inline static bool pie_support() { return g_pie_support; }
 
@@ -63,25 +48,31 @@ class SoUtils {
     g_pie_support = startup_pie;
   }
 
-  inline static void set_jss_icu_path(char* jss_icu_path) {
+  inline static void set_jss_icu_path(char *jss_icu_path) {
     g_jss_icu_path = jss_icu_path;
   }
 
-  inline static const char* jss_icu_path() { return g_jss_icu_path; }
+  inline static const char *jss_icu_path() { return g_jss_icu_path; }
 
-  inline static void set_jsb_so_path(char* jsb_so_path) {
-    g_jsb_so_path = jsb_so_path;
+  inline static void set_jsb_so_cache_path(char *jsb_so_cache_path) {
+    g_jsb_so_cache_path = jsb_so_cache_path;
   }
 
-  inline static const char* jsb_so_path() { return g_jsb_so_path; }
+  inline static const char *jsb_so_cache_path() { return g_jsb_so_cache_path; }
 
-  inline static void set_lib_ld_path(char* lib_ld_path) {
+  inline static void set_jsb_so_inner_path(char *jsb_so_inner_path) {
+    g_jsb_so_inner_path = jsb_so_inner_path;
+  }
+
+  inline static const char *jsb_so_inner_path() { return g_jsb_so_inner_path; }
+
+  inline static void set_lib_ld_path(char *lib_ld_path) {
     g_lib_ld_path = lib_ld_path;
   }
 
-  inline static const char* lib_ld_path() { return g_lib_ld_path; }
+  inline static const char *lib_ld_path() { return g_lib_ld_path; }
 
-  inline static const int android_api() {return g_android_api;}
+  inline static const int android_api() { return g_android_api; }
   inline static void set_android_api(int android_api) {
     g_android_api = android_api;
   }
@@ -89,18 +80,16 @@ class SoUtils {
   static void updateSoLinkPath(const char *lib_ld_path);
 
  private:
-  static const char* GetDefaultCacheDir(JNIEnv* env);
-  static char* g_cache_dir;
-  static char* g_jss_so_path;
-  static char* g_jsb_so_path;
-  static char* g_crash_file_path;
-  static char* g_jss_so_name;
-  static char* g_jss_icu_path;
-  static char* g_jsc_so_path;
-  static char* g_lib_ld_path;
+  static const char *GetDefaultCacheDir(JNIEnv *env);
+  static char *g_cache_dir;
+  static char *g_jsb_so_cache_path;
+  static char *g_jsb_so_inner_path;
+  static char *g_crash_file_path;
+  static char *g_jss_icu_path;
+  static char *g_lib_ld_path;
   static bool g_pie_support;
   static int g_android_api;
-  static std::function<void(const char*, const char*)> g_exception_handler;
+  static std::function<void(const char *, const char *)> g_exception_handler;
 };
 }  // namespace WeexCore
 

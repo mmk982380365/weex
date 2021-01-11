@@ -26,17 +26,15 @@
 #include "base/android/log_utils.h"
 
 namespace WeexCore {
-    char * SoUtils::g_cache_dir = nullptr;
-    char * SoUtils::g_jss_so_path = nullptr;
-    char * SoUtils::g_jsb_so_path = nullptr;
-    char * SoUtils::g_jsc_so_path = nullptr;
-    char * SoUtils::g_crash_file_path = nullptr;
-    char * SoUtils::g_jss_icu_path = nullptr;
-    char * SoUtils::g_lib_ld_path = nullptr;
-    char * SoUtils::g_jss_so_name = const_cast<char *>("/libweexcore.so");
+    char *SoUtils::g_cache_dir = nullptr;
+    char *SoUtils::g_crash_file_path = nullptr;
+    char *SoUtils::g_jss_icu_path = nullptr;
+    char *SoUtils::g_lib_ld_path = nullptr;
+    char *SoUtils::g_jsb_so_cache_path = nullptr;
+    char *SoUtils::g_jsb_so_inner_path = nullptr;
     bool SoUtils::g_pie_support = false;
     int SoUtils::g_android_api = 0;
-    std::function<void(const char*, const char*)> SoUtils::g_exception_handler = nullptr;
+    std::function<void(const char *, const char *)> SoUtils::g_exception_handler = nullptr;
 
     const char *SoUtils::GetDefaultCacheDir(JNIEnv *env) {
         jclass activityThreadCls, applicationCls, fileCls;
@@ -120,86 +118,6 @@ namespace WeexCore {
         g_cache_dir = const_cast<char *>(GetDefaultCacheDir(env));
     }
 
-    std::string SoUtils::FindLibJssSoPath() {
-        std::string executablePath = "";
-        unsigned long target = reinterpret_cast<unsigned long>(__builtin_return_address(0));
-        FILE *f = fopen("/proc/self/maps", "r");
-        if (!f) {
-            return "";
-        }
-        char buffer[256];
-        char *line;
-        while ((line = fgets(buffer, 256, f))) {
-            char *end;
-            unsigned long val;
-            errno = 0;
-            val = strtoul(line, &end, 16);
-            if (errno)
-                continue;
-            if (val > target)
-                continue;
-            end += 1;
-            errno = 0;
-            val = strtoul(end, &end, 16);
-            if (errno)
-                continue;
-            if (val > target) {
-                char *s = strstr(end, "/");
-                if (s != nullptr)
-                    executablePath.assign(s);
-                std::size_t found = executablePath.rfind('/');
-                if (found != std::string::npos) {
-                    executablePath = executablePath.substr(0, found);
-                }
-            }
-            if (!executablePath.empty()) {
-                break;
-            }
-        }
-        fclose(f);
-        LOGE("find so path: %s", executablePath.c_str());
-        std::string::size_type pos = std::string::npos;
-        // dynamic deploy
-        if (!executablePath.empty() && executablePath.find(".maindex") != std::string::npos) {
-            std::string libs[] = {"/opt", "/oat/arm"};
-            auto libsCount = sizeof(libs) / sizeof(std::string);
-            for (int i = 0; i < libsCount; ++i) {
-                auto lib = libs[i];
-                pos = executablePath.find(lib);
-                if (pos != std::string::npos) {
-                    executablePath.replace(pos, lib.length(), "/lib");
-                    break;
-                }
-            }
-        }
-//        std::string soPath = executablePath + "/" + g_jssSoName;
-        std::string soPath = executablePath + "/" + SoUtils::jss_so_name();
-        // -------------------------------------------------
-        // -------------------------------------------------
-        if (access(soPath.c_str(), 00) == 0) {
-            return soPath;
-        } else {
-            const char *error = soPath.c_str();
-            LOGE("so path: %s is not exist, use full package lib", error);
-//            executablePath = s_cacheDir;
-            executablePath = SoUtils::cache_dir();
-            std::string lib = "/cache";
-            if ((pos = soPath.find(lib)) != std::string::npos) {
-                executablePath.replace(pos, lib.length(), "/lib");
-            }
-            soPath = executablePath + "/" + SoUtils::jss_so_name();
-//            soPath = executablePath + "/" + g_jssSoName;
-            if (access(soPath.c_str(), 00) != 0) {
-                LOGE("so path: %s is not exist", soPath.c_str());
-                g_exception_handler("-1004", error);
-                //return false;
-                //use libweexjss.so directly
-//                soPath = g_jssSoName;
-                soPath = SoUtils::jss_so_name();
-            }
-            return soPath;
-        }
-    }
 
     void SoUtils::RegisterExceptionHanler(
             const std::function<void(const char*, const char*)>&

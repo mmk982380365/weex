@@ -1774,20 +1774,24 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
         boolean is_pre_init_mode = false;
         if(extraOption instanceof Map) {
-          ((Map) extraOption).put("engine_type",instance.getJSEngineType().engineName());
-          if(options != null && options.containsKey("pre_init_mode")) {
+          ((Map) extraOption).put("engine_type", instance.getJSEngineType().engineName());
+          if (options != null) {
             Object value = options.get("pre_init_mode");
-            if(value != null) {
+            if (value != null) {
               is_pre_init_mode = true;
               ((Map) extraOption).put("pre_init_mode", value);
             }
+
+            Object run_in_main_process = options.get("run_in_main_process");
+            if (run_in_main_process != null) {
+              ((Map) extraOption).put("run_in_main_process", run_in_main_process);
+            }
+
           }
         }
 
 
-        WXJSObject extraOptionObj = new WXJSObject(WXJSObject.JSON,
-                extraOption == null ? String.format("{\"engine_type\":\"%s\"}", instance.getJSEngineType().engineName())
-                        : WXJsonUtils.fromObjectToJSONString(extraOption));
+        WXJSObject extraOptionObj = new WXJSObject(WXJSObject.JSON, WXJsonUtils.fromObjectToJSONString(extraOption));
 
 
         WXJSObject optionsObj = new WXJSObject(WXJSObject.JSON,
@@ -2426,8 +2430,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     wxParams.setLayoutDirection(config.get(WXConfig.layoutDirection));
     wxParams.setUseSingleProcess(isUseSingleProcess ? "true" : "false");
     wxParams.setCrashFilePath(WXEnvironment.getCrashFilePath(WXEnvironment.getApplication().getApplicationContext()));
-    wxParams.setLibJsbPath(WXEnvironment.CORE_JSB_SO_PATH);
-    wxParams.setLibJssPath(WXEnvironment.getLibJssRealPath());
+    wxParams.setLibJsbCachePath(WXEnvironment.CORE_JSB_SO_CACHE_PATH);
+    wxParams.setLibJsbInnerPath(WXEnvironment.getLibJssRealPath());
     wxParams.setLibIcuPath(WXEnvironment.getLibJssIcuPath());
     wxParams.setLibLdPath(WXEnvironment.getLibLdPath());
     String libJScRealPath = WXEnvironment.getLibJScRealPath();

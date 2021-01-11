@@ -241,7 +241,7 @@ public class WXSoInstallMgrSdk {
         copyPath.mkdirs();
       }
       newfile = new File(copyPath, startSoPath);
-      WXEnvironment.CORE_JSB_SO_PATH = newfile.getAbsolutePath();
+      WXEnvironment.CORE_JSB_SO_CACHE_PATH = newfile.getAbsolutePath();
       String jsb = WXEnvironment.getDefaultSettingValue(startSoName, "-1");
       if(newfile.exists() && TextUtils.equals(WXEnvironment.getAppVersionName(), jsb)) {
         // no update so skip copy

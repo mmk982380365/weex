@@ -96,6 +96,7 @@ WeexRuntimeManager::InstanceEngineData *WeexRuntimeManager::create_instance(std:
                                                                             std::vector<std::pair<
                                                                                 std::string,
                                                                                 std::string>> &params) {
+  LOGE("create_instance is running and params size is %d", params.size());
   JSEngineType engine_type = ENGINE_JSC;
   bool pre_init_mode = false;
   bool run_in_main_process_mode = false;
@@ -122,9 +123,10 @@ WeexRuntimeManager::InstanceEngineData *WeexRuntimeManager::create_instance(std:
       run_in_main_process_mode = true;
     }
   }
-  run_in_main_process_mode = true;
   if (run_in_main_process_mode) {
-    engine_type = ENGINE_QJS;
+    if(engine_type == ENGINE_JSC) {
+      engine_type = ENGINE_QJS;
+    }
   }
 
   LOGE("dyyLog createInstance in mainProcess %d", run_in_main_process_mode);

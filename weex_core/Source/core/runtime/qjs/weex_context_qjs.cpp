@@ -392,7 +392,7 @@ JSContext *WeexContextQJS::createContext(JSRuntime *engine_vm) {
   JSContext *ctx = JS_NewContext(rt);
   JSValue i = JS_GetGlobalObject(ctx);
   JS_SetProperty(ctx, i, JS_NewAtom(ctx, "global"), i);
-  JS_SetMaxStackSize(rt, 1024 * 10000);
+  JS_SetMaxStackSize(rt, 1024 * 10000000000);
   return ctx;
 }
 void WeexContextQJS::RunGC(void *engine_vm) {

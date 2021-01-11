@@ -222,35 +222,10 @@ std::vector<std::pair<std::string, std::string>> initFromParam(
     WeexCoreManager::Instance()->set_release_map(j_release_map_bool == JNI_TRUE);
   }
 
-  jmethodID m_get_jsc_so_path =
-      env->GetMethodID(c_params, "getLibJscPath", "()Ljava/lang/String;");
-  if (m_get_jsc_so_path != nullptr) {
-    jobject j_get_jsc_so_path =
-        env->CallObjectMethod(params, m_get_jsc_so_path);
-    if (j_get_jsc_so_path != nullptr) {
-      SoUtils::set_jsc_so_path(const_cast<char *>(
-                                   env->GetStringUTFChars((jstring) (j_get_jsc_so_path), nullptr)));
-      LOGE("g_jscSoPath is %s ", SoUtils::jsc_so_path());
-      env->DeleteLocalRef(j_get_jsc_so_path);
-    }
-  }
-
-  jmethodID m_get_jss_so_path =
-      env->GetMethodID(c_params, "getLibJssPath", "()Ljava/lang/String;");
-  if (m_get_jss_so_path != nullptr) {
-    jobject j_get_jss_so_path =
-        env->CallObjectMethod(params, m_get_jss_so_path);
-    if (j_get_jss_so_path != nullptr) {
-      SoUtils::set_jss_so_path(const_cast<char *>(
-                                   env->GetStringUTFChars((jstring) (j_get_jss_so_path), nullptr)));
-      LOGE("g_jssSoPath is %s ", SoUtils::jss_so_path());
-      env->DeleteLocalRef(j_get_jss_so_path);
-    }
-  }
 
   jmethodID m_get_crash_file_path =
       env->GetMethodID(c_params, "getCrashFilePath", "()Ljava/lang/String;");
-  if (m_get_jss_so_path != nullptr) {
+  if (m_get_crash_file_path != nullptr) {
     jobject j_get_crash_file_path = env->CallObjectMethod(params, m_get_crash_file_path);
     if (j_get_crash_file_path != nullptr) {
       SoUtils::set_crash_file_path(const_cast<char *>(env->GetStringUTFChars(
@@ -275,16 +250,29 @@ std::vector<std::pair<std::string, std::string>> initFromParam(
     }
   }
 
-  jmethodID m_get_jsb_so_path =
-      env->GetMethodID(c_params, "getLibJsbPath", "()Ljava/lang/String;");
-  if (m_get_jsb_so_path != nullptr) {
-    jobject j_get_jsb_so_path =
-        env->CallObjectMethod(params, m_get_jsb_so_path);
-    if (j_get_jsb_so_path != nullptr) {
-      SoUtils::set_jsb_so_path(const_cast<char *>(
-                                   env->GetStringUTFChars((jstring) (j_get_jsb_so_path), nullptr)));
-      LOGD("g_jsbSoPath is %s ", SoUtils::jsb_so_path());
-      env->DeleteLocalRef(j_get_jsb_so_path);
+  jmethodID m_get_jsb_cache_so_path =
+      env->GetMethodID(c_params, "getLibJsbCachePath", "()Ljava/lang/String;");
+  if (m_get_jsb_cache_so_path != nullptr) {
+    jobject j_get_jsb_so_cache_path =
+        env->CallObjectMethod(params, m_get_jsb_cache_so_path);
+    if (j_get_jsb_so_cache_path != nullptr) {
+      SoUtils::set_jsb_so_cache_path(const_cast<char *>(
+                                   env->GetStringUTFChars((jstring) (j_get_jsb_so_cache_path), nullptr)));
+      LOGD("g_jsbSoCachePath is %s ", SoUtils::jsb_so_path());
+      env->DeleteLocalRef(j_get_jsb_so_cache_path);
+    }
+  }
+
+  jmethodID m_get_jsb_inner_so_path =
+      env->GetMethodID(c_params, "getLibJsbInnerPath", "()Ljava/lang/String;");
+  if (m_get_jsb_inner_so_path != nullptr) {
+    jobject j_get_jsb_so_inner_path =
+        env->CallObjectMethod(params, m_get_jsb_inner_so_path);
+    if (j_get_jsb_so_inner_path != nullptr) {
+      SoUtils::set_jsb_so_inner_path(const_cast<char *>(
+                                         env->GetStringUTFChars((jstring) (j_get_jsb_so_inner_path), nullptr)));
+      LOGD("g_jsbSoInnerPath is %s ", SoUtils::jsb_so_path());
+      env->DeleteLocalRef(j_get_jsb_so_inner_path);
     }
   }
 
