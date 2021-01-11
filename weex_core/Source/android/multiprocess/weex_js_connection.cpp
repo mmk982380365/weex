@@ -280,7 +280,7 @@ IPCSender *WeexJSConnection::start(bool reinit) {
   } else if (child == 0) {
     __android_log_print(ANDROID_LOG_ERROR,"weex","weexcore fork child success\n");
     // the child
-//    closeAllButThis(client_->ipcFd, server_->ipcFd);
+    closeAllButThis(client_->ipcFd, server_->ipcFd);
     // implements close all but handles[1]
     // do exec
     doExec(client_->ipcFd, server_->ipcFd, true, startupPie);
@@ -424,7 +424,7 @@ void doExec(int fdClient, int fdServer, bool traceEnable, bool startupPie) {
 //  if(g_jssSoPath != nullptr) {
 //    executablePath = g_jssSoPath;
   if(SoUtils::jsb_so_path() != nullptr) {
-    executablePath = SoUtils::jsb_so_path();
+    executablePath = SoUtils::jss_so_path();
   } else {
     executablePath = SoUtils::FindLibJssSoPath();
   }

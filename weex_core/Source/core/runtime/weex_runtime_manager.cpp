@@ -122,10 +122,12 @@ WeexRuntimeManager::InstanceEngineData *WeexRuntimeManager::create_instance(std:
       run_in_main_process_mode = true;
     }
   }
-
+  run_in_main_process_mode = true;
   if (run_in_main_process_mode) {
     engine_type = ENGINE_QJS;
   }
+
+  LOGE("dyyLog createInstance in mainProcess %d", run_in_main_process_mode);
   return create_instance(page_id,
                          engine_type,
                          run_in_main_process_mode,
