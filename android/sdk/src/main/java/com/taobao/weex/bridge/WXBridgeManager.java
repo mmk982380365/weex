@@ -1774,6 +1774,17 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
         boolean is_pre_init_mode = false;
         if(extraOption instanceof Map) {
+          Object run_in_main_process = options.get("run_in_main_process");
+          if (run_in_main_process != null) {
+            ((Map) extraOption).put("run_in_main_process", run_in_main_process);
+            if ("true".equals(String.valueOf(run_in_main_process))) {
+              IWXJSEngineManager.EngineType jsEngineType = instance.getJSEngineType();
+              if (jsEngineType == IWXJSEngineManager.EngineType.JavaScriptCore) {
+                instance.setJSEngineType(IWXJSEngineManager.EngineType.QuickJS);
+              }
+            }
+          }
+
           ((Map) extraOption).put("engine_type", instance.getJSEngineType().engineName());
           if (options != null) {
             Object value = options.get("pre_init_mode");
@@ -1781,19 +1792,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               is_pre_init_mode = true;
               ((Map) extraOption).put("pre_init_mode", value);
             }
-
-            Object run_in_main_process = options.get("run_in_main_process");
-            if (run_in_main_process != null) {
-              ((Map) extraOption).put("run_in_main_process", run_in_main_process);
-            }
-
           }
         }
 
-
         WXJSObject extraOptionObj = new WXJSObject(WXJSObject.JSON, WXJsonUtils.fromObjectToJSONString(extraOption));
-
-
         WXJSObject optionsObj = new WXJSObject(WXJSObject.JSON,
                 options == null ? "{}"
                         : WXJsonUtils.fromObjectToJSONString(options));
