@@ -84,6 +84,9 @@ static jint CreateInstanceContext(JNIEnv *env, jobject jcaller,
                                   jstring function,
                                   jobjectArray args);
 
+static void SetUnicornWeexRenderActionPtr(JNIEnv* env, jobject jcaller,
+                                          jlong action_ptr);
+
 static jint DestoryInstance(JNIEnv *env, jobject jcaller,
                             jstring instanceId,
                             jstring name,
@@ -1251,6 +1254,10 @@ static const JNINativeMethod kMethodsWXBridge[] = {
      "[Lcom/taobao/weex/bridge/WXJSObject;"
      ")"
      "I", reinterpret_cast<void *>(DestoryInstance)},
+     {
+       "nativeSetUnicornWeexRenderActionPtr", "(J)V",
+       reinterpret_cast<void*>(SetUnicornWeexRenderActionPtr)
+     },
     {"nativeExecJSOnInstance",
      "("
      "Ljava/lang/String;"

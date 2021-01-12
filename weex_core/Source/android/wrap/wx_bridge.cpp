@@ -376,7 +376,7 @@ static jint InitFramework(JNIEnv *env, jobject object, jstring script,
 //    if(true) {
 //  WeexCoreManager::Instance()->set_project_mode(
 //      WeexCoreManager::ProjectMode::COMMON);
-//
+
 //  WeexCoreManager::Instance()->set_script_bridge(
 //      new ScriptBridgeInSimple);
 //
@@ -701,6 +701,10 @@ static jint CreateInstanceContext(JNIEnv *env, jobject jcaller,
         byte_code_mode = true;
       }
 
+      if (key == "enable_unicorn_weex_render") {
+        RenderManager::GetInstance()->setPageArgument(std::string(scoped_id.getChars()), key, string);
+      }
+
       if (key == "pre_init_mode" && string == "true") {
         pre_init_mode = true;
       }
@@ -738,6 +742,11 @@ static jint CreateInstanceContext(JNIEnv *env, jobject jcaller,
                          scoped_init_data.getChars(), scoped_api.getChars(), params,
                          scoped_render_strategy.getChars());
   }
+}
+
+static void SetUnicornWeexRenderActionPtr(JNIEnv* env, jobject jcaller,
+                                          jlong action_ptr) {
+  WeexCoreManager::Instance()->set_unicorn_weex_action_ptr(static_cast<long>(action_ptr));
 }
 
 static jint DestoryInstance(JNIEnv *env, jobject jcaller, jstring instanceId,

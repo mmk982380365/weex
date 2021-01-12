@@ -35,6 +35,7 @@ import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -70,6 +71,7 @@ import com.taobao.weex.utils.WXWsonJSONSwitch;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
 import com.taobao.weex.utils.tools.LogDetail;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -340,6 +342,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         });
       }
     }
+  }
+
+  public void setWeexRenderActionPtr(long ptr) {
+    mWXBridge.setUnicornWeexRenderActionPtr(ptr);
   }
 
   // setJSFrameworkInit and isJSFrameworkInit may use on diff thread
@@ -1793,9 +1799,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               ((Map) extraOption).put("pre_init_mode", value);
             }
           }
-        }
 
         WXJSObject extraOptionObj = new WXJSObject(WXJSObject.JSON, WXJsonUtils.fromObjectToJSONString(extraOption));
+
+        Object enable_unicorn_weex_render = options.get("enable_unicorn_weex_render");
+          if (enable_unicorn_weex_render != null) {
+            ((Map) extraOption).put("enable_unicorn_weex_render", String.valueOf(enable_unicorn_weex_render));
+          }
+        }
+
         WXJSObject optionsObj = new WXJSObject(WXJSObject.JSON,
                 options == null ? "{}"
                         : WXJsonUtils.fromObjectToJSONString(options));

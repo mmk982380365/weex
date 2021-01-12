@@ -26,7 +26,27 @@
 #include "core/bridge/script_bridge.h"
 #include "log_defines.h"
 
+#include "core/manager/weex_core_manager.h"
+#include "core/render/manager/render_manager.h"
+
 #define countof(x) (sizeof(x) / sizeof((x)[0]))
+
+#define UNICORN_WEEX_RENDER_ACTION \
+  (reinterpret_cast<void (*)(std::string, std::string, JSContext*, JSValueConst*, int)> \
+  (WeexCore::WeexCoreManager::Instance()->unicorn_weex_action_ptr()))
+
+static bool EnableUnicornWeexRender(JSContext *ctx, const JSValueConst *argv) {
+  bool enable_unicorn_weex_render = false;
+  JSValue instance_id = argv[0];
+  if (JS_IsString(instance_id)) {
+    const char *id = JS_ToCString(ctx, instance_id);
+    std::string enabled =
+            RenderManager::GetInstance()->getPageArgument(std::string(id), "enable_unicorn_weex_render");
+    enable_unicorn_weex_render = enabled == "true";
+  }
+
+  return enable_unicorn_weex_render && WeexCoreManager::Instance()->unicorn_weex_action_ptr() > 0;
+}
 
 static WeexCore::ScriptBridge *bridge(JSContext *ctx) {
   if (ctx == nullptr) {
@@ -494,16 +514,20 @@ static JSValue js_CallNativeComponent(JSContext *ctx, JSValueConst this_val,
     return JS_UNDEFINED;
   }
 
-  WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams method(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams arguments(ctx, argv[3], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
-  WeexContextQJS::JSParams options(ctx, argv[4], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
+  if (EnableUnicornWeexRender(ctx, argv)) {
+    UNICORN_WEEX_RENDER_ACTION("dom", "callNativeComponent", ctx, argv, argc);
+  } else {
+      WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+      WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+      WeexContextQJS::JSParams method(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+      WeexContextQJS::JSParams arguments(ctx, argv[3], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
+      WeexContextQJS::JSParams options(ctx, argv[4], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
 
-  script_bridge->core_side()->CallNativeComponent(
-      id.value(), ref.value(),
-      method.value(), arguments.value(), arguments.size(),
-      options.value(), options.size());
+      script_bridge->core_side()->CallNativeComponent(
+          id.value(), ref.value(),
+          method.value(), arguments.value(), arguments.size(),
+          options.value(), options.size());
+  }
 
   return JS_NewInt32(ctx, 0);
 }
@@ -514,14 +538,19 @@ static JSValue js_CallAddElement(JSContext *ctx, JSValueConst this_val,
   if (script_bridge == nullptr) {
     return JS_UNDEFINED;
   }
-  WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams parent_ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams dom_str(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
-  WeexContextQJS::JSParams index_str(ctx, argv[3], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
 
-  script_bridge->core_side()->AddElement(
-      id.value(), parent_ref.value(),
-      dom_str.value(), dom_str.size(), index_str.value());
+  if (EnableUnicornWeexRender(ctx, argv)) {
+    UNICORN_WEEX_RENDER_ACTION("dom", "addElement", ctx, argv, argc);
+  } else {
+    WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams parent_ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams dom_str(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
+    WeexContextQJS::JSParams index_str(ctx, argv[3], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+
+    script_bridge->core_side()->AddElement(
+        id.value(), parent_ref.value(),
+        dom_str.value(), dom_str.size(), index_str.value());
+  }
   return JS_NewInt32(ctx, 0);
 }
 
@@ -583,10 +612,15 @@ static JSValue js_CallCreateBody(JSContext *ctx, JSValueConst this_val,
     return JS_UNDEFINED;
   }
 
-  WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams dom_str(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
-  script_bridge->core_side()->CreateBody(
-      id.value(), dom_str.value(), dom_str.size());
+  if (EnableUnicornWeexRender(ctx, argv)) {
+    UNICORN_WEEX_RENDER_ACTION("dom", "createBody", ctx, argv, argc);
+  } else {
+    WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams dom_str(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
+    script_bridge->core_side()->CreateBody(
+        id.value(), dom_str.value(), dom_str.size());
+  }
+
 
   return JS_NewInt32(ctx, 0);
 }
@@ -615,8 +649,12 @@ static JSValue js_CallCreateFinish(JSContext *ctx, JSValueConst this_val,
   if (script_bridge == nullptr) {
     return JS_UNDEFINED;
   }
-  WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  script_bridge->core_side()->CreateFinish(id.value());
+  if (EnableUnicornWeexRender(ctx, argv)) {
+    UNICORN_WEEX_RENDER_ACTION("dom", "createFinish", ctx, argv, argc);
+  } else {
+    WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    script_bridge->core_side()->CreateFinish(id.value());
+  }
   return JS_NewInt32(ctx, 0);
 }
 
@@ -645,11 +683,16 @@ static JSValue js_CallUpdateAttrs(JSContext *ctx, JSValueConst this_val,
     return JS_UNDEFINED;
   }
 
-  WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams data(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
+  if (EnableUnicornWeexRender(ctx, argv)) {
+    UNICORN_WEEX_RENDER_ACTION("dom", "updateAttributes", ctx, argv, argc);
+  } else {
+    WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams data(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
 
-  script_bridge->core_side()->UpdateAttrs(id.value(), ref.value(), data.value(), data.size());
+    script_bridge->core_side()->UpdateAttrs(id.value(), ref.value(), data.value(), data.size());
+  }
+
   return JS_NewInt32(ctx, 0);
 }
 
@@ -660,10 +703,15 @@ static JSValue js_CallUpdateStyle(JSContext *ctx, JSValueConst this_val,
   if (script_bridge == nullptr) {
     return JS_UNDEFINED;
   }
-  WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams data(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
-  script_bridge->core_side()->UpdateStyle(id.value(), ref.value(), data.value(), data.size());
+  if (EnableUnicornWeexRender(ctx, argv)) {
+    UNICORN_WEEX_RENDER_ACTION("dom", "updateStyle", ctx, argv, argc);
+  } else {
+    WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams data(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
+    script_bridge->core_side()->UpdateStyle(id.value(), ref.value(), data.value(), data.size());
+  }
+
   return JS_NewInt32(ctx, 0);
 }
 
@@ -673,9 +721,15 @@ static JSValue js_CallRemoveElement(JSContext *ctx, JSValueConst this_val,
   if (script_bridge == nullptr) {
     return JS_UNDEFINED;
   }
-  WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  script_bridge->core_side()->RemoveElement(id.value(), ref.value());
+
+  if (EnableUnicornWeexRender(ctx, argv)) {
+    UNICORN_WEEX_RENDER_ACTION("dom", "removeElement", ctx, argv, argc);
+  } else {
+    WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    script_bridge->core_side()->RemoveElement(id.value(), ref.value());
+  }
+
   return JS_NewInt32(ctx, 0);
 }
 
@@ -686,15 +740,19 @@ static JSValue js_CallMoveElement(JSContext *ctx, JSValueConst this_val,
     return JS_UNDEFINED;
   }
 
-  WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams parent_ref(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams index(ctx, argv[3], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+  if (EnableUnicornWeexRender(ctx, argv)) {
+    UNICORN_WEEX_RENDER_ACTION("dom", "moveElement", ctx, argv, argc);
+  } else {
+    WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams parent_ref(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams index(ctx, argv[3], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    script_bridge->core_side()->MoveElement(id.value(),
+                                            ref.value(),
+                                            parent_ref.value(),
+                                            atoi(index.value()));
+  }
 
-  script_bridge->core_side()->MoveElement(id.value(),
-                                          ref.value(),
-                                          parent_ref.value(),
-                                          atoi(index.value()));
   return JS_NewInt32(ctx, 0);
 }
 
@@ -705,11 +763,15 @@ static JSValue js_CallAddEvent(JSContext *ctx, JSValueConst this_val, int argc,
     return JS_UNDEFINED;
   }
 
-  WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams event(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+  if (EnableUnicornWeexRender(ctx, argv)) {
+    UNICORN_WEEX_RENDER_ACTION("dom", "addEvent", ctx, argv, argc);
+  } else {
+    WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams event(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    script_bridge->core_side()->AddEvent(id.value(), ref.value(), event.value());
+  }
 
-  script_bridge->core_side()->AddEvent(id.value(), ref.value(), event.value());
   return JS_NewInt32(ctx, 0);;
 }
 
@@ -719,10 +781,16 @@ static JSValue js_CallRemoveEvent(JSContext *ctx, JSValueConst this_val,
   if (script_bridge == nullptr) {
     return JS_UNDEFINED;
   }
-  WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  WeexContextQJS::JSParams event(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-  script_bridge->core_side()->RemoveEvent(id.value(), ref.value(), event.value());
+
+  if (EnableUnicornWeexRender(ctx, argv)) {
+    UNICORN_WEEX_RENDER_ACTION("dom", "removeEvent", ctx, argv, argc);
+  } else {
+    WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams event(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    script_bridge->core_side()->RemoveEvent(id.value(), ref.value(), event.value());
+  }
+
   return JS_NewInt32(ctx, 0);;
 }
 

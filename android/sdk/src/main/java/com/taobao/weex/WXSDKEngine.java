@@ -18,14 +18,13 @@
  */
 package com.taobao.weex;
 
-import static com.taobao.weex.WXEnvironment.CORE_SO_NAME;
-
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
@@ -87,8 +86,8 @@ import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
 import com.taobao.weex.ui.component.richtext.WXRichText;
 import com.taobao.weex.ui.config.AutoScanConfigRegister;
-import com.taobao.weex.ui.module.WXDeviceInfoModule;
 import com.taobao.weex.ui.module.ConsoleLogModule;
+import com.taobao.weex.ui.module.WXDeviceInfoModule;
 import com.taobao.weex.ui.module.WXLocaleModule;
 import com.taobao.weex.ui.module.WXMetaModule;
 import com.taobao.weex.ui.module.WXModalUIModule;
@@ -100,10 +99,12 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.batch.BatchOperationHelper;
 import com.taobao.weex.utils.cache.RegisterCache;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
+import static com.taobao.weex.WXEnvironment.CORE_SO_NAME;
 
 public class WXSDKEngine implements Serializable {
 

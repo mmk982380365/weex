@@ -18,9 +18,6 @@
  */
 package com.taobao.weex;
 
-import static com.taobao.weex.common.WXErrorCode.WX_ERR_RELOAD_PAGE;
-import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -39,7 +36,6 @@ import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +60,7 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXEaglePlugin;
 import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.bridge.WXParams;
+import com.taobao.weex.bridge.WXReactorPage;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.Destroyable;
 import com.taobao.weex.common.OnWXScrollListener;
@@ -75,8 +72,6 @@ import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.common.WXRefreshData;
 import com.taobao.weex.common.WXRenderStrategy;
 import com.taobao.weex.common.WXRequest;
-import com.taobao.weex.bridge.WXReactorPage;
-import com.taobao.weex.common.*;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.instance.InstanceOnFireEventInterceptor;
@@ -105,6 +100,7 @@ import com.taobao.weex.utils.WXViewUtils;
 import com.taobao.weex.utils.cache.RegisterCache;
 import com.taobao.weex.utils.tools.LogDetail;
 import com.taobao.weex.utils.tools.TimeCalculator;
+
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -114,6 +110,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.taobao.weex.common.WXErrorCode.WX_ERR_RELOAD_PAGE;
+import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 
 
 /**

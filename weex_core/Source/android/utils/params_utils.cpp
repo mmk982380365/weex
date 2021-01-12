@@ -477,6 +477,8 @@ std::vector<std::pair<std::string, std::string>> initFromParam(
             WeexRuntimeManager::Instance()->set_enable_backup_thread(value == "true");
           } else if (key == "enableBackupThreadCache") {
             WeexRuntimeManager::Instance()->set_enable_backup_thread_cache(value == "true");
+          } else if (key == "unicorn_weex_render_action_ptr") {
+            WeexCoreManager::Instance()->set_unicorn_weex_action_ptr(std::stol(value));
           }
         }
       }

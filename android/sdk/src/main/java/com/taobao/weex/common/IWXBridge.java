@@ -235,4 +235,6 @@ public interface IWXBridge extends IWXObject {
   void setDeviceDisplayOfPage(String instanceId, float width, float height);
 
   void setPageDirty(String instanceId, boolean dirty);
+
+  void setUnicornWeexRenderActionPtr(long ptr);
 }

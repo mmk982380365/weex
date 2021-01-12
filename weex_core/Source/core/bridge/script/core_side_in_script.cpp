@@ -128,7 +128,6 @@ void CoreSideInScript::NativeLog(const char *str_array) {
 
 void CoreSideInScript::CreateBody(const char *page_id, const char *dom_str,
                                   int dom_str_length) {
-
   RenderManager::GetInstance()->CreatePage(page_id, dom_str);
 }
 

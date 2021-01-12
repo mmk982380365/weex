@@ -41,6 +41,14 @@ class WeexCoreManager {
 
   inline PlatformBridge *getPlatformBridge() { return platform_bridge_; }
 
+  inline void set_unicorn_weex_action_ptr(long action_ptr) {
+    unicorn_weex_action_ptr_ = action_ptr;
+  }
+
+  inline long unicorn_weex_action_ptr() {
+    return unicorn_weex_action_ptr_;
+  }
+
   inline void set_platform_bridge(PlatformBridge *bridge) {
     platform_bridge_ = bridge;
   }
@@ -90,6 +98,7 @@ class WeexCoreManager {
   ProjectMode project_mode_;
   weex::base::Thread *script_thread_;
   volatile bool release_map_;
+  long unicorn_weex_action_ptr_;
 
   WeexCoreManager()
       : platform_bridge_(nullptr),
@@ -99,7 +108,8 @@ class WeexCoreManager {
         script_thread_(nullptr),
         client_queue_(nullptr),
         server_queue_(nullptr),
-        release_map_(false){};
+        release_map_(false),
+        unicorn_weex_action_ptr_(0){};
   ~WeexCoreManager(){};
 };
 }  // namespace WeexCore

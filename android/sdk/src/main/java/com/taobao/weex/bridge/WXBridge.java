@@ -53,7 +53,7 @@ import java.util.Map;
  * Communication interface for Java code and JavaScript code.
  */
 
-    public class WXBridge implements IWXBridge {
+public class WXBridge implements IWXBridge {
 
   private native int nativeInitFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport);
 
@@ -70,6 +70,8 @@ import java.util.Map;
   public native void nativeExecJSWithCallback(String instanceId, String _namespace, String _function, WXJSObject[] args, long callbackId);
 
   public native void nativeCompileQuickJSBin(String key, String script);
+
+  private native void nativeSetUnicornWeexRenderActionPtr(long ptr);
 
   public native int nativeCreateInstanceContext(String instanceId, String name, String function, WXJSObject[] args);
 
@@ -943,4 +945,8 @@ import java.util.Map;
     }
   }
 
+  @Override
+  public void setUnicornWeexRenderActionPtr(long ptr) {
+    nativeSetUnicornWeexRenderActionPtr(ptr);
+  }
 }
