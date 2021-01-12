@@ -1799,13 +1799,13 @@ public class WXBridgeManager implements Callback, BactchExecutor {
               ((Map) extraOption).put("pre_init_mode", value);
             }
           }
+        }
 
         WXJSObject extraOptionObj = new WXJSObject(WXJSObject.JSON, WXJsonUtils.fromObjectToJSONString(extraOption));
 
         Object enable_unicorn_weex_render = options.get("enable_unicorn_weex_render");
-          if (enable_unicorn_weex_render != null) {
-            ((Map) extraOption).put("enable_unicorn_weex_render", String.valueOf(enable_unicorn_weex_render));
-          }
+        if (enable_unicorn_weex_render != null) {
+          ((Map) extraOption).put("enable_unicorn_weex_render", String.valueOf(enable_unicorn_weex_render));
         }
 
         WXJSObject optionsObj = new WXJSObject(WXJSObject.JSON,
