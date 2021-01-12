@@ -1780,14 +1780,21 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
         boolean is_pre_init_mode = false;
         if(extraOption instanceof Map) {
+          Object enable_unicorn_weex_render = options.get("enable_unicorn_weex_render");
+          if (enable_unicorn_weex_render != null) {
+            ((Map) extraOption).put("enable_unicorn_weex_render", String.valueOf(enable_unicorn_weex_render));
+            ((Map) extraOption).put("run_in_main_process", String.valueOf(enable_unicorn_weex_render));
+          }
+
           Object run_in_main_process = options.get("run_in_main_process");
           if (run_in_main_process != null) {
-            ((Map) extraOption).put("run_in_main_process", run_in_main_process);
-            if ("true".equals(String.valueOf(run_in_main_process))) {
-              IWXJSEngineManager.EngineType jsEngineType = instance.getJSEngineType();
-              if (jsEngineType == IWXJSEngineManager.EngineType.JavaScriptCore) {
-                instance.setJSEngineType(IWXJSEngineManager.EngineType.QuickJS);
-              }
+            ((Map) extraOption).put("run_in_main_process", String.valueOf(run_in_main_process));
+          }
+
+          if ("true".equals(String.valueOf(run_in_main_process)) || "true".equals(String.valueOf(enable_unicorn_weex_render))) {
+            IWXJSEngineManager.EngineType jsEngineType = instance.getJSEngineType();
+            if (jsEngineType == IWXJSEngineManager.EngineType.JavaScriptCore) {
+              instance.setJSEngineType(IWXJSEngineManager.EngineType.QuickJS);
             }
           }
 
@@ -1802,11 +1809,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         }
 
         WXJSObject extraOptionObj = new WXJSObject(WXJSObject.JSON, WXJsonUtils.fromObjectToJSONString(extraOption));
-
-        Object enable_unicorn_weex_render = options.get("enable_unicorn_weex_render");
-        if (enable_unicorn_weex_render != null) {
-          ((Map) extraOption).put("enable_unicorn_weex_render", String.valueOf(enable_unicorn_weex_render));
-        }
 
         WXJSObject optionsObj = new WXJSObject(WXJSObject.JSON,
                 options == null ? "{}"
