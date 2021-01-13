@@ -45,7 +45,7 @@ std::function<void(const char*, const char*)> CreatePageDownloadExec(const char*
             const_cast<std::map<std::string, json11::Json>&>(
                 opts_json.object_items());
         opts_map["bundleType"] = bundleType;
-        std::vector<INIT_FRAMEWORK_PARAMS*> params;
+        std::vector<std::pair<std::string, std::string>> params;
         WeexCoreManager::Instance()
             ->script_bridge()
             ->script_side()
