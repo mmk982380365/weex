@@ -636,6 +636,6 @@ public class WXSDKEngine implements Serializable {
   }
 
   public static IWXJSEngineManager.EngineType defaultEngineType() {
-    return IWXJSEngineManager.EngineType.QuickJS;
+    return IWXJSEngineManager.EngineType.JavaScriptCore;
   }
 }
