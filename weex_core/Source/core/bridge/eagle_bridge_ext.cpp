@@ -49,7 +49,7 @@ std::function<void(const char*, const char*)> CreatePageDownloadExec(const char*
         WeexCoreManager::Instance()
             ->script_bridge()
             ->script_side()
-            ->CreateInstance(instanceId.c_str(), func.c_str(), result,
+            ->CreateInstance(instanceId.c_str(), func.c_str(), result, strlen(result),
                              opts_json.dump().c_str(), initData.c_str(),
                              strcmp("Rax", bundleType) ? "\0" : extendsApi.c_str(),
                              params);
