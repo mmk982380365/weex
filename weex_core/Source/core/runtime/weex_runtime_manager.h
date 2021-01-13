@@ -139,6 +139,14 @@ class WeexRuntimeManager {
     return this->is_enable_backup_thread_cache_;
   }
 
+  inline bool is_enable_main_process_script_side() {
+    return this->is_enable_main_process_script_side_;
+  }
+
+  void set_enable_main_process_script_side(bool enableMainProcessManager) {
+    this->is_enable_main_process_script_side_ = enableMainProcessManager;
+  }
+
   std::map<JSEngineType, WeexRuntime *> runtime_from_page_id(const char *string);
 
  private:
@@ -149,6 +157,7 @@ class WeexRuntimeManager {
   unsigned int js_engine_type_;
   bool is_enable_backup_thread_;
   bool is_enable_backup_thread_cache_;
+  bool is_enable_main_process_script_side_;
 
   static WeexRuntimeManager *instance;
 

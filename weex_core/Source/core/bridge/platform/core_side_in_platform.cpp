@@ -630,11 +630,8 @@ std::vector<WeexCore::ScriptBridge::ScriptSide *> CoreSideInPlatform::GetScriptS
     put_script_side = true;
     put_script_side_main_process_only = true;
   } else {
-    put_script_side_main_process_only =
+    put_script_side_main_process_only = script_side_main_process != nullptr &&
         WeexRuntimeManager::Instance()->is_force_in_main_process(page_id);
-    if (put_script_side_main_process_only) {
-      LOGE("instance %s is running in main process", page_id);
-    }
     put_script_side = !put_script_side_main_process_only;
   }
 

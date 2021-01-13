@@ -1778,6 +1778,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           extraOption = new HashMap<String, Object>();
         }
 
+        if (WXSDKManager.getInstance().getWXJSEngineManager().enableMainProcessScriptSide()
+                && WXSDKManager.getInstance().getWXJSEngineManager().forceAllPageRunInMainProcessScriptSide()) {
+          options.put("run_in_main_process", "true");
+        }
+
         boolean is_pre_init_mode = false;
         if(extraOption instanceof Map) {
           Object enable_unicorn_weex_render = options.get("enable_unicorn_weex_render");
@@ -2464,6 +2469,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     if(wxJscProcessManager != null) {
       customOptions.put("enableBackupThreadCache", String.valueOf(wxJscProcessManager.enableBackUpThreadCache()));
     }
+
+    customOptions.put("enableMainProcessScriptSide", String.valueOf(WXSDKManager.getInstance().getWXJSEngineManager().enableMainProcessScriptSide()));
 
     if (!WXEnvironment.sUseRunTimeApi){
       customOptions.put("__enable_native_promise__","true");
