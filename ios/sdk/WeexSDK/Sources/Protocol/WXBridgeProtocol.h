@@ -184,6 +184,12 @@ typedef NSInteger(^WXJSCallUpdateComponentData)(NSString *instanceId, NSString *
  */
 - (void)executeJavascript:(NSString *)script withSourceURL:(NSURL* _Nullable)sourceURL;
 
+- (void)createInstance:(NSString *)instanceId
+                script:(NSString *)script
+                  opts:(NSDictionary *)opts
+              initData:(NSArray *)initData
+            extendsApi:(NSString *)extendsApi
+                params:(NSDictionary *)params;
 
 @property (nonatomic, strong) NSString* weexInstanceId;
 

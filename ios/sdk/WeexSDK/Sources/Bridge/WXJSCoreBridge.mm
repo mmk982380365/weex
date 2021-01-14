@@ -82,7 +82,6 @@
 {
     _jsContext.instanceId = nil;
     __block JSContext* theContext = _jsContext;
-    _jsContext = nil; // Make sure that the context MUST be freed in JS thread.
     WXPerformBlockOnBridgeThreadForInstance(^{
          theContext = nil; // release the context in js thread to avoid main-thread deadlock
     }, _weexInstanceId);
@@ -443,7 +442,7 @@
 
 - (void)resetEnvironment
 {
-    NSDictionary *data = [WXUtility getEnvironmentForJSContext];
+    NSDictionary *data = [WXUtility getEnvironment];
     _jsContext[@"WXEnvironment"] = data;
 }
 
