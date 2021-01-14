@@ -3847,7 +3847,7 @@
 					"$(inherited)",
 					"OS_IOS=1",
 				);
-				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/WeexSDK/Dependency",
@@ -3906,7 +3906,7 @@
 					"${inherited}",
 					"OS_IOS=1",
 				);
-				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/WeexSDK/Dependency",

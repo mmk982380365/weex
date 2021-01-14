@@ -396,20 +396,20 @@ typedef enum : NSUInteger {
     }
 }
 
-- (void)registerReactorContext:(JSContext*)context {
-    if (!context) {
-        return;
-    }
-    [WXCoreBridge install];
-    [self.canalParams setObject:context forKey:@"mainJSContext"];
-
-    id<WXReactorProtocol> reactorHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXReactorProtocol")];
-    if (reactorHandler) {
-        [reactorHandler registerJSContext:self.instanceId];
-    } else {
-        WXLogError(@"There is no reactor handler");
-    }
-}
+//- (void)registerReactorContext:(JSContext*)context {
+//    if (!context) {
+//        return;
+//    }
+//    [WXCoreBridge install];
+//    [self.canalParams setObject:context forKey:@"mainJSContext"];
+//
+//    id<WXReactorProtocol> reactorHandler = [WXHandlerFactory handlerForProtocol:NSProtocolFromString(@"WXReactorProtocol")];
+//    if (reactorHandler) {
+//        [reactorHandler registerJSContext:self.instanceId];
+//    } else {
+//        WXLogError(@"There is no reactor handler");
+//    }
+//}
 
 - (NSString *) bundleTemplate
 {

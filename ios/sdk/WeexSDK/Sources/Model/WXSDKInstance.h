@@ -395,7 +395,7 @@ typedef enum : NSUInteger {
 /**
 * register jscontext for reactor
 */
-- (void)registerReactorContext:(JSContext*)context;
+//- (void)registerReactorContext:(JSContext*)context; WXSDKInstance 需要与 JSC 解耦
 
 /**
  * jsbundle str ,may be nil (weak)
