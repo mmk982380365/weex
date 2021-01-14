@@ -42,6 +42,7 @@ int bridge::script::ScriptSideInSimple::InitFramework(const char *script,
     WeexRuntimeManager::Instance()
         ->add_weex_runtime(new WeexRuntimeJSC(this->bridge(), false));
 #elif OS_IOS
+      engine_type = ENGINE_QJS;
 #endif
   }
 
@@ -112,15 +113,19 @@ std::unique_ptr<WeexJSResult> bridge::script::ScriptSideInSimple::ExecJSWithResu
                                                                                    std::vector<
                                                                                        VALUE_WITH_TYPE *> &params) {
   std::map<JSEngineType, WeexRuntime *>
-      runtime_map = WeexRuntimeManager::Instance()->runtime_from_page_id(instanceId);
+      kMap = WeexRuntimeManager::Instance()->runtime_from_page_id(instanceId);
 
-  for (auto &runtime: runtime_map) {
-    runtime.second->exeJSWithResult(weex::base::value_or_empty(instanceId),
-                                    weex::base::value_or_empty(nameSpace),
-                                    weex::base::value_or_empty(func), params);
+  std::unique_ptr<WeexJSResult> ret;
+  for (auto &it: kMap) {
+      ret = it.second->exeJSWithResult(weex::base::value_or_empty(instanceId),
+                                       weex::base::value_or_empty(nameSpace),
+                                       weex::base::value_or_empty(func), params);
   }
-
-  return std::unique_ptr<WeexJSResult>();
+  if (!ret)
+  {
+      ret = std::unique_ptr<WeexJSResult>();
+  }
+  return ret;
 }
 void bridge::script::ScriptSideInSimple::ExecJSWithCallback(const char *instanceId,
                                                             const char *nameSpace,
