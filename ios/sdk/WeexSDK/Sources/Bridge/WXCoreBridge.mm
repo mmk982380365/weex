@@ -1279,17 +1279,7 @@ void CoreSideInScript::OnReceivedResult(long callback_id,
 void CoreSideInScript::UpdateComponentData(const char* page_id,
                                            const char* cid,
                                            const char* json_data) {
-    id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
-    if (dataRenderHandler) {
-        WXPerformBlockOnComponentThread(^{
-            long start = [WXUtility getUnixFixTimeMillis];
-            WXSDKInstance *instance = [WXSDKManager instanceForID:@(page_id)];
-            [instance.apmInstance addUpdateComponentDataTimestamp:start];
-            [dataRenderHandler callUpdateComponentData:@(page_id) componentId:@(cid) jsonData:[WXUtility objectFromJSON:@(json_data)]];
-            [instance.apmInstance addUpdateComponentDataTime:[WXUtility getUnixFixTimeMillis] - start];
-        });
-    }
-    else {
+    {
         WXSDKInstance *instance = [WXSDKManager instanceForID:@(page_id)];
         WXComponentManager *manager = instance.componentManager;
         if (manager.isValid) {
