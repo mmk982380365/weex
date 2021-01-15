@@ -116,7 +116,7 @@ _Pragma("clang diagnostic pop") \
     // WXDebugger is a singleton actually and should not call its init twice.
     _jsBridge = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[bridgeClass alloc] init];
     
-    [self registerGlobalFunctions];
+    [self registerGlobalFunctionsForBridge:_jsBridge];
     
     return _jsBridge;
 }
@@ -130,14 +130,14 @@ _Pragma("clang diagnostic pop") \
     return TRUE;
 }
 
-- (void)registerGlobalFunctions
+- (void)registerGlobalFunctionsForBridge:(id<WXBridgeProtocol>)bridge
 {
     __weak typeof(self) weakSelf = self;
-    [_jsBridge registerCallNative:^NSInteger(NSString *instance, NSArray *tasks, NSString *callback) {
+    [bridge registerCallNative:^NSInteger(NSString *instance, NSArray *tasks, NSString *callback) {
         return [weakSelf invokeNative:instance tasks:tasks callback:callback];
     }];
     
-    [_jsBridge registerCallUpdateComponentData:^NSInteger(NSString *instanceId, NSString *componentId, NSString *jsonData) {
+    [bridge registerCallUpdateComponentData:^NSInteger(NSString *instanceId, NSString *componentId, NSString *jsonData) {
         {
             WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
             WXComponentManager *manager = instance.componentManager;
@@ -152,7 +152,7 @@ _Pragma("clang diagnostic pop") \
         return 0;
     }];
 
-    [_jsBridge registerCallAddElement:^NSInteger(NSString *instanceId, NSString *parentRef, NSDictionary *elementData, NSInteger index) {
+    [bridge registerCallAddElement:^NSInteger(NSString *instanceId, NSString *parentRef, NSDictionary *elementData, NSInteger index) {
         
         if ([WXCustomPageBridge isCustomPage:instanceId]) {
             [[WXCustomPageBridge sharedInstance] callAddElement:instanceId parentRef:parentRef data:elementData index:(int)index];
@@ -166,7 +166,7 @@ _Pragma("clang diagnostic pop") \
         return 0;
     }];
     
-    [_jsBridge registerCallCreateBody:^NSInteger(NSString *instanceId, NSDictionary *bodyData) {
+    [bridge registerCallCreateBody:^NSInteger(NSString *instanceId, NSDictionary *bodyData) {
         
         if ([WXCustomPageBridge isCustomPage:instanceId]) {
             [[WXCustomPageBridge sharedInstance] callCreateBody:instanceId data:bodyData];
@@ -180,7 +180,7 @@ _Pragma("clang diagnostic pop") \
         return 0;
     }];
     
-    [_jsBridge registerCallRemoveElement:^NSInteger(NSString *instanceId, NSString *ref) {
+    [bridge registerCallRemoveElement:^NSInteger(NSString *instanceId, NSString *ref) {
         
         if ([WXCustomPageBridge isCustomPage:instanceId]) {
             [[WXCustomPageBridge sharedInstance] callRemoveElement:instanceId ref:ref];
@@ -194,7 +194,7 @@ _Pragma("clang diagnostic pop") \
         return 0;
     }];
     
-    [_jsBridge registerCallMoveElement:^NSInteger(NSString *instanceId, NSString *ref, NSString *parentRef, NSInteger index) {
+    [bridge registerCallMoveElement:^NSInteger(NSString *instanceId, NSString *ref, NSString *parentRef, NSInteger index) {
         
         if ([WXCustomPageBridge isCustomPage:instanceId]) {
             [[WXCustomPageBridge sharedInstance] callMoveElement:instanceId ref:ref parentRef:parentRef index:(int)index];
@@ -208,7 +208,7 @@ _Pragma("clang diagnostic pop") \
         return 0;
     }];
     
-    [_jsBridge registerCallUpdateAttrs:^NSInteger(NSString *instanceId, NSString *ref, NSDictionary *attrsData) {
+    [bridge registerCallUpdateAttrs:^NSInteger(NSString *instanceId, NSString *ref, NSDictionary *attrsData) {
         
         if ([WXCustomPageBridge isCustomPage:instanceId]) {
             [[WXCustomPageBridge sharedInstance] callUpdateAttrs:instanceId ref:ref data:attrsData];
@@ -222,7 +222,7 @@ _Pragma("clang diagnostic pop") \
         return 0;
     }];
     
-    [_jsBridge registerCallUpdateStyle:^NSInteger(NSString *instanceId, NSString *ref, NSDictionary *stylesData) {
+    [bridge registerCallUpdateStyle:^NSInteger(NSString *instanceId, NSString *ref, NSDictionary *stylesData) {
         
         if ([WXCustomPageBridge isCustomPage:instanceId]) {
             [[WXCustomPageBridge sharedInstance] callUpdateStyle:instanceId ref:ref data:stylesData];
@@ -236,7 +236,7 @@ _Pragma("clang diagnostic pop") \
         return 0;
     }];
     
-    [_jsBridge registerCallAddEvent:^NSInteger(NSString *instanceId, NSString *ref, NSString *event) {
+    [bridge registerCallAddEvent:^NSInteger(NSString *instanceId, NSString *ref, NSString *event) {
         
         if ([WXCustomPageBridge isCustomPage:instanceId]) {
             [[WXCustomPageBridge sharedInstance] callAddEvent:instanceId ref:ref event:event];
@@ -250,7 +250,7 @@ _Pragma("clang diagnostic pop") \
         return 0;
     }];
     
-    [_jsBridge registerCallRemoveEvent:^NSInteger(NSString *instanceId, NSString *ref, NSString *event) {
+    [bridge registerCallRemoveEvent:^NSInteger(NSString *instanceId, NSString *ref, NSString *event) {
         
         if ([WXCustomPageBridge isCustomPage:instanceId]) {
             [[WXCustomPageBridge sharedInstance] callRemoveEvent:instanceId ref:ref event:event];
@@ -264,7 +264,7 @@ _Pragma("clang diagnostic pop") \
         return 0;
     }];
     
-    [_jsBridge registerCallCreateFinish:^NSInteger(NSString *instanceId) {
+    [bridge registerCallCreateFinish:^NSInteger(NSString *instanceId) {
         
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         [instance.apmInstance onStage:KEY_PAGE_STAGES_CREATE_FINISH];
@@ -281,8 +281,8 @@ _Pragma("clang diagnostic pop") \
         return 0;
     }];
     
-    if ([_jsBridge respondsToSelector:@selector(registerCallRefreshFinish:)]) {
-        [_jsBridge registerCallRefreshFinish:^NSInteger(NSString *instanceId) {
+    if ([bridge respondsToSelector:@selector(registerCallRefreshFinish:)]) {
+        [bridge registerCallRefreshFinish:^NSInteger(NSString *instanceId) {
             
             if ([WXCustomPageBridge isCustomPage:instanceId]) {
                 [[WXCustomPageBridge sharedInstance] callRefreshFinish:instanceId];
@@ -297,8 +297,8 @@ _Pragma("clang diagnostic pop") \
         }];
     }
     
-    if ([_jsBridge respondsToSelector:@selector(registerCallUpdateFinish:)]) {
-        [_jsBridge registerCallUpdateFinish:^NSInteger(NSString *instanceId) {
+    if ([bridge respondsToSelector:@selector(registerCallUpdateFinish:)]) {
+        [bridge registerCallUpdateFinish:^NSInteger(NSString *instanceId) {
             
             if ([WXCustomPageBridge isCustomPage:instanceId]) {
                 [[WXCustomPageBridge sharedInstance] callUpdateFinish:instanceId];
@@ -313,7 +313,7 @@ _Pragma("clang diagnostic pop") \
         }];
     }
     
-    [_jsBridge registerCallNativeModule:^NSInvocation*(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *arguments, NSDictionary *options) {
+    [bridge registerCallNativeModule:^NSInvocation*(NSString *instanceId, NSString *moduleName, NSString *methodName, NSArray *arguments, NSDictionary *options) {
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         
         if (!instance) {
@@ -350,7 +350,7 @@ _Pragma("clang diagnostic pop") \
         return [method invoke];
     }];
     
-    [_jsBridge registerCallNativeComponent:^void(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options) {
+    [bridge registerCallNativeComponent:^void(NSString *instanceId, NSString *componentRef, NSString *methodName, NSArray *args, NSDictionary *options) {
        
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> action: callNativeComponent ref:%@",componentRef);
