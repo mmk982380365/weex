@@ -200,6 +200,12 @@ int WeexRuntimeQJS::exeJS(const std::string &instanceId,
                                        string2String.length(), "t");
       }
         break;
+      case ParamsType::BYTEARRAYJSONSTRING:{
+          const WeexByteArray *array = paramsObject->value.byteArray;
+          const char *string = array->content;
+          jsValueArray[i] = JS_ParseJSON(thisContext, string, array->length, "t");
+      }
+        break;
       case ParamsType::BYTEARRAY: {
 #if OS_ANDROID
         const WeexByteArray *array = paramsObject->value.byteArray;
@@ -277,6 +283,11 @@ std::unique_ptr<WeexJSResult> WeexRuntimeQJS::exeJSWithResult(const std::string 
         js_args[i] = jsvalue;
       }
         break;
+      case ParamsType::BYTEARRAYJSONSTRING:{
+        const WeexByteArray *array = paramsObject->value.byteArray;
+        const char *string = array->content;
+        js_args[i] = JS_ParseJSON(thisContext, string, array->length, "t");
+      }
       case ParamsType::BYTEARRAY: {
 #if OS_ANDROID
         const WeexByteArray *array = paramsObject->value.byteArray;
