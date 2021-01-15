@@ -1206,15 +1206,22 @@ void CoreSideInScript::MoveElement(const char *page_id, const char *ref,
 
 void CoreSideInScript::AddEvent(const char *page_id, const char *ref,
                                 const char *event) {
+    NSString *page_idStr = [NSString stringWithUTF8String:page_id];
+    NSString *refStr = [NSString stringWithUTF8String:ref];
+    NSString *eventStr = [NSString stringWithUTF8String:event];
     WXPerformBlockOnComponentThread(^{
-        RenderManager::GetInstance()->AddEvent(page_id, ref, event);
+        RenderManager::GetInstance()->AddEvent(page_idStr.UTF8String, refStr.UTF8String, eventStr.UTF8String);
     });
 }
 
 void CoreSideInScript::RemoveEvent(const char *page_id, const char *ref,
                                    const char *event) {
+    
+    NSString *page_idStr = [NSString stringWithUTF8String:page_id];
+    NSString *refStr = [NSString stringWithUTF8String:ref];
+    NSString *eventStr = [NSString stringWithUTF8String:event];
     WXPerformBlockOnComponentThread(^{
-        RenderManager::GetInstance()->RemoveEvent(page_id, ref, event);
+        RenderManager::GetInstance()->RemoveEvent(page_idStr.UTF8String, refStr.UTF8String, eventStr.UTF8String);
     });
 }
 

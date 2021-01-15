@@ -132,7 +132,7 @@ static NSThread *WXBackupBridgeThread;
         WXBridgeThread = [[NSThread alloc] initWithTarget:[[self class]sharedManager] selector:@selector(_runLoopThread) object:nil];
         [WXBridgeThread setName:WX_BRIDGE_THREAD_NAME];
         [WXBridgeThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
-        [WXBridgeThread setStackSize:20 * 1024 * 1024];
+        [WXBridgeThread setStackSize:10 * 1024 * 1024];
         [WXBridgeThread start];
     });
 
@@ -146,7 +146,7 @@ static NSThread *WXBackupBridgeThread;
         WXBackupBridgeThread = [[NSThread alloc] initWithTarget:[[self class]sharedManager] selector:@selector(_runLoopThread) object:nil];
         [WXBackupBridgeThread setName:WX_BACKUP_BRIDGE_THREAD_NAME];
         [WXBackupBridgeThread setQualityOfService:[[NSThread mainThread] qualityOfService]];
-        [WXBackupBridgeThread setStackSize:20 * 1024 * 1024];
+        [WXBackupBridgeThread setStackSize:10 * 1024 * 1024];
         [WXBackupBridgeThread start];
     });
 
