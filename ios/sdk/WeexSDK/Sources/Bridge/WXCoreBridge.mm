@@ -1778,7 +1778,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         
         jsBridge = new WeexCore::ScriptBridge();
         jsBridge->set_core_side(new WeexCore::CoreSideInScript());
-        jsBridge->set_script_side(new WeexCore::bridge::script::ScriptSideInSimple());
+        jsBridge->set_script_side(new WeexCore::bridge::script::ScriptSideInSimple(true));
         WeexCore::WeexCoreManager::Instance()->set_script_bridge(jsBridge);
         
         WeexCore::WeexCoreManager::Instance()->set_measure_function_adapter(new WeexCore::WXCoreMeasureFunctionBridge());

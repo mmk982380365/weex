@@ -54,7 +54,7 @@ using WeexCore::bridge::script::ScriptSideInSimple;
 - (instancetype)init
 {
     if (self = [super init]) {
-        script_side_ = new ScriptSideInSimple();
+        script_side_ = new ScriptSideInSimple(true);
     }
     return self;
 }
