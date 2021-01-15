@@ -142,6 +142,7 @@
 + (void)mountContextEnvironment:(JSContext*)context;
 - (void)callJSMethod:(NSString *)method args:(NSArray *)args onContext:(id<WXBridgeProtocol>)bridge completion:(void (^)(NSString* value))complection;
 
-+ (Class)bridgeClass;
++ (Class)bridgeClassForInstance:(WXSDKInstance *)instance;
+- (id<WXBridgeProtocol>)jsBridgeForInstance:(WXSDKInstance *)instance;
 
 @end

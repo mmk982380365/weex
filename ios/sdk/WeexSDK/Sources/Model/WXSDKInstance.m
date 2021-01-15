@@ -182,7 +182,7 @@ typedef enum : NSUInteger {
 {
     _debugJS = [WXDebugTool isDevToolDebug];
     
-    Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXBridgeContext bridgeClass];
+    Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXBridgeContext bridgeClassForInstance:self];
     
     if (_instanceJavaScriptContext && [_instanceJavaScriptContext isKindOfClass:bridgeClass]) {
         return _instanceJavaScriptContext;
@@ -196,10 +196,11 @@ typedef enum : NSUInteger {
     // WXDebugger is a singleton actually and should not call its init twice.
     _instanceJavaScriptContext = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[bridgeClass alloc] initWithoutDefaultContext];
     if (!_debugJS) {
-        id<WXBridgeProtocol> jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"bridgeCtx.jsBridge"];
+        WXBridgeContext *context = [[WXSDKManager bridgeMgr] valueForKeyPath:@"bridgeCtx"];
         if (_useBackupJsThread) {
-              jsBridge = [[WXSDKManager bridgeMgr] valueForKeyPath:@"backupBridgeCtx.jsBridge"];
+            context = [[WXSDKManager bridgeMgr] valueForKeyPath:@"backupBridgeCtx"];
         }
+        id<WXBridgeProtocol> jsBridge = [context jsBridgeForInstance:self];
         [_instanceJavaScriptContext copySandboxFromGlobalBridge:jsBridge];
     }
     

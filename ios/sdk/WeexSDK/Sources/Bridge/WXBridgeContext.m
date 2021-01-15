@@ -94,9 +94,50 @@ _Pragma("clang diagnostic pop") \
     return self;
 }
 
++ (Class)bridgeClassForInstance:(WXSDKInstance *)instance
+{
+    if ([instance.engineType isEqualToString:@"QJS"] ||
+        [instance.engineType isEqualToString:@"QJSBin"])
+    {
+        return [WXJSRuntimeBridge class];
+    }
+    else
+    {
+        return [WXJSCoreBridge class];
+    }
+}
+
 + (Class)bridgeClass
 {
-    return [WXJSRuntimeBridge class];
+    return [WXJSCoreBridge class];
+}
+
+- (id<WXBridgeProtocol>)jsBridgeForInstance:(WXSDKInstance *)instance
+{
+    WXAssertBridgeThread();
+    _debugJS = [WXDebugTool isDevToolDebug];
+    
+    if (!self.jsCoreBridge)
+    {
+        Class jsCoreBridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXJSCoreBridge class];
+        self.jsCoreBridge = [[jsCoreBridgeClass alloc] init];
+        [self registerGlobalFunctionsForBridge:self.jsCoreBridge];
+    }
+    if (!self.jsRuntimeBridge)
+    {
+        Class jsRuntimeBridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXJSRuntimeBridge class];
+        self.jsRuntimeBridge = [[jsRuntimeBridgeClass alloc] init];
+        [self registerGlobalFunctionsForBridge:self.jsRuntimeBridge];
+    }
+    
+    if ([[self class] bridgeClassForInstance:instance] == [WXJSCoreBridge class])
+    {
+        return self.jsCoreBridge;
+    }
+    else
+    {
+        return self.jsRuntimeBridge;
+    }
 }
 
 - (id<WXBridgeProtocol>)jsBridge
@@ -851,14 +892,9 @@ _Pragma("clang diagnostic pop") \
     }
     if (self.frameworkLoadFinished) {
         WXLogDebug(@"Calling JS... method:%@, args:%@", method, args);
-        if (([bridge isKindOfClass:[WXBridgeContext bridgeClass]]) ||
-            ([bridge isKindOfClass:NSClassFromString(@"WXDebugger") ]) ) {
-            NSString *value = [bridge callJSMethod:method args:args];
-            if (completion) {
-                completion(value);
-            }
-        } else {
-            [bridge callJSMethod:method args:args];
+        NSString *value = [bridge callJSMethod:method args:args];
+        if (completion) {
+            completion(value);
         }
     } else {
         newArg = [args mutableCopy];
