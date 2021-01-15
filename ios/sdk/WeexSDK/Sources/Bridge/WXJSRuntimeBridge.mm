@@ -23,6 +23,7 @@
 #import "WXConvertUtility.h"
 
 #include "core/bridge/script/script_side_in_simple.h"
+#include "core/manager/weex_core_manager.h"
 
 static WeexByteArray *generatorBytesArray(const char *str, size_t len) {
     auto *result = (WeexByteArray *)malloc(len + sizeof(WeexByteArray));
@@ -44,7 +45,7 @@ using WeexCore::bridge::script::ScriptSideInSimple;
 @interface WXJSRuntimeBridge ()
 {
     NSString * _weexInstanceId;
-    ScriptSideInSimple* script_side_;
+    ScriptBridge::ScriptSide* script_side_;
 }
 
 @end
@@ -54,7 +55,7 @@ using WeexCore::bridge::script::ScriptSideInSimple;
 - (instancetype)init
 {
     if (self = [super init]) {
-        script_side_ = new ScriptSideInSimple(true);
+        script_side_ = WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side();
     }
     return self;
 }

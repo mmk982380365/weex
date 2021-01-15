@@ -779,6 +779,8 @@ _Pragma("clang diagnostic pop") \
     WXAssertParam(script);
     
     WX_MONITOR_PERF_START(WXPTFrameworkExecute);
+    
+    [WXCoreBridge install];
 
     [self.jsBridge executeJSFramework:script];
     
