@@ -47,6 +47,18 @@ typedef BOOL (^WXModuleInterceptCallback)(NSString *moduleName, NSString *method
  **/
 - (instancetype)initWithRenderType:(NSString*)renderType;
 
+
+/**
+ * Engine type of current instance
+ */
+@property (nonatomic, strong) NSString *engineType;
+
+/**
+ * Engine type of outer page.
+ * Typically, outer page and inner page's engine type should be a same type.
+ */
+@property (nonatomic, strong) NSString *superEngineType;
+
 /**
  * The render type. Default is "platform"
  **/
