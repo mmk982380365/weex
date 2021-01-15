@@ -1687,6 +1687,29 @@ void CoreSideInScript::CompileQuickJSCallback(const char *key, const char *bytec
                         }
                     }
                         break;
+                    case ParamsType::BYTEARRAYJSONSTRING:{
+                        NSString* s = [NSString stringWithUTF8String:result->value.byteArray->content];
+                        free(result->value.string);
+                        
+                        @try {
+                            NSError* error = nil;
+                            id jsonObj = [NSJSONSerialization JSONObjectWithData:[s dataUsingEncoding:NSUTF8StringEncoding]
+                                                                         options:NSJSONReadingMutableContainers | NSJSONReadingMutableLeaves
+                                                                           error:&error];
+                            
+                            if (jsonObj == nil) {
+                                WXLogError(@"%@", error);
+                                WXAssert(NO, @"Fail to convert json to object. %@", error);
+                            }
+                            else {
+                                *returnValue = jsonObj;
+                            }
+                        } @catch (NSException *exception) {
+                            WXLogError(@"%@", exception);
+                            WXAssert(NO, @"Fail to convert json to object. %@", exception);
+                        }
+                    }
+                      break;
                     case ParamsType::STRING:
                         *returnValue = [NSString stringWithCharacters:(const unichar *)(result->value.string->content) length:result->value.string->length];
                         free(result->value.string);

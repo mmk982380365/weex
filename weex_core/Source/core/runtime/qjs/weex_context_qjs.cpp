@@ -487,6 +487,12 @@ static JSValue js_CallNativeModule(JSContext *ctx, JSValueConst this_val,
       free(result->value.string);
     }
       break;
+    case ParamsType::BYTEARRAYJSONSTRING:{
+      const WeexByteArray *array = result->value.byteArray;
+      const char *string = array->content;
+      ret = JS_ParseJSON(ctx, string, array->length, "t");
+    }
+      break;
     case ParamsType::BYTEARRAY: {
 #if OS_ANDROID
       wson_parser w(result->value.byteArray->content,
