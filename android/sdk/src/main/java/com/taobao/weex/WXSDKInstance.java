@@ -76,6 +76,8 @@ import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.http.WXHttpUtil;
 import com.taobao.weex.instance.InstanceOnFireEventInterceptor;
 import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.performance.IWXInstanceRecorder;
+import com.taobao.weex.performance.IWXRecorderGenerator;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.performance.WhiteScreenUtils;
@@ -169,6 +171,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public boolean isNewFsEnd = false;
   private List<JSONObject> componentsInfoExceedGPULimit  = new LinkedList<>();
+  private IWXInstanceRecorder mInstanceRecorder;
 
   private WXProcessNotify mWxProcessNotify;
   /**
@@ -639,6 +642,15 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mVisibleListeners.remove(l);
   }
 
+  private void initInstanceRecorderIfNeed() {
+    if (null == mInstanceRecorder) {
+      IWXRecorderGenerator recorderGenerator = WXSDKManager.getInstance().getRecorderGenerator();
+      if (recorderGenerator != null) {
+        mInstanceRecorder = recorderGenerator.getInstanceRecorder(this);
+      }
+    }
+  }
+
   public void init(Context context) {
     initFixMultiThreadFlag();
     RegisterCache.getInstance().idle(true);
@@ -652,6 +664,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if (null == mApmForInstance){
       mApmForInstance = new WXInstanceApm(mInstanceId);
     }
+
+    initInstanceRecorderIfNeed();
 
     mWXPerformance.WXSDKVersion = WXEnvironment.WXSDK_VERSION;
     mWXPerformance.JSLibInitTime = WXEnvironment.sJSLibInitTime;
@@ -1111,6 +1125,11 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
 
     setJSEngineType(engineType);
+
+    initInstanceRecorderIfNeed();
+    if (mInstanceRecorder != null) {
+      mInstanceRecorder.updateUrl(url);
+    }
 
     String downloadUrl = url;
     if(engineType == IWXJSEngineManager.EngineType.QuickJSBin) {
@@ -1996,6 +2015,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         }
       });
 
+      if (mInstanceRecorder != null && mInstanceRecorder.needRecord()) {
+        mInstanceRecorder.uploadRecord();
+      }
       if(mParentInstance != null){
          mParentInstance = null;
       }
@@ -2615,6 +2637,26 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   public void setRenderType(String renderType) {
     this.mRenderType = renderType;
+  }
+
+  public void record(JSONObject info, IWXInstanceRecorder.RecordType type) {
+    if (mInstanceRecorder != null) {
+      mInstanceRecorder.record(info, type);
+    }
+  }
+
+  public void record(String key, Object value) {
+    if (mInstanceRecorder != null) {
+      mInstanceRecorder.record(key, value);
+    }
+  }
+
+  public boolean needRecord() {
+    if (mInstanceRecorder == null) {
+      return false;
+    }
+
+    return this.mInstanceRecorder.needRecord();
   }
 
   private static boolean isDisableSkipFrameworkInDataRender() {

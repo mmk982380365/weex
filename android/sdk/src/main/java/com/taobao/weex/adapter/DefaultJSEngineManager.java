@@ -75,4 +75,14 @@ public class DefaultJSEngineManager implements IWXJSEngineManager {
     public void updateDisableUrlData(String data) {
 
     }
+
+    @Override
+    public boolean enableMainProcessScriptSide() {
+        return true;
+    }
+
+    @Override
+    public boolean forceAllPageRunInMainProcessScriptSide() {
+        return false;
+    }
 }

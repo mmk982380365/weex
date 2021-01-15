@@ -222,7 +222,6 @@ std::vector<std::pair<std::string, std::string>> initFromParam(
     WeexCoreManager::Instance()->set_release_map(j_release_map_bool == JNI_TRUE);
   }
 
-
   jmethodID m_get_crash_file_path =
       env->GetMethodID(c_params, "getCrashFilePath", "()Ljava/lang/String;");
   if (m_get_crash_file_path != nullptr) {
@@ -257,7 +256,8 @@ std::vector<std::pair<std::string, std::string>> initFromParam(
         env->CallObjectMethod(params, m_get_jsb_cache_so_path);
     if (j_get_jsb_so_cache_path != nullptr) {
       SoUtils::set_jsb_so_cache_path(const_cast<char *>(
-                                   env->GetStringUTFChars((jstring) (j_get_jsb_so_cache_path), nullptr)));
+                                         env->GetStringUTFChars((jstring) (j_get_jsb_so_cache_path),
+                                                                nullptr)));
       LOGD("g_jsbSoCachePath is %s ", SoUtils::jsb_so_path());
       env->DeleteLocalRef(j_get_jsb_so_cache_path);
     }
@@ -270,7 +270,8 @@ std::vector<std::pair<std::string, std::string>> initFromParam(
         env->CallObjectMethod(params, m_get_jsb_inner_so_path);
     if (j_get_jsb_so_inner_path != nullptr) {
       SoUtils::set_jsb_so_inner_path(const_cast<char *>(
-                                         env->GetStringUTFChars((jstring) (j_get_jsb_so_inner_path), nullptr)));
+                                         env->GetStringUTFChars((jstring) (j_get_jsb_so_inner_path),
+                                                                nullptr)));
       LOGD("g_jsbSoInnerPath is %s ", SoUtils::jsb_so_path());
       env->DeleteLocalRef(j_get_jsb_so_inner_path);
     }
@@ -479,6 +480,8 @@ std::vector<std::pair<std::string, std::string>> initFromParam(
             WeexRuntimeManager::Instance()->set_enable_backup_thread_cache(value == "true");
           } else if (key == "unicorn_weex_render_action_ptr") {
             WeexCoreManager::Instance()->set_unicorn_weex_action_ptr(std::stol(value));
+          } else if (key == "enableMainProcessScriptSide") {
+            WeexRuntimeManager::Instance()->set_enable_main_process_script_side(value == "true");
           }
         }
       }

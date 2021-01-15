@@ -682,7 +682,9 @@ std::unique_ptr<IPCResult> CompileQuickJSBinCallback(IPCArguments *arguments) {
 
 ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   set_script_side(new bridge::script::ScriptSideInMultiProcess);
-  set_script_side_main_process_only(new bridge::script::ScriptSideInSimple(true));
+  if (WeexRuntimeManager::Instance()->is_enable_main_process_script_side()) {
+    set_script_side_main_process_only(new bridge::script::ScriptSideInSimple(true));
+  }
   set_core_side(new CoreSideInScript);
   std::unique_ptr<MultiProcessAndSoInitializer> initializer(
       new MultiProcessAndSoInitializer);

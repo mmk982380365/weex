@@ -41,7 +41,8 @@ static bool EnableUnicornWeexRender(JSContext *ctx, const JSValueConst *argv) {
   if (JS_IsString(instance_id)) {
     const char *id = JS_ToCString(ctx, instance_id);
     std::string enabled =
-            RenderManager::GetInstance()->getPageArgument(std::string(id), "enable_unicorn_weex_render");
+        RenderManager::GetInstance()->getPageArgument(std::string(id),
+                                                      "enable_unicorn_weex_render");
     enable_unicorn_weex_render = enabled == "true";
   }
 
@@ -517,16 +518,16 @@ static JSValue js_CallNativeComponent(JSContext *ctx, JSValueConst this_val,
   if (EnableUnicornWeexRender(ctx, argv)) {
     UNICORN_WEEX_RENDER_ACTION("dom", "callNativeComponent", ctx, argv, argc);
   } else {
-      WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-      WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-      WeexContextQJS::JSParams method(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
-      WeexContextQJS::JSParams arguments(ctx, argv[3], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
-      WeexContextQJS::JSParams options(ctx, argv[4], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
+    WeexContextQJS::JSParams id(ctx, argv[0], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams method(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+    WeexContextQJS::JSParams arguments(ctx, argv[3], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
+    WeexContextQJS::JSParams options(ctx, argv[4], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
 
-      script_bridge->core_side()->CallNativeComponent(
-          id.value(), ref.value(),
-          method.value(), arguments.value(), arguments.size(),
-          options.value(), options.size());
+    script_bridge->core_side()->CallNativeComponent(
+        id.value(), ref.value(),
+        method.value(), arguments.value(), arguments.size(),
+        options.value(), options.size());
   }
 
   return JS_NewInt32(ctx, 0);
@@ -620,7 +621,6 @@ static JSValue js_CallCreateBody(JSContext *ctx, JSValueConst this_val,
     script_bridge->core_side()->CreateBody(
         id.value(), dom_str.value(), dom_str.size());
   }
-
 
   return JS_NewInt32(ctx, 0);
 }
@@ -1007,11 +1007,23 @@ void WeexContextQJS::JSParams::set_value(JSContext *context, JSValue value) {
     length_ = wson_buffer_->position;
   } else {
     ctx_ = context;
-    value_ = const_cast<char *>(JS_ToCStringLen(context, &length_, value));
+    if(!JS_IsString(value)) {
+      value = JS_JSONStringify(context, value, JS_UNDEFINED,
+                               JS_NewInt32(context, 0));
+    }
+    value_ = const_cast<char *>(JS_ToCStringLen(context,
+                                                &length_,
+                                                value));
   }
 #else
   ctx_ = context;
-  value_ = const_cast<char *>(JS_ToCStringLen(context, &length_, value));
+    if(!JS_IsString(value)) {
+      value = JS_JSONStringify(context, value, JS_UNDEFINED,
+                               JS_NewInt32(context, 0));
+    }
+    value_ = const_cast<char *>(JS_ToCStringLen(context,
+                                                &length_,
+                                                value));
 #endif
 }
 WeexContextQJS::JSParams::~JSParams() {
