@@ -82,13 +82,26 @@ using WeexCore::bridge::script::ScriptSideInSimple;
 }
 
 - (NSString *)callJSMethod:(nonnull NSString *)method args:(NSArray * _Nullable)args {
-    VALUE_WITH_TYPE* param = new VALUE_WITH_TYPE();
-    NSString *jsonString = [WXUtility JSONString:args];
-    
-    param->type = ParamsType::BYTEARRAYJSONSTRING;
-    param->value.byteArray = generatorBytesArray(jsonString.UTF8String, jsonString.length);
+
     std::vector<VALUE_WITH_TYPE*> params;
-    params.push_back(param);
+
+    for (id obj in args)
+    {
+        NSString *jsonString = @"";
+        if ([obj isKindOfClass:[NSString class]])
+        {
+            jsonString = obj;
+        }
+        else
+        {
+            jsonString = [WXUtility JSONString:obj];
+        }
+        VALUE_WITH_TYPE* param = new VALUE_WITH_TYPE();
+        param->type = ParamsType::BYTEARRAYJSONSTRING;
+        param->value.byteArray = generatorBytesArray(jsonString.UTF8String, jsonString.length);
+        params.push_back(param);
+    }
+    
     std::unique_ptr<WeexJSResult> ret = script_side_->ExecJSWithResult([_weexInstanceId UTF8String], "", [method UTF8String], params);
     if (ret)
     {
@@ -98,9 +111,18 @@ using WeexCore::bridge::script::ScriptSideInSimple;
     return nil;
 }
 
-- (void)executeJSFramework:(nonnull NSString *)frameworkScript {
-    std::vector<std::pair<std::string, std::string>> params;
-    script_side_->InitFramework([frameworkScript UTF8String] ?: "", params);
+- (void)executeJSFramework:(nonnull NSString *)frameworkScript
+{
+    NSDictionary *data = [WXUtility getEnvironment];
+    std::vector<std::pair<std::string, std::string>>* params = new std::vector<std::pair<std::string, std::string>>();
+    [data enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+        ConvertToCString(obj, ^(const char * value) {
+            if (value != nullptr) {
+                params->emplace_back([key UTF8String], value);
+            }
+        });
+    }];
+    script_side_->InitFramework([frameworkScript UTF8String] ?: "", *params);
 }
 
 - (void)executeJavascript:(nonnull NSString *)script {
