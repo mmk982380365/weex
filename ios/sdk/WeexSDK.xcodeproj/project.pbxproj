@@ -71,6 +71,10 @@
 		33CE19142153444900CF9670 /* WXJSFrameworkLoadProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 33CE19122153444900CF9670 /* WXJSFrameworkLoadProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		37B51EE41E97804D0040A743 /* WXCycleSliderComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 37B51EE21E97804D0040A743 /* WXCycleSliderComponent.h */; };
 		37B51EE51E97804D0040A743 /* WXCycleSliderComponent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 37B51EE31E97804D0040A743 /* WXCycleSliderComponent.mm */; };
+		425F148125B2005F00405C6A /* message_loop.h in Headers */ = {isa = PBXBuildFile; fileRef = 425F147825B2005F00405C6A /* message_loop.h */; };
+		425F148225B2005F00405C6A /* message_loop.cc in Sources */ = {isa = PBXBuildFile; fileRef = 425F147925B2005F00405C6A /* message_loop.cc */; };
+		425F149625B200A700405C6A /* message_pump_darwin.cc in Sources */ = {isa = PBXBuildFile; fileRef = 425F149425B200A700405C6A /* message_pump_darwin.cc */; };
+		425F149725B200A700405C6A /* message_pump_darwin.h in Headers */ = {isa = PBXBuildFile; fileRef = 425F149525B200A700405C6A /* message_pump_darwin.h */; };
 		42ABAD7825B046B80017AD6E /* WXJSRuntimeBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 42ABAD7625B046B80017AD6E /* WXJSRuntimeBridge.h */; };
 		42ABAD7925B046B80017AD6E /* WXJSRuntimeBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42ABAD7725B046B80017AD6E /* WXJSRuntimeBridge.mm */; };
 		42ABAD8425B078340017AD6E /* script_side_in_simple.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 42ABAD8225B078340017AD6E /* script_side_in_simple.cpp */; };
@@ -1007,6 +1011,10 @@
 		33CE19122153444900CF9670 /* WXJSFrameworkLoadProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXJSFrameworkLoadProtocol.h; sourceTree = "<group>"; };
 		37B51EE21E97804D0040A743 /* WXCycleSliderComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXCycleSliderComponent.h; sourceTree = "<group>"; };
 		37B51EE31E97804D0040A743 /* WXCycleSliderComponent.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXCycleSliderComponent.mm; sourceTree = "<group>"; };
+		425F147825B2005F00405C6A /* message_loop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = message_loop.h; sourceTree = "<group>"; };
+		425F147925B2005F00405C6A /* message_loop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = message_loop.cc; sourceTree = "<group>"; };
+		425F149425B200A700405C6A /* message_pump_darwin.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = message_pump_darwin.cc; path = ../../../../../../ae3/WeexSDK/weex_core/Source/base/message_loop/message_pump_darwin.cc; sourceTree = "<group>"; };
+		425F149525B200A700405C6A /* message_pump_darwin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = message_pump_darwin.h; path = ../../../../../../ae3/WeexSDK/weex_core/Source/base/message_loop/message_pump_darwin.h; sourceTree = "<group>"; };
 		42ABAD7625B046B80017AD6E /* WXJSRuntimeBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXJSRuntimeBridge.h; sourceTree = "<group>"; };
 		42ABAD7725B046B80017AD6E /* WXJSRuntimeBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXJSRuntimeBridge.mm; sourceTree = "<group>"; };
 		42ABAD8225B078340017AD6E /* script_side_in_simple.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = script_side_in_simple.cpp; sourceTree = "<group>"; };
@@ -1526,6 +1534,17 @@
 				744BEA571D0520F300452B5D /* WXComponent+Layout.h */,
 			);
 			name = Layout;
+			sourceTree = "<group>";
+		};
+		425F147525B2005F00405C6A /* message_loop */ = {
+			isa = PBXGroup;
+			children = (
+				425F149425B200A700405C6A /* message_pump_darwin.cc */,
+				425F149525B200A700405C6A /* message_pump_darwin.h */,
+				425F147825B2005F00405C6A /* message_loop.h */,
+				425F147925B2005F00405C6A /* message_loop.cc */,
+			);
+			path = message_loop;
 			sourceTree = "<group>";
 		};
 		42ABAD8A25B07ACE0017AD6E /* runtime */ = {
@@ -2489,6 +2508,7 @@
 		B8D66B872125572F003960BD /* base */ = {
 			isa = PBXGroup;
 			children = (
+				425F147525B2005F00405C6A /* message_loop */,
 				D735F1AA22D761F800B53CDF /* utils */,
 				77E349F6229FE67900B1CDAB /* log_defines.cpp */,
 				77CF6A5421E6E47D00BA8634 /* core_constants.h */,
@@ -2594,6 +2614,7 @@
 				42ABAD9A25B07ACE0017AD6E /* weex_runtime_manager.h in Headers */,
 				743933B41C7ED9AA00773BB7 /* WXSimulatorShortcutManager.h in Headers */,
 				B8D66C0B21255730003960BD /* platform_bridge.h in Headers */,
+				425F148125B2005F00405C6A /* message_loop.h in Headers */,
 				74862F811E03A24500B7A041 /* WXComponentMethod.h in Headers */,
 				74915F471C8EB02B00BEBCC0 /* WXAssert.h in Headers */,
 				2A8E658A1C7C7AA20025C7B7 /* WXVideoComponent.h in Headers */,
@@ -2747,6 +2768,7 @@
 				B8D66C7D21255730003960BD /* render_text_factory.h in Headers */,
 				742AD7301DF98C45007DC46C /* WXResourceRequestHandler.h in Headers */,
 				77E65A151C155EB5008B8775 /* WXTextComponent.h in Headers */,
+				425F149725B200A700405C6A /* message_pump_darwin.h in Headers */,
 				B8D66C9921255730003960BD /* weex_core_manager.h in Headers */,
 				C4B3D6D41E6954300013F38D /* WXEditComponent.h in Headers */,
 				74CC7A1C1C2BC5F800829368 /* WXCellComponent.h in Headers */,
@@ -3260,7 +3282,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${SRCROOT}/Podfile.lock\" \"${SRCROOT}/Pods/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		59D3CA601D003832008835DC /* Generate WeexSDK.h */ = {
@@ -3375,6 +3397,7 @@
 				D3FC0DF81C508B2A002B9E31 /* WXTimerModule.m in Sources */,
 				594C28921CF9E61A009793A4 /* WXAnimationModule.m in Sources */,
 				986CEAA923B230C2004166E0 /* WXEaglePluginManager.mm in Sources */,
+				425F148225B2005F00405C6A /* message_loop.cc in Sources */,
 				B8D66C6F21255730003960BD /* render_object.cpp in Sources */,
 				BD88C13D22F02111004467AA /* render_action_remove_child_from_richtext.cpp in Sources */,
 				59A5961D1CB630F10012CD52 /* WXComponent+Navigation.m in Sources */,
@@ -3493,6 +3516,7 @@
 				74BA4AB41F70F4B600AC29BF /* WXRecycleListLayout.m in Sources */,
 				745ED2DB1C5F2C7E002DB5A8 /* WXView.m in Sources */,
 				DC03ADB91D508719003F76E7 /* WXTextAreaComponent.mm in Sources */,
+				425F149625B200A700405C6A /* message_pump_darwin.cc in Sources */,
 				42ABADA425B07ACE0017AD6E /* weex_runtime_manager.cpp in Sources */,
 				59A596231CB6311F0012CD52 /* WXNavigatorModule.m in Sources */,
 				BD88C13722F02101004467AA /* render_action_add_child_to_richtext.cpp in Sources */,
