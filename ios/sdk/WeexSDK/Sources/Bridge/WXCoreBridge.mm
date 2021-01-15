@@ -1126,8 +1126,11 @@ void CoreSideInScript::CallNativeComponent(const char *page_id, const char *ref,
 void CoreSideInScript::AddElement(const char *page_id, const char *parent_ref,
                                   const char *dom_str, int dom_str_length,
                                   const char *index_str) {
+    NSString *page_idStr = [NSString stringWithUTF8String:page_id];
+    NSString *parent_refStr = [NSString stringWithUTF8String:parent_ref];
+    NSString *dom_strStr = [NSString stringWithUTF8String:dom_str];
     WXPerformBlockOnComponentThread(^{
-        [WXCoreBridge callAddElement:@(page_id) parentRef:@(parent_ref) data:[WXUtility objectFromJSON:@(dom_str)] index:atoi(index_str)];
+        [WXCoreBridge callAddElement:@(page_idStr.UTF8String) parentRef:@(parent_refStr.UTF8String) data:[WXUtility objectFromJSON:@(dom_strStr.UTF8String)] index:atoi(index_str)];
     });
 }
 
@@ -1141,8 +1144,10 @@ void CoreSideInScript::NativeLog(const char *str_array) {
 
 void CoreSideInScript::CreateBody(const char *page_id, const char *dom_str,
                                   int dom_str_length) {
+    NSString *page_idStr = [NSString stringWithUTF8String:page_id];
+    NSString *dom_strStr = [NSString stringWithUTF8String:dom_str];
     WXPerformBlockOnComponentThread(^{
-        [WXCoreBridge callCreateBody:@(page_id) data:[WXUtility objectFromJSON:@(dom_str)]];
+        [WXCoreBridge callCreateBody:@(page_idStr.UTF8String) data:[WXUtility objectFromJSON:@(dom_strStr.UTF8String)]];
     });
 }
 
@@ -1159,47 +1164,61 @@ int CoreSideInScript::UpdateFinish(const char *page_id, const char *task,
 void CoreSideInScript::CreateFinish(const char *page_id) {
     WXSDKInstance *instance = [WXSDKManager instanceForID:@(page_id)];
     [instance.apmInstance onStage:KEY_PAGE_STAGES_CREATE_FINISH];
+    NSString *page_idStr = [NSString stringWithUTF8String:page_id];
     WXPerformBlockOnComponentThread(^{
-        RenderManager::GetInstance()->CreateFinish(page_id);
+        RenderManager::GetInstance()->CreateFinish(page_idStr.UTF8String);
     });
 }
 
 int CoreSideInScript::RefreshFinish(const char *page_id, const char *task,
                                     const char *callback) {
     if (page_id == nullptr) return -1;
+    NSString *page_idStr = [NSString stringWithUTF8String:page_id];
+    NSString *taskStr = [NSString stringWithUTF8String:task];
     WXPerformBlockOnComponentThread(^{
         WeexCoreManager::Instance()
             ->getPlatformBridge()
             ->platform_side()
-            ->RefreshFinish(page_id, task, callback);
+            ->RefreshFinish(page_idStr.UTF8String, taskStr.UTF8String, callback);
     });
     return 0;
 }
 
 void CoreSideInScript::UpdateAttrs(const char *page_id, const char *ref,
                                    const char *data, int data_length) {
+    NSString *page_idStr = [NSString stringWithUTF8String:page_id];
+    NSString *refStr = [NSString stringWithUTF8String:ref];
+    NSString *dataStr = [NSString stringWithUTF8String:data];
     WXPerformBlockOnComponentThread(^{
-        [WXCoreBridge callUpdateAttrs:@(page_id) ref:@(ref) data:[WXUtility objectFromJSON:@(data)]];
+        [WXCoreBridge callUpdateAttrs:@(page_idStr.UTF8String) ref:@(refStr.UTF8String) data:[WXUtility objectFromJSON:@(dataStr.UTF8String)]];
     });
 }
 
 void CoreSideInScript::UpdateStyle(const char *page_id, const char *ref,
                                    const char *data, int data_length) {
+    NSString *page_idStr = [NSString stringWithUTF8String:page_id];
+    NSString *refStr = [NSString stringWithUTF8String:ref];
+    NSString *dataStr = [NSString stringWithUTF8String:data];
     WXPerformBlockOnComponentThread(^{
-        [WXCoreBridge callUpdateStyle:@(page_id) ref:@(ref) data:[WXUtility objectFromJSON:@(data)]];
+        [WXCoreBridge callUpdateStyle:@(page_idStr.UTF8String) ref:@(refStr.UTF8String) data:[WXUtility objectFromJSON:@(dataStr.UTF8String)]];
     });
 }
 
 void CoreSideInScript::RemoveElement(const char *page_id, const char *ref) {
+    NSString *page_idStr = [NSString stringWithUTF8String:page_id];
+    NSString *refStr = [NSString stringWithUTF8String:ref];
     WXPerformBlockOnComponentThread(^{
-        RenderManager::GetInstance()->RemoveRenderObject(page_id, ref);
+        RenderManager::GetInstance()->RemoveRenderObject(page_idStr.UTF8String, refStr.UTF8String);
     });
 }
 
 void CoreSideInScript::MoveElement(const char *page_id, const char *ref,
                                    const char *parent_ref, int index) {
+    NSString *page_idStr = [NSString stringWithUTF8String:page_id];
+    NSString *refStr = [NSString stringWithUTF8String:ref];
+    NSString *parent_refStr = [NSString stringWithUTF8String:parent_ref];
     WXPerformBlockOnComponentThread(^{
-        RenderManager::GetInstance()->MoveRenderObject(page_id, ref, parent_ref,
+        RenderManager::GetInstance()->MoveRenderObject(page_idStr.UTF8String, refStr.UTF8String, parent_refStr.UTF8String,
                                                        index);
     });
 }
