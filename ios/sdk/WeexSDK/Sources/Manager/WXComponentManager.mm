@@ -867,6 +867,11 @@ static NSThread *WXComponentThread;
 
 - (void)scrollToComponent:(NSString *)ref options:(NSDictionary *)options
 {
+    if (ref.length == 0)
+    {
+        return;
+    }
+    
     WXAssertComponentThread();
     WXAssertParam(ref);
     
