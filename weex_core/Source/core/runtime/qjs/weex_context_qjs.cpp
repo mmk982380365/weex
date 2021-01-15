@@ -1007,15 +1007,23 @@ void WeexContextQJS::JSParams::set_value(JSContext *context, JSValue value) {
     length_ = wson_buffer_->position;
   } else {
     ctx_ = context;
+    if(!JS_IsString(value)) {
+      value = JS_JSONStringify(context, value, JS_UNDEFINED,
+                               JS_NewInt32(context, 0));
+    }
     value_ = const_cast<char *>(JS_ToCStringLen(context,
                                                 &length_,
-                                                JS_JSONStringify(context, value, JS_UNDEFINED,
-                                                                 JS_UNDEFINED)));
+                                                value));
   }
 #else
   ctx_ = context;
-  value_ = const_cast<char *>(JS_ToCStringLen(context, &length_, JS_JSONStringify(context, value, JS_UNDEFINED,
-                                                                 JS_UNDEFINED)));
+    if(!JS_IsString(value)) {
+      value = JS_JSONStringify(context, value, JS_UNDEFINED,
+                               JS_NewInt32(context, 0));
+    }
+    value_ = const_cast<char *>(JS_ToCStringLen(context,
+                                                &length_,
+                                                value));
 #endif
 }
 WeexContextQJS::JSParams::~JSParams() {

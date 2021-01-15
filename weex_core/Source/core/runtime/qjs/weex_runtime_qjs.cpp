@@ -416,8 +416,8 @@ int WeexRuntimeQJS::createInstance(const std::string &instanceId,
     createInstanceRet =
         JS_EvalBinary(thisContext, reinterpret_cast<const uint8_t *>(script), script_size);
 #elif OS_IOS
-      createInstanceRet =
-          JS_EvalBinary(thisContext, reinterpret_cast<const uint8_t *>(script), script_size, 0);
+    createInstanceRet =
+        JS_EvalBinary(thisContext, reinterpret_cast<const uint8_t *>(script), script_size, 0);
 #endif
   } else {
     createInstanceRet = JS_Eval(thisContext, script, script_size,
