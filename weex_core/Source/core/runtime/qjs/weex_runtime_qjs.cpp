@@ -418,8 +418,13 @@ int WeexRuntimeQJS::createInstance(const std::string &instanceId,
   }
   JSValue createInstanceRet;
   if (engine_type == ENGINE_QJS_BIN) {
+#if OS_ANDROID
     createInstanceRet =
         JS_EvalBinary(thisContext, reinterpret_cast<const uint8_t *>(script), script_size);
+#elif OS_IOS
+      createInstanceRet =
+          JS_EvalBinary(thisContext, reinterpret_cast<const uint8_t *>(script), script_size, 0);
+#endif
   } else {
     createInstanceRet = JS_Eval(thisContext, script, script_size,
                                 "createInstance", JS_EVAL_TYPE_GLOBAL);
@@ -452,7 +457,11 @@ std::unique_ptr<WeexJSResult> WeexRuntimeQJS::exeJSOnInstance(const std::string 
 
   JSValue ret;
   if (engine_type == ENGINE_QJS_BIN) {
+#if OS_ANDROID
     ret = JS_EvalBinary(engine_context, reinterpret_cast<const uint8_t *>(script), script_size);
+#elif OS_IOS
+      ret = JS_EvalBinary(engine_context, reinterpret_cast<const uint8_t *>(script), script_size, 0);
+#endif
   } else {
     ret = JS_Eval(engine_context, script, script_size,
                   "exeJsOnInstance", JS_EVAL_TYPE_GLOBAL);

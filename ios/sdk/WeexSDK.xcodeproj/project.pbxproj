@@ -3986,7 +3986,6 @@
 					"\"Security\"",
 					"-lstdc++",
 				);
-				PODS_ROOT = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.taobao.WeexSDK;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4046,7 +4045,6 @@
 					"\"Security\"",
 					"-lstdc++",
 				);
-				PODS_ROOT = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.taobao.WeexSDK;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

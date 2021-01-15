@@ -28,7 +28,7 @@ extern "C" {
 #if OS_ANDROID
 #include "quickjs.h"
 #elif OS_IOS
-#include <AliQuickJS/quickjs.h>
+#import <AliQuickJS/quickjs.h>
 #endif
 }
 
