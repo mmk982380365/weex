@@ -1065,6 +1065,7 @@
 		59CE27E71CC387DB000BE37A /* WXEmbedComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXEmbedComponent.m; sourceTree = "<group>"; };
 		59D3CA481CFC3CE1008835DC /* NSTimer+Weex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTimer+Weex.h"; sourceTree = "<group>"; };
 		59D3CA491CFC3CE1008835DC /* NSTimer+Weex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTimer+Weex.m"; sourceTree = "<group>"; };
+		63FE84DDB69C75534FF66D32 /* Pods-WeexSDK.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WeexSDK.release.xcconfig"; path = "Target Support Files/Pods-WeexSDK/Pods-WeexSDK.release.xcconfig"; sourceTree = "<group>"; };
 		740451E81E14BB26004157CB /* WXServiceFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXServiceFactory.h; sourceTree = "<group>"; };
 		740451E91E14BB26004157CB /* WXServiceFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXServiceFactory.m; sourceTree = "<group>"; };
 		7408C48C1CFB345D000BCCD0 /* WXComponent+Events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WXComponent+Events.h"; sourceTree = "<group>"; };
@@ -1261,6 +1262,7 @@
 		986CEAA623B230C2004166E0 /* WXEaglePluginManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXEaglePluginManager.mm; sourceTree = "<group>"; };
 		9B9E74771FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTestBridgeMethodDummy.h; sourceTree = "<group>"; };
 		9B9E74781FA2DB5800DAAEA9 /* WXTestBridgeMethodDummy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTestBridgeMethodDummy.m; sourceTree = "<group>"; };
+		AEB8FF2CDD948F28756F2CA1 /* Pods-WeexSDK.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WeexSDK.debug.xcconfig"; path = "Target Support Files/Pods-WeexSDK/Pods-WeexSDK.debug.xcconfig"; sourceTree = "<group>"; };
 		B8394F3521468AF100CA1EFF /* render_action_trigger_vsync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = render_action_trigger_vsync.h; sourceTree = "<group>"; };
 		B8394F3621468AF100CA1EFF /* render_action_trigger_vsync.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_action_trigger_vsync.cpp; sourceTree = "<group>"; };
 		B863DF312107307F00EA887D /* WXBridgeContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXBridgeContext.m; sourceTree = "<group>"; };
@@ -1423,7 +1425,6 @@
 		D7D6B6E1238E1B1D00BE56DD /* WXDarkSchemeProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDarkSchemeProtocol.h; sourceTree = "<group>"; };
 		D7D6B6E4238E1B2A00BE56DD /* WXDarkSchemeDefaultImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXDarkSchemeDefaultImpl.m; sourceTree = "<group>"; };
 		D7D6B6E5238E1B2A00BE56DD /* WXDarkSchemeDefaultImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDarkSchemeDefaultImpl.h; sourceTree = "<group>"; };
-		DAB176F008F516E4F9391C61 /* libPods-WeexSDK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WeexSDK.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC03ADB71D508719003F76E7 /* WXTextAreaComponent.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WXTextAreaComponent.mm; sourceTree = "<group>"; };
 		DC03ADB81D508719003F76E7 /* WXTextAreaComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTextAreaComponent.h; sourceTree = "<group>"; };
 		DC15A3D92010BC93009C8977 /* weex-main-jsfm.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "weex-main-jsfm.js"; path = "../../../../pre-build/weex-main-jsfm.js"; sourceTree = "<group>"; };
@@ -1825,6 +1826,7 @@
 				DCA445261EFA555400D0CFA8 /* WeexSDK-Dynamic */,
 				77D160FE1C02DBE70010B15B /* Products */,
 				A5818E244F9E235722E3B938 /* Frameworks */,
+				A101496FA8EF472D2DEC431B /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2171,6 +2173,15 @@
 			path = Plugin;
 			sourceTree = "<group>";
 		};
+		A101496FA8EF472D2DEC431B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				AEB8FF2CDD948F28756F2CA1 /* Pods-WeexSDK.debug.xcconfig */,
+				63FE84DDB69C75534FF66D32 /* Pods-WeexSDK.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		A5818E244F9E235722E3B938 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -2184,7 +2195,6 @@
 				740938F41D3D0DDE00DBB801 /* AVFoundation.framework */,
 				740938ED1D3D079100DBB801 /* JavaScriptCore.framework */,
 				7469869B1C4DEAC20054A57E /* libicucore.tbd */,
-				DAB176F008F516E4F9391C61 /* libPods-WeexSDK.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -3096,6 +3106,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 77D161111C02DBE70010B15B /* Build configuration list for PBXNativeTarget "WeexSDK" */;
 			buildPhases = (
+				2BCF9953D6ED558882BC4CAB /* [CP] Check Pods Manifest.lock */,
 				59D3CA601D003832008835DC /* Generate WeexSDK.h */,
 				77D160F81C02DBE70010B15B /* Sources */,
 				77D160F91C02DBE70010B15B /* Frameworks */,
@@ -3229,6 +3240,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Sets the target folders and the final framework product.\n# 如果工程名称和Framework的Target名称不一样的话，要自定义FMKNAME\nFMK_NAME=${PROJECT_NAME}\n# Install dir will be the final output to the framework.\n# The following line create it in the root folder of the current project.\nINSTALL_DIR=${SRCROOT}/Products/${FMK_NAME}.framework\n# Working dir will be deleted after the framework creation.\nWRK_DIR=build\nDEVICE_DIR=${WRK_DIR}/Release-iphoneos/${FMK_NAME}.framework\nSIMULATOR_DIR=${WRK_DIR}/Release-iphonesimulator/${FMK_NAME}.framework\n# -configuration ${CONFIGURATION}\n# Clean and Building both architectures.\necho xcodebuild -configuration \"Release\" -target \"${FMK_NAME}\" -sdk iphoneos \"CODE_SIGN_IDENTITY=${CODE_SIGN_IDENTITY}\" clean build\nxcodebuild -configuration \"Release\" -target \"${FMK_NAME}\" -sdk iphoneos \"CODE_SIGN_IDENTITY=${CODE_SIGN_IDENTITY}\" clean build\nif [ \"$?\" != \"0\" ]; then\nexit 1\nfi\necho xcodebuild -configuration \"Release\" -target \"${FMK_NAME}\" -sdk iphonesimulator \"CODE_SIGN_IDENTITY=${CODE_SIGN_IDENTITY}\" build\nxcodebuild -configuration \"Release\" -target \"${FMK_NAME}\" -sdk iphonesimulator \"CODE_SIGN_IDENTITY=${CODE_SIGN_IDENTITY}\" build\nif [ \"$?\" != \"0\" ]; then\nexit 1\nfi\n# Cleaning the oldest.\nif [ -d \"${INSTALL_DIR}\" ]\nthen\nrm -rf \"${INSTALL_DIR}\"\nfi\nmkdir -p \"${INSTALL_DIR}\"\ncp -R \"${SIMULATOR_DIR}/\" \"${INSTALL_DIR}/\"\n# 移除签名资源和 Info.plist\nrm \"${INSTALL_DIR}/Info.plist\"\nrm -rf \"${INSTALL_DIR}/_CodeSignature\"\n# Uses the Lipo Tool to merge both binary files (i386 + armv6/armv7) into one Universal final product.\nlipo -create \"${DEVICE_DIR}/${FMK_NAME}\" \"${SIMULATOR_DIR}/${FMK_NAME}\" -output \"${INSTALL_DIR}/${FMK_NAME}\"\nrm -r \"${WRK_DIR}\"\n";
+		};
+		2BCF9953D6ED558882BC4CAB /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-WeexSDK-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${SRCROOT}/Podfile.lock\" \"${SRCROOT}/Pods/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
 		};
 		59D3CA601D003832008835DC /* Generate WeexSDK.h */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3905,6 +3938,7 @@
 		};
 		77D161121C02DBE70010B15B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AEB8FF2CDD948F28756F2CA1 /* Pods-WeexSDK.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -3965,6 +3999,7 @@
 		};
 		77D161131C02DBE70010B15B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 63FE84DDB69C75534FF66D32 /* Pods-WeexSDK.release.xcconfig */;
 			buildSettings = {
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
