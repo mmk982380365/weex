@@ -70,9 +70,6 @@ static inline void convertJSValueToWeexJSResult(JSContext *ctx,
                                                 JSValue &ret,
                                                 WeexJSResult *jsResult) {
 #if OS_ANDROID
-  useWson = true;
-
-  if (useWson) {
     wson_buffer *buffer = nullptr;
     buffer = toWsonBuffer(ctx, ret);
     jsResult->length = buffer->position;
@@ -81,8 +78,7 @@ static inline void convertJSValueToWeexJSResult(JSContext *ctx,
     buf[jsResult->length] = '\0';
     jsResult->data.reset(buf);
     wson_buffer_free(buffer);
-  } else {
-#endif
+#else
     size_t length = 0;
     const char *ret_string;
     if (JS_IsString(ret))
@@ -101,8 +97,6 @@ static inline void convertJSValueToWeexJSResult(JSContext *ctx,
     jsResult->length = (int) length;
     jsResult->data.reset(buf);
     //JS_FreeCString(ctx, ret_string);
-#if OS_ANDROID
-  }
 #endif
 }
 
