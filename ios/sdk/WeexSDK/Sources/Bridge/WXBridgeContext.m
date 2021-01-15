@@ -63,7 +63,9 @@ _Pragma("clang diagnostic pop") \
 
 @interface WXBridgeContext ()
 
-@property (nonatomic, strong) id<WXBridgeProtocol>  jsBridge;
+//@property (nonatomic, strong) id<WXBridgeProtocol>  jsBridge;
+@property (nonatomic, strong) id<WXBridgeProtocol>  jsCoreBridge;
+@property (nonatomic, strong) id<WXBridgeProtocol>  jsRuntimeBridge;
 @property (nonatomic, strong) id<WXBridgeProtocol> devToolSocketBridge;
 @property (nonatomic, assign) BOOL  debugJS;
 //store the methods which will be executed from native to js
@@ -102,23 +104,27 @@ _Pragma("clang diagnostic pop") \
     WXAssertBridgeThread();
     _debugJS = [WXDebugTool isDevToolDebug];
     
-    Class bridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXBridgeContext bridgeClass];
-    
-    if (_jsBridge && [_jsBridge isKindOfClass:bridgeClass]) {
-        return _jsBridge;
+    if (!self.jsCoreBridge)
+    {
+        Class jsCoreBridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXJSCoreBridge class];
+        self.jsCoreBridge = [[jsCoreBridgeClass alloc] init];
+        [self registerGlobalFunctionsForBridge:self.jsCoreBridge];
+    }
+    if (!self.jsRuntimeBridge)
+    {
+        Class jsRuntimeBridgeClass = _debugJS ? NSClassFromString(@"WXDebugger") : [WXJSRuntimeBridge class];
+        self.jsRuntimeBridge = [[jsRuntimeBridgeClass alloc] init];
+        [self registerGlobalFunctionsForBridge:self.jsRuntimeBridge];
     }
     
-    if (_jsBridge) {
-        [_methodQueue removeAllObjects];
-        _frameworkLoadFinished = NO;
+    if ([[self class] bridgeClass] == [WXJSCoreBridge class])
+    {
+        return self.jsCoreBridge;
     }
-    
-    // WXDebugger is a singleton actually and should not call its init twice.
-    _jsBridge = _debugJS ? [NSClassFromString(@"WXDebugger") alloc] : [[bridgeClass alloc] init];
-    
-    [self registerGlobalFunctionsForBridge:_jsBridge];
-    
-    return _jsBridge;
+    else
+    {
+        return self.jsRuntimeBridge;
+    }
 }
 
 - (NSInteger)checkInstance:(WXSDKInstance *)instance
@@ -739,8 +745,8 @@ _Pragma("clang diagnostic pop") \
 		[self.insStack removeObject:instance];
 	}
     
-    if(_jsBridge && [_jsBridge respondsToSelector:@selector(removeTimers:)]){
-        [_jsBridge removeTimers:instance];
+    if(self.jsBridge && [self.jsBridge respondsToSelector:@selector(removeTimers:)]){
+        [self.jsBridge removeTimers:instance];
     }
 
     if(self.sendQueue[instance]){
@@ -940,7 +946,7 @@ _Pragma("clang diagnostic pop") \
 
 - (void)resetEnvironment
 {
-    [_jsBridge resetEnvironment];
+    [self.jsBridge resetEnvironment];
 }
 
 #pragma mark JS Debug Management
