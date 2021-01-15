@@ -69,9 +69,10 @@ static void finish_quickjs_PendingJob(JSRuntime *rt) {
 static inline void convertJSValueToWeexJSResult(JSContext *ctx,
                                                 JSValue &ret,
                                                 WeexJSResult *jsResult) {
-
-  
 #if OS_ANDROID
+  useWson = true;
+
+  if (useWson) {
     wson_buffer *buffer = nullptr;
     buffer = toWsonBuffer(ctx, ret);
     jsResult->length = buffer->position;
@@ -80,15 +81,28 @@ static inline void convertJSValueToWeexJSResult(JSContext *ctx,
     buf[jsResult->length] = '\0';
     jsResult->data.reset(buf);
     wson_buffer_free(buffer);
-#else
+  } else {
+#endif
     size_t length = 0;
-    const char *ret_string = JS_ToCStringLen(ctx, &length, ret);
+    const char *ret_string;
+    if (JS_IsString(ret))
+    {
+      ret_string = JS_ToCStringLen(ctx, &length, ret);
+    }
+    else if (JS_IsObject(ret))
+    {
+      JSValue stringify = JS_JSONStringify(ctx, ret, JS_UNDEFINED, JS_NewInt32(ctx, 0));
+      ret_string = JS_ToCStringLen(ctx, &length, stringify);
+      JS_FreeValue(ctx, stringify);
+    }
     char *buf = new char[length + 1];
     memcpy(buf, ret_string, length);
     buf[length] = '\0';
     jsResult->length = (int) length;
     jsResult->data.reset(buf);
-    JS_FreeCString(ctx, ret_string);
+    //JS_FreeCString(ctx, ret_string);
+#if OS_ANDROID
+  }
 #endif
 }
 
@@ -404,8 +418,13 @@ int WeexRuntimeQJS::createInstance(const std::string &instanceId,
   }
   JSValue createInstanceRet;
   if (engine_type == ENGINE_QJS_BIN) {
+#if OS_ANDROID
     createInstanceRet =
         JS_EvalBinary(thisContext, reinterpret_cast<const uint8_t *>(script), script_size);
+#elif OS_IOS
+      createInstanceRet =
+          JS_EvalBinary(thisContext, reinterpret_cast<const uint8_t *>(script), script_size, 0);
+#endif
   } else {
     createInstanceRet = JS_Eval(thisContext, script, script_size,
                                 "createInstance", JS_EVAL_TYPE_GLOBAL);
@@ -438,7 +457,11 @@ std::unique_ptr<WeexJSResult> WeexRuntimeQJS::exeJSOnInstance(const std::string 
 
   JSValue ret;
   if (engine_type == ENGINE_QJS_BIN) {
+#if OS_ANDROID
     ret = JS_EvalBinary(engine_context, reinterpret_cast<const uint8_t *>(script), script_size);
+#elif OS_IOS
+      ret = JS_EvalBinary(engine_context, reinterpret_cast<const uint8_t *>(script), script_size, 0);
+#endif
   } else {
     ret = JS_Eval(engine_context, script, script_size,
                   "exeJsOnInstance", JS_EVAL_TYPE_GLOBAL);

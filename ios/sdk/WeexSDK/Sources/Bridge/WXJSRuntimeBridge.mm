@@ -19,6 +19,8 @@
 
 #import "WXJSRuntimeBridge.h"
 #import "WXUtility.h"
+#import "WXCoreBridge.h"
+#import "WXConvertUtility.h"
 
 #include "core/bridge/script/script_side_in_simple.h"
 
@@ -52,7 +54,7 @@ using WeexCore::bridge::script::ScriptSideInSimple;
 - (instancetype)init
 {
     if (self = [super init]) {
-        script_side_ = new ScriptSideInSimple();
+        script_side_ = new ScriptSideInSimple(true);
     }
     return self;
 }
@@ -107,6 +109,54 @@ using WeexCore::bridge::script::ScriptSideInSimple;
 - (void)executeJavascript:(NSString *)script withSourceURL:(NSURL *)sourceURL
 {
     script_side_->ExecJSOnInstance([self.weexInstanceId UTF8String], [script UTF8String], (int)[script lengthOfBytesUsingEncoding:NSUTF8StringEncoding], 0);
+}
+
++ (NSString *)jsonStringFromObject:(id)object
+{
+    if ([NSJSONSerialization isValidJSONObject:object])
+    {
+        NSData *body = [NSJSONSerialization dataWithJSONObject:object options:0 error:nil];
+        NSString *string = [[NSString alloc] initWithData:body encoding:NSUTF8StringEncoding];
+        return string;
+    }
+    return @"";
+}
+
+- (void)createInstance:(NSString *)instanceId
+                script:(NSString *)script
+                  opts:(NSDictionary *)opts
+              initData:(NSArray *)initData
+            extendsApi:(NSString *)extendsApi
+                params:(NSDictionary *)params
+{
+    //int WeexRuntimeQJS::createInstance(const std::string &instanceId,
+    //                                   const std::string &func,
+    //                                   const char *script,
+    //                                   const int script_size,
+    //                                   const std::string &opts,
+    //                                   const std::string &initData,
+    //                                   const std::string &extendsApi,
+    //                                   std::vector<std::pair<std::string, std::string>> params,
+    //                                   unsigned int engine_type)
+    NSString *optsString = [[self class] jsonStringFromObject:opts];
+    NSString *initDataString = [[self class] jsonStringFromObject:initData];
+    std::vector<std::pair<std::string, std::string>>* result = new std::vector<std::pair<std::string, std::string>>();
+    [params enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+        ConvertToCString(obj, ^(const char * value) {
+            if (value != nullptr) {
+                result->emplace_back([key UTF8String], value);
+            }
+        });
+    }];
+    script_side_->CreateInstance(instanceId.UTF8String,
+                                 "",
+                                 script.UTF8String,
+                                 (int)[script lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
+                                 optsString.UTF8String,
+                                 initDataString.UTF8String,
+                                 extendsApi.UTF8String,
+                                 *result
+                                 );
 }
 
 - (void)registerCallAddElement:(nonnull WXJSCallAddElement)callAddElement {

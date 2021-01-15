@@ -1279,17 +1279,7 @@ void CoreSideInScript::OnReceivedResult(long callback_id,
 void CoreSideInScript::UpdateComponentData(const char* page_id,
                                            const char* cid,
                                            const char* json_data) {
-    id<WXDataRenderHandler> dataRenderHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXDataRenderHandler)];
-    if (dataRenderHandler) {
-        WXPerformBlockOnComponentThread(^{
-            long start = [WXUtility getUnixFixTimeMillis];
-            WXSDKInstance *instance = [WXSDKManager instanceForID:@(page_id)];
-            [instance.apmInstance addUpdateComponentDataTimestamp:start];
-            [dataRenderHandler callUpdateComponentData:@(page_id) componentId:@(cid) jsonData:[WXUtility objectFromJSON:@(json_data)]];
-            [instance.apmInstance addUpdateComponentDataTime:[WXUtility getUnixFixTimeMillis] - start];
-        });
-    }
-    else {
+    {
         WXSDKInstance *instance = [WXSDKManager instanceForID:@(page_id)];
         WXComponentManager *manager = instance.componentManager;
         if (manager.isValid) {
@@ -1788,7 +1778,7 @@ static WeexCore::ScriptBridge* jsBridge = nullptr;
         
         jsBridge = new WeexCore::ScriptBridge();
         jsBridge->set_core_side(new WeexCore::CoreSideInScript());
-        jsBridge->set_script_side(new WeexCore::bridge::script::ScriptSideInSimple());
+        jsBridge->set_script_side(new WeexCore::bridge::script::ScriptSideInSimple(true));
         WeexCore::WeexCoreManager::Instance()->set_script_bridge(jsBridge);
         
         WeexCore::WeexCoreManager::Instance()->set_measure_function_adapter(new WeexCore::WXCoreMeasureFunctionBridge());

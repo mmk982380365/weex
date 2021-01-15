@@ -127,4 +127,6 @@ Pod::Spec.new do |s|
   
   s.libraries = 'c++'
 
+  s.dependency 'AliQuickJS'
+
 end

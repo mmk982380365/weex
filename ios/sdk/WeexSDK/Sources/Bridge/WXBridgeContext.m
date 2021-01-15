@@ -51,7 +51,6 @@
 #import "WXJSFrameworkLoadDefaultImpl.h"
 #import "WXHandlerFactory.h"
 #import "WXExtendCallNativeManager.h"
-#import "WXEaglePluginManager.h"
 #import "WXJSRuntimeBridge.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
@@ -81,7 +80,7 @@ _Pragma("clang diagnostic pop") \
 @end
 
 @implementation WXBridgeContext
-    
+
 - (instancetype) init
 {
     self = [super init];
@@ -95,7 +94,7 @@ _Pragma("clang diagnostic pop") \
 
 + (Class)bridgeClass
 {
-    return [WXJSCoreBridge class];
+    return [WXJSRuntimeBridge class];
 }
 
 - (id<WXBridgeProtocol>)jsBridge
@@ -139,17 +138,7 @@ _Pragma("clang diagnostic pop") \
     }];
     
     [_jsBridge registerCallUpdateComponentData:^NSInteger(NSString *instanceId, NSString *componentId, NSString *jsonData) {
-        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-        if (instance.renderPlugin) {
-            WXPerformBlockOnComponentThread(^{
-                long start = [WXUtility getUnixFixTimeMillis];
-                WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
-                [instance.apmInstance addUpdateComponentDataTimestamp:start];
-                [instance.renderPlugin updateInstance:instanceId component:componentId jsonData:jsonData];
-                [instance.apmInstance addUpdateComponentDataTime:[WXUtility getUnixFixTimeMillis] - start];
-            });
-        }
-        else {
+        {
             WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
             WXComponentManager *manager = instance.componentManager;
             if (manager.isValid) {
@@ -331,7 +320,6 @@ _Pragma("clang diagnostic pop") \
             WXLogInfo(@"instance not found for callNativeModule:%@.%@, maybe already destroyed", moduleName, methodName);
             return nil;
         }
-
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> action: callNativeModule : %@ . %@",moduleName,methodName);
 #endif
@@ -357,11 +345,6 @@ _Pragma("clang diagnostic pop") \
         WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:[newArguments copy] options:[newOptions copy] instance:instance];
         if(![moduleName isEqualToString:@"dom"] && instance.needPrerender){
             [WXPrerenderManager storePrerenderModuleTasks:method forUrl:instance.scriptURL.absoluteString];
-            return nil;
-        }
-
-        BOOL intercepted = [instance moduleInterceptWithModuleName:moduleName methodName:methodName arguments:[newArguments copy] options:[newOptions copy]];
-        if (intercepted) {
             return nil;
         }
         return [method invoke];
@@ -485,25 +468,6 @@ _Pragma("clang diagnostic pop") \
     NSMutableArray *sendQueue = [NSMutableArray array];
     [self.sendQueue setValue:sendQueue forKey:instanceIdString];
 
-    if (sdkInstance.renderPlugin && ![options[@"EXEC_JS"] boolValue]) {
-        if (sdkInstance.renderPlugin) {
-            WXPerformBlockOnComponentThread(^{
-                [sdkInstance.renderPlugin createPage:instanceIdString contents:jsBundleString options:options data:data];
-            });
-        }
-        else {
-            WXComponentManager *manager = sdkInstance.componentManager;
-            if (manager.isValid) {
-                WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
-                NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-                WXPerformBlockOnComponentThread(^{
-                    [manager renderFailed:error];
-                });
-            }
-        }
-        return;
-    }
-
     NSArray *args = nil;
     WX_MONITOR_INSTANCE_PERF_START(WXFirstScreenJSFExecuteTime, [WXSDKManager instanceForID:instanceIdString]);
     WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
@@ -551,56 +515,68 @@ _Pragma("clang diagnostic pop") \
             };
             __weak typeof(self) weakSelf = self;
             [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
-            [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, immutableOptions, data?:@[]] onContext:nil completion:^(NSString *instanceContextEnvironment) {
-                if (sdkInstance.pageName)
-                {
-                    if ([sdkInstance.instanceJavaScriptContext respondsToSelector:@selector(setContextName:)])
+            if ([self.jsBridge respondsToSelector:@selector(createInstance:script:opts:initData:extendsApi:params:)])
+            {
+                [self.jsBridge createInstance:sdkInstance.instanceId
+                                       script:jsBundleString
+                                         opts:immutableOptions
+                                     initData:data?:@[]
+                                   extendsApi:raxAPIScript
+                                       params:@{@"engine_type":@"QJS"}];
+            }
+            else
+            {
+                [self callJSMethod:@"createInstanceContext" args:@[instanceIdString, immutableOptions, data?:@[]] onContext:nil completion:^(NSString *instanceContextEnvironment) {
+                    if (sdkInstance.pageName)
                     {
-                        [sdkInstance.instanceJavaScriptContext setContextName:sdkInstance.pageName];
+                        if ([sdkInstance.instanceJavaScriptContext respondsToSelector:@selector(setContextName:)])
+                        {
+                            [sdkInstance.instanceJavaScriptContext setContextName:sdkInstance.pageName];
+                        }
                     }
-                }
-                weakSelf.jsBridge[@"wxExtFuncInfo"] = nil;
-               
-                if ([sdkInstance.instanceJavaScriptContext respondsToSelector:@selector(handleVueGlobalVars:env:)])
-                {
-                    [sdkInstance.instanceJavaScriptContext handleVueGlobalVars:sdkInstance env:instanceContextEnvironment];
-                }
-                
-                if (WX_SYS_VERSION_LESS_THAN(@"10.2")) {
-                    if (handler && [handler respondsToSelector:@selector(loadPolyfillFramework:)]) {
-                        [handler loadPolyfillFramework:^(NSString *path, NSString *script) {
-                            if (script) {
-                                [sdkInstance.instanceJavaScriptContext executeJavascript:script withSourceURL:[NSURL URLWithString:path]];
-                            } else {
-                                WXLogError(@"weex-pollyfill can not found");
-                            }
-                        }];
+                    weakSelf.jsBridge[@"wxExtFuncInfo"] = nil;
+                   
+                    if ([sdkInstance.instanceJavaScriptContext respondsToSelector:@selector(handleVueGlobalVars:env:)])
+                    {
+                        [sdkInstance.instanceJavaScriptContext handleVueGlobalVars:sdkInstance env:instanceContextEnvironment];
                     }
-                }
+                    
+                    if (WX_SYS_VERSION_LESS_THAN(@"10.2")) {
+                        if (handler && [handler respondsToSelector:@selector(loadPolyfillFramework:)]) {
+                            [handler loadPolyfillFramework:^(NSString *path, NSString *script) {
+                                if (script) {
+                                    [sdkInstance.instanceJavaScriptContext executeJavascript:script withSourceURL:[NSURL URLWithString:path]];
+                                } else {
+                                    WXLogError(@"weex-pollyfill can not found");
+                                }
+                            }];
+                        }
+                    }
 
-                if (raxAPIScript) {
-                    [sdkInstance.instanceJavaScriptContext executeJavascript:raxAPIScript withSourceURL:[NSURL URLWithString:raxAPIScriptPath]];
-                    if ([sdkInstance.instanceJavaScriptContext respondsToSelector:@selector(handleRaxResult:)])
-                    {
-                        [sdkInstance.instanceJavaScriptContext handleRaxResult:sdkInstance];
+                    if (raxAPIScript) {
+                        [sdkInstance.instanceJavaScriptContext executeJavascript:raxAPIScript withSourceURL:[NSURL URLWithString:raxAPIScriptPath]];
+                        if ([sdkInstance.instanceJavaScriptContext respondsToSelector:@selector(handleRaxResult:)])
+                        {
+                            [sdkInstance.instanceJavaScriptContext handleRaxResult:sdkInstance];
+                        }
                     }
-                }
-                
-                NSDictionary* funcInfo = @{
-                                           @"func":@"createInstance",
-                                           @"arg":@"start",
-                                           @"instanceId":sdkInstance.instanceId?:@"unknownId"
-                                        };
-                sdkInstance.instanceJavaScriptContext[@"wxExtFuncInfo"] = funcInfo;
-                if ([NSURL URLWithString:sdkInstance.pageName] || sdkInstance.scriptURL) {
-                    [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]?:sdkInstance.scriptURL];
-                } else {
-                    [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
-                }
-                sdkInstance.instanceJavaScriptContext[@"wxExtFuncInfo"] = nil;
-                [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_EXECUTE_BUNDLE_END];
-                WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
-            }];
+                    
+                    NSDictionary* funcInfo = @{
+                                               @"func":@"createInstance",
+                                               @"arg":@"start",
+                                               @"instanceId":sdkInstance.instanceId?:@"unknownId"
+                                            };
+                    sdkInstance.instanceJavaScriptContext[@"wxExtFuncInfo"] = funcInfo;
+                    if ([NSURL URLWithString:sdkInstance.pageName] || sdkInstance.scriptURL) {
+                        [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString withSourceURL:[NSURL URLWithString:sdkInstance.pageName]?:sdkInstance.scriptURL];
+                    } else {
+                        [sdkInstance.instanceJavaScriptContext executeJavascript:jsBundleString];
+                    }
+                    sdkInstance.instanceJavaScriptContext[@"wxExtFuncInfo"] = nil;
+                    [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_EXECUTE_BUNDLE_END];
+                    WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
+                }];
+            }
         }
         
     } else {
@@ -657,21 +633,6 @@ _Pragma("clang diagnostic pop") \
     //create a sendQueue bind to the current instance
     NSMutableArray *sendQueue = [NSMutableArray array];
     [self.sendQueue setValue:sendQueue forKey:instanceIdString];
-
-    if (sdkInstance.renderPlugin) {
-        WXPerformBlockOnComponentThread(^{
-            [sdkInstance.renderPlugin createPage:instanceIdString contents:contents options:options data:data];
-        });
-    } else {
-        WXComponentManager *manager = sdkInstance.componentManager;
-        if (manager.isValid) {
-            WXSDKErrCode errorCode = WX_KEY_EXCEPTION_DEGRADE_EAGLE_RENDER_ERROR;
-            NSError *error = [NSError errorWithDomain:WX_ERROR_DOMAIN code:errorCode userInfo:@{@"message":@"No data render handler found!"}];
-            WXPerformBlockOnComponentThread(^{
-                [manager renderFailed:error];
-            });
-        }
-    }
 }
 
 - (NSString *)_pareJSBundleType:(NSString*)instanceIdString jsBundleString:(NSString*)jsBundleString
@@ -786,10 +747,7 @@ _Pragma("clang diagnostic pop") \
         [self.sendQueue removeObjectForKey:instance];
     }
     
-    WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
-    if (!sdkInstance.renderPlugin || sdkInstance.renderPlugin.isSupportExecScript) {
-        [self callJSMethod:@"destroyInstance" args:@[instance]];
-    }
+    [self callJSMethod:@"destroyInstance" args:@[instance]];
 }
 
 - (void)forceGarbageCollection
@@ -804,18 +762,7 @@ _Pragma("clang diagnostic pop") \
 {
     WXAssertBridgeThread();
     WXAssertParam(instance);
-    
-    if (!data) return;
-    
-    WXSDKInstance *sdkInstance = [WXSDKManager instanceForID:instance];
-    if (sdkInstance.renderPlugin) {
-        WXPerformBlockOnComponentThread(^{
-            [sdkInstance.renderPlugin refreshInstance:instance data:[WXUtility JSONString:data]];
-        });
-        [[WXSDKManager bridgeMgr] callJSMethod:@"callJS" args:@[instance, @[@{@"method":@"fireEvent", @"args":@[@"", @"refresh", [WXUtility objectFromJSON:@"[]"], @"", @{@"params":@[@{@"data":data}]}]}]]];
-    } else {
-        [self callJSMethod:@"refreshInstance" args:@[instance, data]];
-    }
+    [self callJSMethod:@"refreshInstance" args:@[instance, data]];
 }
 
 - (void)updateState:(NSString *)instance data:(id)data
@@ -968,7 +915,6 @@ _Pragma("clang diagnostic pop") \
     if(!modules) return;
     
     [self callJSMethod:@"registerModules" args:@[modules]];
-    [WXEaglePluginManager registerModules:modules];
 }
 
 - (void)registerComponents:(NSArray *)components
@@ -978,7 +924,6 @@ _Pragma("clang diagnostic pop") \
     if(!components) return;
     
     [self callJSMethod:@"registerComponents" args:@[components]];
-    [WXEaglePluginManager registerComponents:components];
 }
 
 - (void)callJSMethod:(NSString *)method args:(NSArray *)args

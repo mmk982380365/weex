@@ -25,7 +25,11 @@
 #include "core/runtime/weex_context.h"
 #include "base/log_defines.h"
 extern "C" {
+#if OS_ANDROID
 #include "quickjs.h"
+#elif OS_IOS
+#import <AliQuickJS/quickjs.h>
+#endif
 }
 
 #if OS_ANDROID

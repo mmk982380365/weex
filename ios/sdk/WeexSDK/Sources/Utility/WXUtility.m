@@ -39,6 +39,7 @@
 #import "WXTextComponent.h"
 #import "WXAssert.h"
 #import "WXDarkSchemeProtocol.h"
+#import <JavaScriptCore/JavaScriptCore.h>
 
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
