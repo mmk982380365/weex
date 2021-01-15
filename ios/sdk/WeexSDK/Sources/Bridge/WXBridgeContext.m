@@ -555,21 +555,21 @@ _Pragma("clang diagnostic pop") \
             NSDictionary* immutableOptions = [newOptions copy];
             sdkInstance.callCreateInstanceContext = [NSString stringWithFormat:@"instanceId:%@\noptions:%@\ndata:%@", instanceIdString, immutableOptions, data];
             //add instanceId to weexContext ,if fucn createInstanceContext failure ，then we will know which instance has problem (exceptionhandler)
-            self.jsBridge[@"wxExtFuncInfo"]= @{
+            [self jsBridgeForInstance:sdkInstance][@"wxExtFuncInfo"]= @{
                 @"func":@"createInstanceContext",
                 @"arg":@"start",
                 @"instanceId":sdkInstance.instanceId?:@"unknownId"
             };
             __weak typeof(self) weakSelf = self;
             [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
-            if ([self.jsBridge respondsToSelector:@selector(createInstance:script:opts:initData:extendsApi:params:)])
+            if ([[self jsBridgeForInstance:sdkInstance] respondsToSelector:@selector(createInstance:script:opts:initData:extendsApi:params:)])
             {
-                [self.jsBridge createInstance:sdkInstance.instanceId
-                                       script:jsBundleString
-                                         opts:immutableOptions
-                                     initData:data?:@[]
-                                   extendsApi:raxAPIScript
-                                       params:@{@"engine_type":@"QJS"}];
+                [[self jsBridgeForInstance:sdkInstance] createInstance:sdkInstance.instanceId
+                                                                script:jsBundleString
+                                                                  opts:immutableOptions
+                                                              initData:data?:@[]
+                                                            extendsApi:raxAPIScript
+                                                                params:@{@"engine_type":@"QJS"}];
             }
             else
             {
@@ -581,7 +581,7 @@ _Pragma("clang diagnostic pop") \
                             [sdkInstance.instanceJavaScriptContext setContextName:sdkInstance.pageName];
                         }
                     }
-                    weakSelf.jsBridge[@"wxExtFuncInfo"] = nil;
+                    [weakSelf jsBridgeForInstance:sdkInstance][@"wxExtFuncInfo"] = nil;
                    
                     if ([sdkInstance.instanceJavaScriptContext respondsToSelector:@selector(handleVueGlobalVars:env:)])
                     {
@@ -786,8 +786,9 @@ _Pragma("clang diagnostic pop") \
 		[self.insStack removeObject:instance];
 	}
     
-    if(self.jsBridge && [self.jsBridge respondsToSelector:@selector(removeTimers:)]){
-        [self.jsBridge removeTimers:instance];
+    WXSDKInstance* sdkInstance = [WXSDKManager instanceForID:instance];
+    if([self jsBridgeForInstance:sdkInstance] && [[self jsBridgeForInstance:sdkInstance] respondsToSelector:@selector(removeTimers:)]){
+        [[self jsBridgeForInstance:sdkInstance] removeTimers:instance];
     }
 
     if(self.sendQueue[instance]){
@@ -799,8 +800,11 @@ _Pragma("clang diagnostic pop") \
 
 - (void)forceGarbageCollection
 {
-    if ([self.jsBridge respondsToSelector:@selector(garbageCollect)]) {
-        [self.jsBridge garbageCollect];
+    if ([self.jsCoreBridge respondsToSelector:@selector(garbageCollect)]) {
+        [self.jsCoreBridge garbageCollect];
+    }
+    if ([self.jsRuntimeBridge respondsToSelector:@selector(garbageCollect)]) {
+        [self.jsRuntimeBridge garbageCollect];
     }
 }
 
@@ -908,7 +912,9 @@ _Pragma("clang diagnostic pop") \
 - (NSString *)excuteJSMethodWithResult:(WXCallJSMethod *)method
 {
     WXAssertBridgeThread();
-    return  [self.jsBridge callJSMethod:@"callJS" args:@[method.instance.instanceId, @[[method callJSTask]]]];
+    NSString *result = [self.jsCoreBridge callJSMethod:@"callJS" args:@[method.instance.instanceId, @[[method callJSTask]]]];
+    [self.jsRuntimeBridge callJSMethod:@"callJS" args:@[method.instance.instanceId, @[[method callJSTask]]]];
+    return result;
 }
 
 - (void)executeAllJsService
@@ -982,7 +988,8 @@ _Pragma("clang diagnostic pop") \
 
 - (void)resetEnvironment
 {
-    [self.jsBridge resetEnvironment];
+    [self.jsCoreBridge resetEnvironment];
+    [self.jsRuntimeBridge resetEnvironment];
 }
 
 #pragma mark JS Debug Management
