@@ -3140,7 +3140,6 @@
 			buildConfigurationList = 77D161111C02DBE70010B15B /* Build configuration list for PBXNativeTarget "WeexSDK" */;
 			buildPhases = (
 				2BCF9953D6ED558882BC4CAB /* [CP] Check Pods Manifest.lock */,
-				59D3CA601D003832008835DC /* Generate WeexSDK.h */,
 				77D160F81C02DBE70010B15B /* Sources */,
 				77D160F91C02DBE70010B15B /* Frameworks */,
 				77D160FA1C02DBE70010B15B /* Headers */,
@@ -3295,20 +3294,6 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${SRCROOT}/Podfile.lock\" \"${SRCROOT}/Pods/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
-		};
-		59D3CA601D003832008835DC /* Generate WeexSDK.h */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Generate WeexSDK.h";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = ". \"${PROJECT_DIR}/buildScripts.sh\"\n\ngenerateSDKHeader 'WeexSDK'\ngenerateBuildTime \"${PROJECT_DIR}/WeexSDK/Sources/Utility/WXVersion.m\"\n";
 		};
 		DCA445C81EFA584000D0CFA8 /* Generate WeexSDK.h */ = {
 			isa = PBXShellScriptBuildPhase;
