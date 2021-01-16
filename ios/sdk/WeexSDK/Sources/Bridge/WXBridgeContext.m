@@ -103,7 +103,7 @@ _Pragma("clang diagnostic pop") \
     }
     else
     {
-        return [WXJSRuntimeBridge class];
+        return [WXJSCoreBridge class];
     }
 }
 
@@ -553,7 +553,7 @@ _Pragma("clang diagnostic pop") \
                                                                   opts:immutableOptions
                                                               initData:data?:@[]
                                                             extendsApi:raxAPIScript
-                                                                params:@{@"engine_type":@"QJS"}];
+                                                                params:@{@"engine_type":sdkInstance.engineType ?: @"QJS"}];
             }
             else
             {
