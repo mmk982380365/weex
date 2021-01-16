@@ -107,11 +107,6 @@ _Pragma("clang diagnostic pop") \
     }
 }
 
-+ (Class)bridgeClass
-{
-    return [WXJSRuntimeBridge class];
-}
-
 - (id<WXBridgeProtocol>)jsBridgeForInstance:(WXSDKInstance *)instance
 {
     WXAssertBridgeThread();
