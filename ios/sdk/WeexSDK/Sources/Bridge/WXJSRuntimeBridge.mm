@@ -103,7 +103,7 @@ using WeexCore::bridge::script::ScriptSideInSimple;
     }
     
     std::unique_ptr<WeexJSResult> ret = script_side_->ExecJSWithResult([_weexInstanceId UTF8String], "", [method UTF8String], params);
-    if (ret)
+    if (ret && ret->data.get())
     {
         NSString *str = [[NSString alloc] initWithUTF8String:ret->data.get()];
         return str;
