@@ -6799,8 +6799,13 @@ JSValue JS_GetPropertyInternal(JSContext *ctx, JSValueConst obj,
     if (unlikely(tag != JS_TAG_OBJECT)) {
         switch(tag) {
         case JS_TAG_NULL:
-        case JS_TAG_UNDEFINED:
-            return JS_ThrowTypeError(ctx, "value has no property");
+        case JS_TAG_UNDEFINED: {
+            char buf[ATOM_GET_STR_BUF_SIZE];
+            JSValue stringify = JS_JSONStringify(ctx, obj, JS_UNDEFINED, JS_NewInt32(ctx, 0));
+            size_t length = 0;
+            const char * ret_string = JS_ToCStringLen(ctx, &length, stringify);
+            return JS_ThrowTypeError(ctx, "%s value has no property %s",ret_string, JS_AtomGetStr(ctx, buf, sizeof(buf), prop));
+        }
         case JS_TAG_EXCEPTION:
             return JS_EXCEPTION;
         case JS_TAG_STRING:
@@ -8106,7 +8111,8 @@ int JS_SetPropertyInternal(JSContext *ctx, JSValueConst this_obj,
         case JS_TAG_NULL:
         case JS_TAG_UNDEFINED:
             JS_FreeValue(ctx, val);
-            JS_ThrowTypeError(ctx, "value has no property");
+            char buf[ATOM_GET_STR_BUF_SIZE];
+            JS_ThrowTypeError(ctx, "value has no property %s",JS_AtomGetStr(ctx, buf, sizeof(buf), prop));
             return -1;
         default:
             /* even on a primitive type we can have setters on the prototype */
@@ -18062,6 +18068,7 @@ static JSValue JS_CallInternal(JSContext *caller_ctx, JSValueConst func_obj,
         CASE(OP_to_propkey2):
             /* must be tested first */
             if (unlikely(JS_IsUndefined(sp[-2]) || JS_IsNull(sp[-2]))) {
+                char buf[ATOM_GET_STR_BUF_SIZE];
                 JS_ThrowTypeError(ctx, "value has no property");
                 goto exception;
             }
@@ -41795,6 +41802,20 @@ static JSValue js_regexp_Symbol_replace(JSContext *ctx, JSValueConst this_val,
             goto exception;
         if (JS_SetPropertyInt64(ctx, tab, 0, JS_DupValue(ctx, matched)) < 0)
             goto exception;
+
+        char buf[3] = {0, 0, 0};
+        JSValue g = JS_GetGlobalObject(ctx);
+        JSValue regexp = JS_GetPropertyStr(ctx, g, "RegExp");
+        JS_SetPropertyStr(ctx, regexp, "$1", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$2", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$3", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$4", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$5", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$6", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$7", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$8", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$9", JS_NewString(ctx,""));
+
         for(n = 1; n < nCaptures; n++) {
             JSValue capN;
             capN = JS_GetPropertyInt64(ctx, result, n);
@@ -41805,9 +41826,19 @@ static JSValue js_regexp_Symbol_replace(JSContext *ctx, JSValueConst this_val,
                 if (JS_IsException(capN))
                     goto exception;
             }
+
+            if (n < 10) {
+              sprintf(buf, "$%d", n);
+              JS_SetPropertyStr(ctx, regexp, buf, JS_DupValue(ctx, capN));
+            }
+
             if (JS_SetPropertyInt64(ctx, tab, n, capN) < 0)
                 goto exception;
         }
+
+        JS_FreeValue(ctx, regexp);
+        JS_FreeValue(ctx, g);
+
         JS_FreeValue(ctx, namedCaptures);
         namedCaptures = JS_GetProperty(ctx, result, JS_ATOM_groups);
         if (JS_IsException(namedCaptures))
@@ -42109,6 +42140,15 @@ void JS_AddIntrinsicRegExp(JSContext *ctx)
     JS_SetPropertyFunctionList(ctx, ctx->class_proto[JS_CLASS_REGEXP_STRING_ITERATOR],
                                js_regexp_string_iterator_proto_funcs,
                                countof(js_regexp_string_iterator_proto_funcs));
+    JS_SetPropertyStr(ctx, obj, "$1", JS_NewString(ctx,""));
+    JS_SetPropertyStr(ctx, obj, "$2", JS_NewString(ctx,""));
+    JS_SetPropertyStr(ctx, obj, "$3", JS_NewString(ctx,""));
+    JS_SetPropertyStr(ctx, obj, "$4", JS_NewString(ctx,""));
+    JS_SetPropertyStr(ctx, obj, "$5", JS_NewString(ctx,""));
+    JS_SetPropertyStr(ctx, obj, "$6", JS_NewString(ctx,""));
+    JS_SetPropertyStr(ctx, obj, "$7", JS_NewString(ctx,""));
+    JS_SetPropertyStr(ctx, obj, "$8", JS_NewString(ctx,""));
+    JS_SetPropertyStr(ctx, obj, "$9", JS_NewString(ctx,""));
 }
 
 /* JSON */
