@@ -41198,6 +41198,20 @@ static JSValue js_regexp_exec(JSContext *ctx, JSValueConst this_val,
             group_name_ptr = (char *)(re_bytecode + 7 + re_bytecode_len);
         }
 
+        char buf[3] = {0, 0, 0};
+        JSValue g = JS_GetGlobalObject(ctx);
+        JSValue regexp = JS_GetPropertyStr(ctx, g, "RegExp");
+        JS_SetPropertyStr(ctx, regexp, "$1", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$2", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$3", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$4", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$5", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$6", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$7", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$8", JS_NewString(ctx,""));
+        JS_SetPropertyStr(ctx, regexp, "$9", JS_NewString(ctx,""));
+
+
         for(i = 0; i < capture_count; i++) {
             int start, end;
             JSValue val;
@@ -41211,6 +41225,11 @@ static JSValue js_regexp_exec(JSContext *ctx, JSValueConst this_val,
                 if (JS_IsException(val))
                     goto fail;
             }
+            if(i < 9) {
+                sprintf(buf, "$%d", i+1);
+                JS_SetPropertyStr(ctx, regexp, buf, JS_DupValue(ctx, val));
+            }
+
             if (group_name_ptr && i > 0) {
                 if (*group_name_ptr) {
                     if (JS_DefinePropertyValueStr(ctx, groups, group_name_ptr,
@@ -41225,6 +41244,10 @@ static JSValue js_regexp_exec(JSContext *ctx, JSValueConst this_val,
             if (JS_DefinePropertyValueUint32(ctx, obj, i, val, prop_flags) < 0)
                 goto fail;
         }
+
+        JS_FreeValue(ctx, regexp);
+        JS_FreeValue(ctx, g);
+
         if (JS_DefinePropertyValue(ctx, obj, JS_ATOM_groups,
                                    groups, prop_flags) < 0)
             goto fail;
