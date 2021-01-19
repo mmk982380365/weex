@@ -370,6 +370,7 @@ int WeexRuntimeQJS::createInstance(const std::string &instanceId,
 
     JSValue ret = JS_Call(globalContext, createInstanceContextFunc,
                           JS_GetGlobalObject(globalContext), 3, args);
+    finish_quickjs_PendingJob(engine_vm<JSRuntime>());
 
     for (JSValue arg : args) {
       JS_FreeValue(globalContext, arg);
