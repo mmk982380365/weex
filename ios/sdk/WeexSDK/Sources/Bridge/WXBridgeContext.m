@@ -103,7 +103,7 @@ _Pragma("clang diagnostic pop") \
     }
     else
     {
-        return [WXJSRuntimeBridge class];
+        return [WXJSCoreBridge class];
     }
 }
 

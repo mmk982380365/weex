@@ -257,6 +257,9 @@ void WeexContextQJS::initGlobalContextFunctions() {
       JS_CFUNC_DEF("callNativeModule", 5, js_CallNativeModule),
       JS_CFUNC_DEF("callNativeComponent", 5, js_CallNativeComponent),
       JS_CFUNC_DEF("callAddElement", 5, js_CallAddElement),
+#if OS_IOS
+      JS_CFUNC_DEF("setTimeout", 2, js_SetNativeTimeout),
+#endif
       JS_CFUNC_DEF("setTimeoutNative", 2, js_SetTimeoutNative),
       JS_CFUNC_DEF("nativeLog", 5, js_NativeLog),
       JS_CFUNC_DEF("notifyTrimMemory", 0, js_NotifyTrimMemory),

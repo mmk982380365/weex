@@ -288,6 +288,7 @@ std::unique_ptr<WeexJSResult> WeexRuntimeQJS::exeJSWithResult(const std::string 
         const char *string = array->content;
         js_args[i] = JS_ParseJSON(thisContext, string, array->length, "t");
       }
+            break;
       case ParamsType::BYTEARRAY: {
 #if OS_ANDROID
         const WeexByteArray *array = paramsObject->value.byteArray;
@@ -313,6 +314,8 @@ std::unique_ptr<WeexJSResult> WeexRuntimeQJS::exeJSWithResult(const std::string 
   finish_quickjs_PendingJob(engine_vm<JSRuntime>());
 
   if (JS_IsException(funcVal)) {
+    ReportException(thisContext, "exeJSWithResult", instanceId, script_bridge());
+  } else if (JS_IsException(ret)) {
     ReportException(thisContext, "exeJSWithResult", instanceId, script_bridge());
   } else {
     convertJSValueToWeexJSResult(thisContext, ret, returnResult.get());
