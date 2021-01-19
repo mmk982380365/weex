@@ -609,12 +609,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
-    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
-      mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
-              .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
-      WXLogUtils.d(mLodBuilder.substring(0));
-      mLodBuilder.setLength(0);
-    }
+//    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
+//      mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
+//              .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
+//      WXLogUtils.d(mLodBuilder.substring(0));
+//      mLodBuilder.setLength(0);
+//    }
 
     try {
       if (WXDomModule.WXDOM.equals(module)) {
@@ -645,12 +645,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
-    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
-      mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
-              .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
-      WXLogUtils.d(mLodBuilder.substring(0));
-      mLodBuilder.setLength(0);
-    }
+//    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
+//      mLodBuilder.append("[WXBridgeManager] callNativeModule >>>> instanceId:").append(instanceId)
+//              .append(", module:").append(module).append(", method:").append(method).append(", arguments:").append(arguments);
+//      WXLogUtils.d(mLodBuilder.substring(0));
+//      mLodBuilder.setLength(0);
+//    }
 
     try {
       if (WXDomModule.WXDOM.equals(module)) {
@@ -682,12 +682,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
-    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
-      mLodBuilder.append("[WXBridgeManager] callNativeComponent >>>> instanceId:").append(instanceId)
-              .append(", componentRef:").append(componentRef).append(", method:").append(method).append(", arguments:").append(arguments);
-      WXLogUtils.d(mLodBuilder.substring(0));
-      mLodBuilder.setLength(0);
-    }
+//    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
+//      mLodBuilder.append("[WXBridgeManager] callNativeComponent >>>> instanceId:").append(instanceId)
+//              .append(", componentRef:").append(componentRef).append(", method:").append(method).append(", arguments:").append(arguments);
+//      WXLogUtils.d(mLodBuilder.substring(0));
+//      mLodBuilder.setLength(0);
+//    }
 
     try {
       WXDomModule dom = WXModuleManager.getDomModule(instanceId);
@@ -726,12 +726,12 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       return IWXBridge.INSTANCE_RENDERING_ERROR;
     }
 
-    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
-      mLodBuilder.append("[WXBridgeManager] callNative >>>> instanceId:").append(instanceId)
-              .append(", tasks:").append(tasks).append(", callback:").append(callback);
-      WXLogUtils.d(mLodBuilder.substring(0));
-      mLodBuilder.setLength(0);
-    }
+//    if (WXEnvironment.isApkDebugable() && BRIDGE_LOG_SWITCH) {
+//      mLodBuilder.append("[WXBridgeManager] callNative >>>> instanceId:").append(instanceId)
+//              .append(", tasks:").append(tasks).append(", callback:").append(callback);
+//      WXLogUtils.d(mLodBuilder.substring(0));
+//      mLodBuilder.setLength(0);
+//    }
 
     if (mDestroyedInstanceId != null && mDestroyedInstanceId.contains(instanceId)) {
       return IWXBridge.DESTROY_INSTANCE;
@@ -3278,39 +3278,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return IWXBridge.INSTANCE_RENDERING;
   }
 
-  private void setExceedGPULimitComponentsInfo(String instanceId,String ref,GraphicSize layoutSize){
-    float limit = WXRenderManager.getOpenGLRenderLimitValue();
-    if(limit > 0 && (layoutSize.getHeight() > limit || layoutSize.getWidth() > limit)){
-      JSONObject ext = new JSONObject();
-      WXComponent component = WXSDKManager.getInstance().getWXRenderManager().getWXComponent(instanceId,ref);
-      ext.put("GPU limit",String.valueOf(limit));
-      ext.put("component.width",String.valueOf(layoutSize.getWidth()));
-      ext.put("component.height",String.valueOf(layoutSize.getHeight()));
-      if (component.getComponentType() != null && !component.getComponentType().isEmpty()) {
-        ext.put("component.type", component.getComponentType());
-      }
-      if (component.getStyles() != null && !component.getStyles().isEmpty()) {
-        ext.put("component.style", component.getStyles().toString());
-      }
-      if (component.getAttrs() != null && !component.getAttrs().isEmpty()) {
-        ext.put("component.attr", component.getAttrs().toString());
-      }
-      if (component.getEvents() != null && !component.getEvents().isEmpty()) {
-        ext.put("component.event", component.getEvents().toString());
-      }
-      if (component.getMargin() != null) {
-        ext.put("component.margin", component.getMargin().toString());
-      }
-      if (component.getPadding() != null) {
-        ext.put("component.padding", component.getPadding().toString());
-      }
-      if (component.getBorder() != null) {
-        ext.put("component.border", component.getBorder().toString());
-      }
-      WXSDKManager.getInstance().getSDKInstance(instanceId).setComponentsInfoExceedGPULimit(ext);
-    }
-  }
-
   public int callAddChildToRichtext(String instanceId, String nodeType, String ref, String parentRef, String richTextRef,
                                     HashMap<String, String> styles, HashMap<String, String> attrs){
     if (TextUtils.isEmpty(instanceId) || TextUtils.isEmpty(ref)) {
@@ -3501,7 +3468,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       if (instance != null) {
         GraphicSize size = new GraphicSize(width, height);
         GraphicPosition position = new GraphicPosition(left, top, right, bottom);
-        setExceedGPULimitComponentsInfo(pageId,ref,size);
         GraphicActionAddElement addAction = instance.getInActiveAddElementAction(ref);
         if(addAction!=null) {
           addAction.setRTL(isRTL);

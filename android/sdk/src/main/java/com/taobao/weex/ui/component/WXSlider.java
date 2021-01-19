@@ -449,9 +449,6 @@ public class WXSlider extends WXVContainer<FrameLayout> {
       if (mAdapter.getRealPosition(pos) == lastPos) {
         return;
       }
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.d("onPageSelected >>>>" + mAdapter.getRealPosition(pos) + " lastPos: " + lastPos);
-      }
       if (mAdapter == null || mAdapter.getRealCount() == 0) {
         return;
       }

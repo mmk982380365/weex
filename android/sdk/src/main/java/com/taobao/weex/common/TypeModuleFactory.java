@@ -97,9 +97,9 @@ public class TypeModuleFactory<T extends WXModule> implements ModuleFactory<T> {
   }
 
   private void generateMethodMap() {
-    if(WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d(TAG, "extractMethodNames:" + mClazz.getSimpleName());
-    }
+//    if(WXEnvironment.isApkDebugable()) {
+//      WXLogUtils.d(TAG, "extractMethodNames:" + mClazz.getSimpleName());
+//    }
     HashMap<String, Invoker> methodMap = new HashMap<>();
     try {
       for (Method method : mClazz.getMethods()) {

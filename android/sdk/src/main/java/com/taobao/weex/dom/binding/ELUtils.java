@@ -117,9 +117,9 @@ public class ELUtils {
         }else if(vfor instanceof  String){
             return vforBlock(JSONObject.parseObject(vfor.toString()));
         }else{
-            if(WXEnvironment.isApkDebugable()){
-                WXLogUtils.e("weex", "weex vfor is illegal " + vfor);
-            }
+//            if(WXEnvironment.isApkDebugable()){
+//                WXLogUtils.e("weex", "weex vfor is illegal " + vfor);
+//            }
         }
         return vfor;
     }

@@ -77,26 +77,16 @@ class DefaultDragHelper implements DragHelper {
 
     @Override
     public void onDragStart(@NonNull WXComponent component, int from) {
-        if (WXEnvironment.isApkDebugable()) {
-            WXLogUtils.d(TAG, "list on drag start : from index " + from);
-        }
         mEventTrigger.triggerEvent(EVENT_START_DRAG, buildEvent(component.getRef(), from, -1));
     }
 
     @Override
     public void onDragEnd(@NonNull WXComponent component, int from, int to) {
-        if (WXEnvironment.isApkDebugable()) {
-            WXLogUtils.d(TAG, "list on drag end : " + "from index " + from + " to index " + to);
-        }
         mEventTrigger.triggerEvent(EVENT_END_DRAG, buildEvent(component.getRef(), from, to));
     }
 
     @Override
     public void onDragging(int fromPos, int toPos) {
-        if (WXEnvironment.isApkDebugable()) {
-            WXLogUtils.d(TAG, "list on dragging : from index " + fromPos + " to index " + toPos);
-        }
-
         RecyclerView.Adapter adapter = mRecyclerView.getAdapter();
         if (adapter == null) {
             WXLogUtils.e(TAG, "drag failed because of RecyclerView#Adapter is not bound");

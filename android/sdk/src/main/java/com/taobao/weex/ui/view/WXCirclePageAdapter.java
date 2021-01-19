@@ -68,10 +68,6 @@ public class WXCirclePageAdapter extends PagerAdapter {
   }
 
   public void addPageView(View view) {
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("onPageSelected >>>> addPageView");
-    }
-
     originalViews.add(view);
     if (this.isRTL) {
       views.add(0, view);
@@ -82,19 +78,12 @@ public class WXCirclePageAdapter extends PagerAdapter {
   }
 
   public void removePageView(View view) {
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("onPageSelected >>>> removePageView");
-    }
     views.remove(view);
     originalViews.remove(view);
     ensureShadow();
   }
 
   public void replacePageView(View oldView, View newView) {
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("onPageSelected >>>> replacePageView");
-    }
-
     int index = views.indexOf(oldView);
     views.remove(index);
     views.add(index, newView);
@@ -119,9 +108,6 @@ public class WXCirclePageAdapter extends PagerAdapter {
     View pageView = null;
     try {
       pageView = shadow.get(position);
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.d("onPageSelected >>>> instantiateItem >>>>> position:" + position + ",position % getRealCount()" + position % getRealCount());
-      }
       if (pageView.getParent() == null) {
         container.addView(pageView);
       } else {
@@ -136,9 +122,6 @@ public class WXCirclePageAdapter extends PagerAdapter {
 
   @Override
   public void destroyItem(ViewGroup container, int position, Object object) {
-    if (WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("onPageSelected >>>> destroyItem >>>>> position:" + position);
-    }
     // container.removeView((View) object);
   }
 

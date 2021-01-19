@@ -982,9 +982,6 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       int scrollerH = scrollView.getHeight();
       int offScreenY = contentH - y - scrollerH;
       if (offScreenY < offsetInt) {
-        if (WXEnvironment.isApkDebugable()) {
-          WXLogUtils.d("[WXScroller-onScroll] offScreenY :" + offScreenY);
-        }
         if (mContentHeight != contentH || mForceLoadmoreNextTime) {
           fireEvent(Constants.Event.LOADMORE);
           mContentHeight = contentH;

@@ -246,14 +246,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private WXReactorPageManager mReactorPageManager;
 
-  public  List<JSONObject> getComponentsExceedGPULimit(){return componentsInfoExceedGPULimit;}
-  @RestrictTo(Scope.LIBRARY)
-  public void setComponentsInfoExceedGPULimit(JSONObject component){
-    if(component!= null && !component.isEmpty()){
-      componentsInfoExceedGPULimit.add(component);
-    }
-  }
-
   public List<String> getLayerOverFlowListeners() {
     return mLayerOverFlowListeners;
   }

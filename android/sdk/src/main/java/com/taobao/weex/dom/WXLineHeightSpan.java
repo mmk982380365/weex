@@ -33,10 +33,6 @@ public class WXLineHeightSpan implements LineHeightSpan{
 
   @Override
   public void chooseHeight(CharSequence text, int start, int end, int spanstartv, int v, Paint.FontMetricsInt fm) {
-    if(WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d("LineHeight", text + " ; start " + start + "; end " + end + "; spanstartv "
-              + spanstartv + "; v " + v + "; fm " + fm);
-    }
     int halfLeading=(lineHeight-(fm.descent-fm.ascent))/2;
     fm.top-=halfLeading;
     fm.bottom+=halfLeading;

@@ -120,8 +120,6 @@ public class StickyHeaderHelper {
     final View headerView = mHeaderViews.remove(compToRemove.getRef());
 
     if(component == null || headerView == null){
-      if(WXEnvironment.isApkDebugable()) {
-      }
       return;
     }
     if(mCurrentStickyRef != null && mCurrentStickyRef.equals(compToRemove.getRef())){

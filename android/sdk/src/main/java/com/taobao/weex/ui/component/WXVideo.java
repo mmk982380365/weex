@@ -87,9 +87,6 @@ public class WXVideo extends WXComponent<FrameLayout> {
 
       @Override
       public void onPrepared(MediaPlayer mediaPlayer) {
-        if (WXEnvironment.isApkDebugable()) {
-          WXLogUtils.d("Video", "onPrepared");
-        }
         video.getProgressBar().setVisibility(View.GONE);
         mPrepared = true;
         if (mAutoPlay) {
@@ -116,9 +113,6 @@ public class WXVideo extends WXComponent<FrameLayout> {
 
       @Override
       public void onCompletion(MediaPlayer mediaPlayer) {
-        if (WXEnvironment.isApkDebugable()) {
-          WXLogUtils.d("Video", "onCompletion");
-        }
         if (getEvents().contains(Constants.Event.FINISH)) {
           WXVideo.this.notify(Constants.Event.FINISH, Constants.Value.STOP);
         }
@@ -129,9 +123,6 @@ public class WXVideo extends WXComponent<FrameLayout> {
 
       @Override
       public void onPause() {
-        if (WXEnvironment.isApkDebugable()) {
-          WXLogUtils.d("Video", "onPause");
-        }
         if (getEvents().contains(Constants.Event.PAUSE)) {
           WXVideo.this.notify(Constants.Event.PAUSE, Constants.Value.PAUSE);
         }
@@ -139,10 +130,6 @@ public class WXVideo extends WXComponent<FrameLayout> {
 
       @Override
       public void onStart() {
-        if (WXEnvironment.isApkDebugable()) {
-          WXLogUtils.d("Video", "onStart");
-        }
-
         if (getEvents().contains(Constants.Event.START)) {
           WXVideo.this.notify(Constants.Event.START, Constants.Value.PLAY);
         }

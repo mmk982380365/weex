@@ -130,10 +130,6 @@ public class SimpleComponentHolder implements IFComponentHolder{
   }
 
   private synchronized void generate(){
-    if(WXEnvironment.isApkDebugable()) {
-      WXLogUtils.d(TAG, "Generate Component:" + mClz.getSimpleName());
-    }
-
     Pair<Map<String, Invoker>, Map<String, Invoker>> methodPair = getMethods(mClz);
     mPropertyInvokers = methodPair.first;
     mMethodInvokers = methodPair.second;

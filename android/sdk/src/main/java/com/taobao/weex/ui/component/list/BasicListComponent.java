@@ -95,7 +95,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private String TAG = "BasicListComponent";
   private int mListCellCount = 0;
   private boolean mForceLoadmoreNextTime = false;
-  private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
+ // private static final Pattern transformPattern = Pattern.compile("([a-z]+)\\(([0-9\\.]+),?([0-9\\.]+)?\\)");
 
   private Map<String, AppearanceHelper> mAppearComponents = new HashMap<>();
   private Runnable mAppearChangeRunnable = null;
@@ -115,8 +115,8 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   protected int mColumnCount = 1;
   protected float mColumnGap = 0;
   protected float mColumnWidth = 0;
-  protected float mLeftGap = 0;
-  protected float mRightGap = 0;
+//  protected float mLeftGap = 0;
+//  protected float mRightGap = 0;
 
   private int mOffsetAccuracy = 10;
   private Point mLastReport = new Point(-1, -1);

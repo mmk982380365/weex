@@ -373,9 +373,9 @@ public class WXStreamModule extends WXModule {
         mCallback.onResponse(response, mRespHeaders);
       }
 
-      if(WXEnvironment.isApkDebugable()){
-        WXLogUtils.d("WXStreamModule",response!=null && response.originalData!=null?new String(response.originalData):"response data is NUll!");
-      }
+//      if(WXEnvironment.isApkDebugable()){
+//        WXLogUtils.d("WXStreamModule",response!=null && response.originalData!=null?new String(response.originalData):"response data is NUll!");
+//      }
     }
   }
 

@@ -181,13 +181,13 @@ public class BoxShadowUtil {
     shadowPath.addRoundRect(shadowRect, shadowRadii, Path.Direction.CCW);
     canvas.drawPath(shadowPath, shadowPaint);
 
-    if (false && WXEnvironment.isApkDebugable()) {
-      Paint paint = new Paint();
-      paint.setAntiAlias(true);
-      paint.setColor(Color.BLACK);
-      paint.setStyle(Paint.Style.STROKE);
-      canvas.drawRect(shadowRect, paint);
-    }
+//    if (false && WXEnvironment.isApkDebugable()) {
+//      Paint paint = new Paint();
+//      paint.setAntiAlias(true);
+//      paint.setColor(Color.BLACK);
+//      paint.setStyle(Paint.Style.STROKE);
+//      canvas.drawRect(shadowRect, paint);
+//    }
   }
 
   private static void setNormalBoxShadow(View target, List<BoxShadowOptions> options, float quality, float[] radii) {
@@ -226,14 +226,14 @@ public class BoxShadowUtil {
       }
       Canvas canvas = new Canvas(output);
 
-      if (false && WXEnvironment.isApkDebugable()) {
-        // Using for debug
-        Paint strokePaint = new Paint();
-        strokePaint.setColor(Color.BLACK);
-        strokePaint.setStrokeWidth(2);
-        strokePaint.setStyle(Paint.Style.STROKE);
-        canvas.drawRect(canvas.getClipBounds(), strokePaint);
-      }
+//      if (false && WXEnvironment.isApkDebugable()) {
+//        // Using for debug
+//        Paint strokePaint = new Paint();
+//        strokePaint.setColor(Color.BLACK);
+//        strokePaint.setStrokeWidth(2);
+//        strokePaint.setStyle(Paint.Style.STROKE);
+//        canvas.drawRect(canvas.getClipBounds(), strokePaint);
+//      }
 
       for (BoxShadowOptions option : options) {
         Rect rect = option.getTargetCanvasRect();
