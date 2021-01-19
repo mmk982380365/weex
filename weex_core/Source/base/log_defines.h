@@ -224,16 +224,8 @@ class LogImplement {
 #endif
 
 
-#ifdef DEBUG
 #define LOGD_TAG(TAG, format, ...) WEEX_CORE_LOG(WeexCore::LogLevel::Debug, TAG, format, ##__VA_ARGS__)
-
 #define LOGD(format, ...) LOGD_TAG(WEEX_CORE_LOG_TAG, format, ##__VA_ARGS__)
-
-#else
-#define LOGD_TAG(TAG, format, ...)       ((void) 0)
-#define LOGD(format, ...)                ((void) 0)
-
-#endif
 
 #define LOGV                    LOGD
 #define LOGV_TAG                LOGD_TAG

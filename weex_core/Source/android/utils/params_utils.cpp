@@ -258,7 +258,6 @@ std::vector<std::pair<std::string, std::string>> initFromParam(
       SoUtils::set_jsb_so_cache_path(const_cast<char *>(
                                          env->GetStringUTFChars((jstring) (j_get_jsb_so_cache_path),
                                                                 nullptr)));
-      LOGD("g_jsbSoCachePath is %s ", SoUtils::jsb_so_path());
       env->DeleteLocalRef(j_get_jsb_so_cache_path);
     }
   }
@@ -272,7 +271,6 @@ std::vector<std::pair<std::string, std::string>> initFromParam(
       SoUtils::set_jsb_so_inner_path(const_cast<char *>(
                                          env->GetStringUTFChars((jstring) (j_get_jsb_so_inner_path),
                                                                 nullptr)));
-      LOGD("g_jsbSoInnerPath is %s ", SoUtils::jsb_so_path());
       env->DeleteLocalRef(j_get_jsb_so_inner_path);
     }
   }

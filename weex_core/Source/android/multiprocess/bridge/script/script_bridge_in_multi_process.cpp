@@ -284,7 +284,6 @@ std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::InitAppFramework(
   auto id = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
   auto js = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
 
-  LOGD("Weex jsserver IPCJSMsg::INITAPPFRAMEWORK id:%s", id);
   if (id == nullptr) {
     return createInt32Result(static_cast<int32_t>(false));
   }
