@@ -99,11 +99,11 @@ _Pragma("clang diagnostic pop") \
     if ([instance.engineType isEqualToString:@"QJS"] ||
         [instance.engineType isEqualToString:@"QJSBin"])
     {
-        return [WXJSRuntimeBridge class];
+        return [WXJSCoreBridge class];
     }
     else
     {
-        return [WXJSRuntimeBridge class];
+        return [WXJSCoreBridge class];
     }
 }
 
