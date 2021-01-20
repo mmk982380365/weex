@@ -465,7 +465,7 @@ static JSValue js_CallNativeModule(JSContext *ctx, JSValueConst this_val,
   WeexContextQJS::JSParams arguments(ctx, argv[3], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
   WeexContextQJS::JSParams options(ctx, argv[4], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
 
-  auto result =
+  std::unique_ptr<ValueWithType> result =
       script_bridge->core_side()->CallNativeModule(
           id.value(), module.value(), method.value(), arguments.value(), arguments.size(),
           options.value(), options.size());
@@ -480,6 +480,11 @@ static JSValue js_CallNativeModule(JSContext *ctx, JSValueConst this_val,
           result->value.string->content,
           result->value.string->length);
       ret = JS_NewString(ctx, string.c_str());
+    }
+      break;
+    case ParamsType::BYTEARRAYSTRING: {
+        const char *str = result->value.byteArray->content;
+        ret = JS_NewString(ctx, str);
     }
       break;
     case ParamsType::JSONSTRING: {
