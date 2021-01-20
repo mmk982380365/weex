@@ -471,6 +471,10 @@ static JSValue js_CallNativeModule(JSContext *ctx, JSValueConst this_val,
           options.value(), options.size());
   JSValue ret;
   switch (result->type) {
+    case ParamsType::VOID: {
+      ret = JS_UNDEFINED;
+    }
+      break;
     case ParamsType::DOUBLE: {
       ret = JS_NewInt64(ctx, result->value.doubleValue);
     }
@@ -516,7 +520,9 @@ static JSValue js_CallNativeModule(JSContext *ctx, JSValueConst this_val,
 
     }
       break;
-    default: { ret = JS_UNDEFINED; }
+    default: {
+        ret = JS_UNDEFINED;
+    }
       break;
   }
   return ret;
