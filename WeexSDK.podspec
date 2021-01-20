@@ -46,7 +46,6 @@ Pod::Spec.new do |s|
                     'weex_core/Source/core/parser/action_args_check.*',
                     'weex_core/Source/third_party/IPC',
                     'weex_core/Source/third_party/dependence',
-                    'weex_core/Source/third_party/json11',
                     'weex_core/Source/core/network/android/',
                     'weex_core/Source/include/JavaScriptCore/',
                     'weex_core/Source/include/wtf'
