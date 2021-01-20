@@ -170,6 +170,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private Map<String,String> mContainerInfo;
 
   public boolean isNewFsEnd = false;
+
   private List<JSONObject> componentsInfoExceedGPULimit  = new LinkedList<>();
   private IWXInstanceRecorder mInstanceRecorder;
 
@@ -334,6 +335,11 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void setCustomFontNetworkHandler(CustomFontNetworkHandler customFontNetworkHandler) {
     this.mCustomFontNetworkHandler = customFontNetworkHandler;
   }
+
+  public  List<JSONObject> getComponentsExceedGPULimit(){
+    return null;
+  }
+
 
 
   /**
