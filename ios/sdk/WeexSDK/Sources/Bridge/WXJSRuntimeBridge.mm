@@ -98,7 +98,7 @@ using WeexCore::bridge::script::ScriptSideInSimple;
         }
         VALUE_WITH_TYPE* param = new VALUE_WITH_TYPE();
         param->type = ParamsType::BYTEARRAYJSONSTRING;
-        param->value.byteArray = generatorBytesArray(jsonString.UTF8String, jsonString.length);
+        param->value.byteArray = generatorBytesArray(jsonString.UTF8String, [jsonString lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
         params.push_back(param);
     }
     
