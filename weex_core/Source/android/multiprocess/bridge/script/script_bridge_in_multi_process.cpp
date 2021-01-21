@@ -550,20 +550,15 @@ std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::ExecJSOnInstance(
   auto instanceID = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
   auto script = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
 
-  weex::base::WaitableEvent event;
-  std::unique_ptr<WeexJSResult> retVal;
   ScriptBridgeInMultiProcess::Instance()
       ->js_thread()
       ->message_loop()
       ->PostTask(weex::base::MakeCopyable(
-          [ret = &retVal, id = std::move(instanceID), s = std::move(script), size = script_size,
-              t = type, e = &event] {
-            *ret =
-                Instance()->script_side()->ExecJSOnInstance(id.get(), s.get(), size, t);
-            e->Signal();
+          [id = std::move(instanceID), s = std::move(script), size = script_size,
+              t = type] {
+            Instance()->script_side()->ExecJSOnInstance(id.get(), s.get(), size, t);
           }));
-  event.Wait();
-  return createByteArrayResult(retVal->data.get(), retVal->length);
+  return createByteArrayResult("", 0);
 }
 
 std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::UpdateGlobalConfig(
