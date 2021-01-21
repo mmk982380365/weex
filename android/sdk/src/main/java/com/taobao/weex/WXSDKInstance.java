@@ -1133,7 +1133,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
 
     setJSEngineType(engineType);
-    setRunInMainProcess(WXSDKManager.getInstance().getWXJSEngineManager().runInMainProcess(url));
+//    setRunInMainProcess(WXSDKManager.getInstance().getWXJSEngineManager().runInMainProcess(url));
 
     initInstanceRecorderIfNeed();
     if (mInstanceRecorder != null) {

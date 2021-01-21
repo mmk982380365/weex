@@ -66,10 +66,10 @@ public class DefaultJSEngineManager implements IWXJSEngineManager {
         return new Pair<>(defaultEngine(), url);
     }
 
-    @Override
-    public boolean runInMainProcess(String url) {
-        return false;
-    }
+//    @Override
+//    public boolean runInMainProcess(String url) {
+//        return false;
+//    }
 
     @Override
     public void updateEnableUrlData(String data) {
