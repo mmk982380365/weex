@@ -31,6 +31,8 @@ public interface IWXJSEngineManager {
     // url -> data
     Pair<EngineType, String> engineType(String url);
 
+    boolean runInMainProcess(String url);
+
     //Online Config -> url : engineType
     void updateEnableUrlData(String data);
 

@@ -67,6 +67,11 @@ public class DefaultJSEngineManager implements IWXJSEngineManager {
     }
 
     @Override
+    public boolean runInMainProcess(String url) {
+        return false;
+    }
+
+    @Override
     public void updateEnableUrlData(String data) {
 
     }

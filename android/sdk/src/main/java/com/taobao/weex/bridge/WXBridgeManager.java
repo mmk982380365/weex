@@ -1778,25 +1778,28 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           extraOption = new HashMap<String, Object>();
         }
 
-        if (WXSDKManager.getInstance().getWXJSEngineManager().enableMainProcessScriptSide()
-                && WXSDKManager.getInstance().getWXJSEngineManager().forceAllPageRunInMainProcessScriptSide()) {
-          options.put("run_in_main_process", "true");
-        }
-
         boolean is_pre_init_mode = false;
         if(extraOption instanceof Map) {
-          Object enable_unicorn_weex_render = options.get("enable_unicorn_weex_render");
+
+          String key_enable_unicorn_weex_render = "enable_unicorn_weex_render";
+          String key_run_in_main_process = "run_in_main_process";
+
+          Object enable_unicorn_weex_render = options.get(key_enable_unicorn_weex_render);
           if (enable_unicorn_weex_render != null) {
-            ((Map) extraOption).put("enable_unicorn_weex_render", String.valueOf(enable_unicorn_weex_render));
-            ((Map) extraOption).put("run_in_main_process", String.valueOf(enable_unicorn_weex_render));
+            ((Map) extraOption).put(key_enable_unicorn_weex_render, String.valueOf(enable_unicorn_weex_render));
+            ((Map) extraOption).put(key_run_in_main_process, String.valueOf(enable_unicorn_weex_render));
           }
 
-          Object run_in_main_process = options.get("run_in_main_process");
-          if (run_in_main_process != null) {
-            ((Map) extraOption).put("run_in_main_process", String.valueOf(run_in_main_process));
+          Object run_in_main_process = options.get(key_run_in_main_process);
+          if ((WXSDKManager.getInstance().getWXJSEngineManager().enableMainProcessScriptSide()
+                  && WXSDKManager.getInstance().getWXJSEngineManager().forceAllPageRunInMainProcessScriptSide())
+                  || run_in_main_process != null) {
+            ((Map) extraOption).put(key_run_in_main_process, String.valueOf(run_in_main_process));
           }
 
-          if ("true".equals(String.valueOf(run_in_main_process)) || "true".equals(String.valueOf(enable_unicorn_weex_render))) {
+          if (instance.isRunInMainProcess()
+                  || "true".equals(String.valueOf(run_in_main_process))
+                  || "true".equals(String.valueOf(enable_unicorn_weex_render))) {
             IWXJSEngineManager.EngineType jsEngineType = instance.getJSEngineType();
             if (jsEngineType == IWXJSEngineManager.EngineType.JavaScriptCore) {
               instance.setJSEngineType(IWXJSEngineManager.EngineType.QuickJS);
@@ -1804,12 +1807,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           }
 
           ((Map) extraOption).put("engine_type", instance.getJSEngineType().engineName());
-          if (options != null) {
-            Object value = options.get("pre_init_mode");
-            if (value != null) {
-              is_pre_init_mode = true;
-              ((Map) extraOption).put("pre_init_mode", value);
-            }
+          Object value = options.get("pre_init_mode");
+          if (value != null) {
+            is_pre_init_mode = true;
+            ((Map) extraOption).put("pre_init_mode", value);
           }
         }
 

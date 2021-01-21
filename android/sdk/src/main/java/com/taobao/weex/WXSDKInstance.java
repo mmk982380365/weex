@@ -234,6 +234,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private IWXJSEngineManager.EngineType mJSEngineType = WXSDKEngine.defaultEngineType();
   private IWXJSEngineManager.EngineType mJSEngineTypeFixed = null;
 
+  private boolean runInMainProcess = false;
+
   /**
    * Default Width And Viewport is 750,
    * when screen width change, we adjust viewport to adapter screen change
@@ -264,7 +266,13 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public List<String> getLayerOverFlowListeners() {
     return mLayerOverFlowListeners;
   }
+  public boolean isRunInMainProcess() {
+    return runInMainProcess;
+  }
 
+  public void setRunInMainProcess(boolean runInMainProcess) {
+    this.runInMainProcess = runInMainProcess;
+  }
   public void addLayerOverFlowListener(String ref) {
     if (mLayerOverFlowListeners == null)
       mLayerOverFlowListeners = new ArrayList<>();
@@ -1125,6 +1133,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
 
     setJSEngineType(engineType);
+    setRunInMainProcess(WXSDKManager.getInstance().getWXJSEngineManager().runInMainProcess(url));
 
     initInstanceRecorderIfNeed();
     if (mInstanceRecorder != null) {
@@ -2010,7 +2019,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         public void run() {
           if (mReactorPage != null) {
             mReactorPage.unregisterJSContext();
-
           }
         }
       });
@@ -2029,7 +2037,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       }
 
       mApmForInstance.onEnd();
-
 
       if(mRendered) {
         WXSDKManager.getInstance().destroyInstance(mInstanceId);
