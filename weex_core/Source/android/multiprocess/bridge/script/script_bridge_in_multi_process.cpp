@@ -352,7 +352,7 @@ std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::CallJSOnAppContext(
   const char *instanceId = GetUTF8StringFromIPCArg(arguments, 0);
   const char *func = GetUTF8StringFromIPCArg(arguments, 1);
 
-  std::vector<VALUE_WITH_TYPE *> params;
+  std::vector < VALUE_WITH_TYPE * > params;
   FillVectorOfValueWithType(params, arguments, 2, arguments->getCount());
   auto result =
       Instance()->script_side()->CallJSOnAppContext(instanceId, func, params);
@@ -423,7 +423,7 @@ std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::ExecJS(
   auto namespaceStr = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
   auto func = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
 
-  std::vector<VALUE_WITH_TYPE *> params;
+  std::vector < VALUE_WITH_TYPE * > params;
   FillVectorOfValueWithType(params, arguments, 3, arguments->getCount());
 
   ScriptBridgeInMultiProcess::Instance()
@@ -446,7 +446,7 @@ std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::ExecJSWithResult(
   const char *namespaceStr = GetUTF8StringFromIPCArg(arguments, 1);
   const char *func = GetUTF8StringFromIPCArg(arguments, 2);
 
-  std::vector<VALUE_WITH_TYPE *> params;
+  std::vector < VALUE_WITH_TYPE * > params;
   FillVectorOfValueWithType(params, arguments, 3, arguments->getCount());
   const std::unique_ptr<WeexJSResult> &ptr = Instance()->script_side()->ExecJSWithResult(
       instanceId, namespaceStr, func, params);
@@ -467,7 +467,7 @@ std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::ExecJSWithCallback(
   // pass callback_id before params
   long id = arguments->get<int64_t>(3);
 
-  std::vector<VALUE_WITH_TYPE *> params;
+  std::vector < VALUE_WITH_TYPE * > params;
   FillVectorOfValueWithType(params, arguments, 4, arguments->getCount());
   Instance()->script_side()->ExecJSWithCallback(
       instanceId, namespaceStr, func, params, id);
@@ -564,14 +564,14 @@ std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::ExecJSOnInstance(
 std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::UpdateGlobalConfig(
     IPCArguments *arguments) {
   LOGD("ScriptBridgeInMultiProcess::UpdateGlobalConfig");
-  const char *configString = GetUTF8StringFromIPCArg(arguments, 0);
-  Instance()->script_side()->UpdateGlobalConfig(configString);
-
+  auto configString = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
   ScriptBridgeInMultiProcess::Instance()
       ->js_thread()
       ->message_loop()
       ->PostTask(weex::base::MakeCopyable(
-          [] {}));
+          [config = std::move(configString)] {
+            Instance()->script_side()->UpdateGlobalConfig(config.get());
+          }));
 
   return createVoidResult();
 }
@@ -579,17 +579,19 @@ std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::UpdateGlobalConfig(
 std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::UpdateInitFrameworkParams(
     IPCArguments *arguments) {
   LOGD("ScriptBridgeInMultiProcess::UpdateInitFrameworkParams");
-  const char *key = GetUTF8StringFromIPCArg(arguments, 0);
-  const char *value = GetUTF8StringFromIPCArg(arguments, 1);
-  const char *desc = GetUTF8StringFromIPCArg(arguments, 2);
-  Instance()->script_side()->UpdateInitFrameworkParams(key, value, desc);
-  LOGD("ScriptBridgeInMultiProcess::UpdateInitFrameworkParams End");
+  auto keyStr = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  auto valueStr = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
+  auto descStr = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
 
   ScriptBridgeInMultiProcess::Instance()
       ->js_thread()
       ->message_loop()
       ->PostTask(weex::base::MakeCopyable(
-          [] {}));
+          [key = std::move(keyStr), value = std::move(valueStr), desc = std::move(descStr)] {
+            Instance()->script_side()->UpdateInitFrameworkParams(key.get(),
+                                                                 value.get(),
+                                                                 desc.get());
+          }));
   return createVoidResult();
 }
 
@@ -598,26 +600,29 @@ std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::setLogType(
   LOGD("ScriptBridgeInMultiProcess::setLogType");
   int type = arguments->get<int32_t>(0);
   int perf = arguments->get<int32_t>(1);
-  Instance()->script_side()->SetLogType(type, perf == 1);
+
   ScriptBridgeInMultiProcess::Instance()
       ->js_thread()
       ->message_loop()
       ->PostTask(weex::base::MakeCopyable(
-          [] {}));
+          [t = type, p = perf] {
+            Instance()->script_side()->SetLogType(t, p);
+          }));
   return createVoidResult();
 }
 
 std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::compileQuickJSBin(
     IPCArguments *arguments) {
-  const char *key = GetUTF8StringFromIPCArg(arguments, 0);
-  const char *script = GetUTF8StringFromIPCArg(arguments, 1);
-  Instance()->script_side()->CompileQuickJSBin(key, script);
+  auto keyStr = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
+  auto scriptStr = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
 
   ScriptBridgeInMultiProcess::Instance()
       ->js_thread()
       ->message_loop()
       ->PostTask(weex::base::MakeCopyable(
-          [] {}));
+          [key = std::move(keyStr), script = std::move(scriptStr)] {
+            Instance()->script_side()->CompileQuickJSBin(key.get(), script.get());
+          }));
 
   return createVoidResult();
 }
