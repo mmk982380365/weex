@@ -100,7 +100,6 @@
 #include <stdatomic.h>
 #include <errno.h>
 #endif
-#include <android/log.h>
 enum {
     /* classid tag        */    /* union usage   | properties */
     JS_CLASS_OBJECT = 1,        /* must be first */
@@ -6398,8 +6397,6 @@ static JSValue JS_ThrowError2(JSContext *ctx, JSErrorEnum error_num,
     if (add_backtrace) {
         build_backtrace(ctx, obj, NULL, 0, 0);
     }
-
-    __android_log_print(ANDROID_LOG_ERROR,"dyyLog","dyyLog Quickjs Exception %s",buf);
 
     ret = JS_Throw(ctx, obj);
     return ret;
