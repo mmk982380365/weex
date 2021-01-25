@@ -385,7 +385,7 @@ typedef enum : NSUInteger {
 
     if ([source isKindOfClass:[NSString class]]) {
         WXLogDebug(@"Render source: %@, data:%@", self, [WXUtility JSONString:data]);
-        [self _renderWithMainBundleString:source];
+        [self _renderWithMainBundleString:source binaryData:nil];
     } else if ([source isKindOfClass:[NSData class]]) {
         [self _renderWithData:source];
     }
@@ -509,7 +509,7 @@ typedef enum : NSUInteger {
     _isRendered = YES;
 }
 
-- (void)_renderWithMainBundleString:(NSString *)mainBundleString
+- (void)_renderWithMainBundleString:(NSString *)mainBundleString binaryData:(NSData *)binaryData
 {
     if (!self.instanceId) {
         WXLogError(@"Fail to find instance！");
@@ -619,7 +619,7 @@ typedef enum : NSUInteger {
             WXLogError(@"There is no reactor handler");
         }
     } else {
-        [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString options:dictionary data:_jsData];
+        [[WXSDKManager bridgeMgr] createInstance:self.instanceId template:mainBundleString binaryData:binaryData options:dictionary data:_jsData];
     }
     
     WX_MONITOR_PERF_SET(WXPTBundleSize, [mainBundleString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], self);
@@ -656,7 +656,7 @@ typedef enum : NSUInteger {
 
 - (void)renderWithMainBundleString:(NSNotification*)notification
 {
-    [self _renderWithMainBundleString:_mainBundleString];
+    [self _renderWithMainBundleString:_mainBundleString binaryData:nil];
 }
 
 - (void)_renderWithRequest:(WXResourceRequest *)request options:(NSDictionary *)options data:(id)data;
@@ -744,8 +744,20 @@ typedef enum : NSUInteger {
             return;
         }
 
-        NSString *jsBundleString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if (!jsBundleString) {
+        NSString *jsBundleString = nil;
+        NSData *binaryData = nil;
+        NSString *isQJSBinInHeader = response.allHeaderFields[@"isURPQJSBin"];
+        if ([isQJSBinInHeader isEqualToString:@"true"])
+        {
+            binaryData = data;
+            strongSelf.engineType = @"QJSBin";
+        }
+        else
+        {
+            jsBundleString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            strongSelf.engineType = @"JSC";
+        }
+        if (binaryData.length == 0 && !jsBundleString) {
             WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_STRING_CONVERT, @"data converting to string failed.", strongSelf.pageName)
             [strongSelf.apmInstance setProperty:KEY_PROPERTIES_ERROR_CODE withValue:[@(WX_ERR_JSBUNDLE_STRING_CONVERT) stringValue]];
             return;
@@ -771,7 +783,7 @@ typedef enum : NSUInteger {
         
         [strongSelf.apmInstance onStage:KEY_PAGE_STAGES_DOWN_BUNDLE_END];
         [strongSelf.apmInstance updateExtInfoFromResponseHeader:response.allHeaderFields];
-        [strongSelf _renderWithMainBundleString:jsBundleString];
+        [strongSelf _renderWithMainBundleString:jsBundleString binaryData:binaryData];
         [WXMonitor performanceFinishWithState:DebugAfterRequest instance:strongSelf];
     };
     

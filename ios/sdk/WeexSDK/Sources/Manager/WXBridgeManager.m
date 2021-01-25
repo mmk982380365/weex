@@ -309,18 +309,20 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
         }
         WXBridgeContext* context = sdkInstance.useBackupJsThread ? weakSelf.backupBridgeCtx :  weakSelf.bridgeCtx;
         [context createInstance:instance
-                                  template:temp
-                                   options:newOptions
-                                      data:data];
+                       template:temp
+                     binaryData:nil
+                        options:newOptions
+                           data:data];
     }, instance);
 }
 
 - (void)createInstance:(NSString *)instance
               template:(NSString *)temp
+            binaryData:(NSData *)binaryData
                options:(NSDictionary *)options
                   data:(id)data
 {
-    if (!instance || !temp) return;
+    if (!instance || (!temp && !binaryData)) return;
     if (![self.instanceIdStack containsObject:instance]) {
         if ([options[@"RENDER_IN_ORDER"] boolValue]) {
             [self.instanceIdStack addObject:instance];
@@ -337,9 +339,10 @@ void WXPerformBlockSyncOnBridgeThreadForInstance(void (^block) (void), NSString*
     WXPerformBlockOnBridgeThreadForInstance(^(){
         WXBridgeContext* context = sdkInstance.useBackupJsThread ? weakSelf.backupBridgeCtx :  weakSelf.bridgeCtx;
         [context createInstance:instance
-                                  template:temp
-                                   options:options
-                                      data:data];
+                       template:temp
+                     binaryData:binaryData
+                        options:options
+                           data:data];
     }, instance);
 }
 

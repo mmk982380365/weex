@@ -474,6 +474,7 @@ _Pragma("clang diagnostic pop") \
 
 - (void)createInstance:(NSString *)instanceIdString
               template:(NSString *)jsBundleString
+            binaryData:(NSData *)binaryData
                options:(NSDictionary *)options
                   data:(id)data
 {

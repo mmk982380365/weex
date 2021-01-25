@@ -70,6 +70,7 @@ extern "C" {
  **/
 - (void)createInstance:(NSString *)instance
               template:(NSString *)temp
+            binaryData:(NSData *)binaryData
                options:(NSDictionary * _Nullable)options
                   data:(id _Nullable)data;
 

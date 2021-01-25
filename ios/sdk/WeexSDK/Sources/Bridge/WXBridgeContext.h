@@ -40,6 +40,7 @@
  **/
 - (void)createInstance:(NSString *)instance
               template:(NSString *)temp
+            binaryData:(NSData *)binaryData
                options:(NSDictionary *)options
                   data:(id)data;
 
