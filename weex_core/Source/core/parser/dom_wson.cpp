@@ -323,11 +323,7 @@ namespace WeexCore {
         }
         wson_parser parser(data);
         RenderObject* res;
-        if (WXCoreEnvironment::getInstance()->isUseRunTimeApi()){
-            res=  parserWson2RenderObjectNew(parser,nullptr,0,pageId,reserveStyles);
-        } else{
-            res= parserWson2RenderObject(parser, nullptr, 0, pageId,reserveStyles);
-        }
+        res= parserWson2RenderObject(parser, nullptr, 0, pageId,reserveStyles);
         return res;
     }
 
