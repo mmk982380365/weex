@@ -147,6 +147,7 @@ using WeexCore::bridge::script::ScriptSideInSimple;
 
 - (void)createInstance:(NSString *)instanceId
                 script:(NSString *)script
+            binaryData:(NSData *)data
                   opts:(NSDictionary *)opts
               initData:(NSArray *)initData
             extendsApi:(NSString *)extendsApi
@@ -171,15 +172,30 @@ using WeexCore::bridge::script::ScriptSideInSimple;
             }
         });
     }];
-    script_side_->CreateInstance(instanceId.UTF8String,
-                                 "",
-                                 script.UTF8String,
-                                 (int)[script lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
-                                 optsString.UTF8String,
-                                 initDataString.UTF8String,
-                                 extendsApi.UTF8String,
-                                 *result
-                                 );
+    if (script)
+    {
+        script_side_->CreateInstance(instanceId.UTF8String,
+                                     "",
+                                     script.UTF8String,
+                                     (int)[script lengthOfBytesUsingEncoding:NSUTF8StringEncoding],
+                                     optsString.UTF8String,
+                                     initDataString.UTF8String,
+                                     extendsApi.UTF8String,
+                                     *result
+                                     );
+    }
+    else if (data)
+    {
+        script_side_->CreateInstance(instanceId.UTF8String,
+                                     "",
+                                     (const char *)data.bytes,
+                                     (int)[data length],
+                                     optsString.UTF8String,
+                                     initDataString.UTF8String,
+                                     extendsApi.UTF8String,
+                                     *result
+                                     );
+    }
 }
 
 - (void)registerCallAddElement:(nonnull WXJSCallAddElement)callAddElement {

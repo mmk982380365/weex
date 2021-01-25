@@ -505,6 +505,10 @@ _Pragma("clang diagnostic pop") \
     WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instanceIdString]);
 
     NSString * bundleType = [self _pareJSBundleType:instanceIdString jsBundleString:jsBundleString]; // bundleType can be Vue, Rax and the new framework.
+    if (binaryData)
+    {
+        bundleType = @"Rax";//这里缓存不会回传 bundle string 了，没有什么好的判断方式，先暂时写死 rax
+    }
     if (bundleType) {
         [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_BUNDLE_TYPE withValue:bundleType];
         NSMutableDictionary *newOptions = [options mutableCopy];
@@ -547,10 +551,11 @@ _Pragma("clang diagnostic pop") \
             };
             __weak typeof(self) weakSelf = self;
             [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
-            if ([[self jsBridgeForInstance:sdkInstance] respondsToSelector:@selector(createInstance:script:opts:initData:extendsApi:params:)])
+            if ([[self jsBridgeForInstance:sdkInstance] respondsToSelector:@selector(createInstance:script:binaryData:opts:initData:extendsApi:params:)])
             {
                 [[self jsBridgeForInstance:sdkInstance] createInstance:sdkInstance.instanceId
                                                                 script:jsBundleString
+                                                            binaryData:binaryData
                                                                   opts:immutableOptions
                                                               initData:data?:@[]
                                                             extendsApi:raxAPIScript
@@ -615,9 +620,9 @@ _Pragma("clang diagnostic pop") \
         [sdkInstance.apmInstance setProperty:KEY_PAGE_PROPERTIES_BUNDLE_TYPE withValue:@"other"];
         [sdkInstance.apmInstance onStage:KEY_PAGE_STAGES_LOAD_BUNDLE_END];
         if (data){
-            args = @[instanceIdString, jsBundleString, options ?: @{}, data];
+            args = @[instanceIdString ?: @"", jsBundleString ?: @"", options ?: @{}, data];
         } else {
-            args = @[instanceIdString, jsBundleString, options ?: @{}];
+            args = @[instanceIdString ?: @"", jsBundleString ?: @"", options ?: @{}];
         }
         NSDictionary* funcInfo = @{
                                    @"func":@"createInstance",

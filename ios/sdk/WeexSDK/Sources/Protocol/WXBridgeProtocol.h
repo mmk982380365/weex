@@ -186,6 +186,7 @@ typedef NSInteger(^WXJSCallUpdateComponentData)(NSString *instanceId, NSString *
 
 - (void)createInstance:(NSString *)instanceId
                 script:(NSString *)script
+            binaryData:(NSData *)data
                   opts:(NSDictionary *)opts
               initData:(NSArray *)initData
             extendsApi:(NSString *)extendsApi
