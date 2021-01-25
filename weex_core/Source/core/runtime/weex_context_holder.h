@@ -67,12 +67,14 @@ class WeexContextHolder {
     if (iterator != weex_context_map.end()) {
       WeexContext *weexContext = weex_context_map[page_id];
       this->weex_context_map.erase(page_id);
-      if (page_id.length() > 0) {
+#if OS_ANDROID
+        if (page_id.length() > 0) {
         int index = atoi(page_id.c_str());
         if (index > 0 && index % 20 == 0) {
           weexContext->RunGC(js_engine_vm_);
         }
       }
+#endif
       delete weexContext;
       weexContext = nullptr;
     }
