@@ -344,25 +344,20 @@ static std::unique_ptr<IPCResult> FunctionCallCreateBody(
 
 static std::unique_ptr<IPCResult> HandleCallAddElement(
     IPCArguments *arguments) {
-  auto arg1 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 0));
-  auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
-  auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
-  auto arg4 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 3));
-  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
-      weex::base::MakeCopyable([page_id = std::move(arg1),
-                                   parent_ref = std::move(arg2),
-                                   dom_str = std::move(arg3),
-                                   index_cstr = std::move(arg4)] {
-        const char *index_char =
-            index_cstr.get() == nullptr ? "\0" : index_cstr.get();
-        int index = atoi(index_char);
-        if (page_id.get() != nullptr && parent_ref.get() != nullptr &&
-            dom_str.get() != nullptr && index >= -1) {
-          WeexCoreManager::Instance()->script_bridge()->core_side()->AddElement(
-              page_id.get(), parent_ref.get(), dom_str.get(),
-              strlen(dom_str.get()), index_char);
-        }
-      }));
+  if (arguments->getCount() < 4) {
+    return createInt32Result(0);
+  }
+
+  const IPCByteArray *page_id = arguments->getByteArray(0);
+  const IPCByteArray *parent_ref = arguments->getByteArray(1);
+  const IPCByteArray *dom_str = arguments->getByteArray(2);
+  const IPCByteArray *index = arguments->getByteArray(3);
+  WeexCoreManager::Instance()->script_bridge()->core_side()->AddElement(
+      page_id->content,
+      parent_ref->content,
+      dom_str->content,
+      dom_str->length,
+      index->content);
   return createInt32Result(0);
 }
 
