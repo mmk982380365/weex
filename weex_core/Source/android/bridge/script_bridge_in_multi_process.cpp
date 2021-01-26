@@ -384,7 +384,10 @@ static std::unique_ptr<IPCResult> FunctionCallMoveElement(
   auto arg2 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 1));
   auto arg3 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 2));
   auto arg4 = std::unique_ptr<char[]>(getArumentAsCStr(arguments, 3));
-  int index = atoi(arg4.get());
+
+  const char *indexChar = (arg4 == nullptr ? "\0" : arg4.get());
+
+  int index = atoi(indexChar);
   if (arg1 == nullptr || arg2 == nullptr || arg3 == nullptr ||
       arg4 == nullptr || index < -1)
     return createInt32Result(0);
