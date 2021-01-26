@@ -5,17 +5,6 @@
 //  Created by openthread on 8/12/20.
 //
 
-#import <Foundation/Foundation.h>
+#include <AliQuickJS/quickjs.h>
 
-NS_ASSUME_NONNULL_BEGIN
-
-@interface WXTimeOutModule : NSObject
-
-+ (instancetype)sharedInstance;
-
-+ (void)delayTrigger:(void(^)(void))func interval:(double)interval;
-
-@end
-
-
-NS_ASSUME_NONNULL_END
+void WXQJSSetTimeOut(JSContext *ctx, JSValue func, JSValue this_val, int32_t interval_ms);

@@ -29,6 +29,12 @@
 #include "core/manager/weex_core_manager.h"
 #include "core/render/manager/render_manager.h"
 
+#ifdef OS_IOS
+extern "C"{
+#include "WXTimeOutModule.h"
+}
+#endif
+
 #define countof(x) (sizeof(x) / sizeof((x)[0]))
 
 static WeexCore::ScriptBridge *bridge(JSContext *ctx) {
@@ -139,6 +145,11 @@ static JSValue js_PostMessage(JSContext *ctx, JSValueConst this_val, int argc,
 static JSValue addNativeTimer(JSContext *ctx, JSValueConst this_val,
                               int argc, JSValueConst *argv, bool repeat);
 
+#ifdef OS_IOS
+static JSValue js_SetTimeout(JSContext *ctx, JSValueConst this_val,
+                             int argc, JSValueConst *argv);
+#endif
+
 static JSValue js_SetNativeTimeout(JSContext *ctx, JSValueConst this_val,
                                    int argc, JSValueConst *argv);
 
@@ -240,7 +251,7 @@ void WeexContextQJS::initGlobalContextFunctions() {
       JS_CFUNC_DEF("callNativeComponent", 5, js_CallNativeComponent),
       JS_CFUNC_DEF("callAddElement", 5, js_CallAddElement),
 #if OS_IOS
-      JS_CFUNC_DEF("setTimeout", 2, js_SetNativeTimeout),
+      JS_CFUNC_DEF("setTimeout", 2, js_SetTimeout),
 #endif
       JS_CFUNC_DEF("setTimeoutNative", 2, js_SetTimeoutNative),
       JS_CFUNC_DEF("nativeLog", 5, js_NativeLog),
@@ -908,6 +919,26 @@ static JSValue addNativeTimer(JSContext *ctx, JSValueConst this_val,
   setNativeTimer(funcId, timeoutNumber, this_val, weexContext, repeat);
   return JS_NewInt32(ctx, funcId);
 }
+
+#ifdef OS_IOS
+static JSValue js_SetTimeout(JSContext *ctx, JSValueConst this_val,
+                                   int argc, JSValueConst *argv)
+{
+    if (argc >= 2)
+    {
+        if (JS_IsFunction(ctx, argv[0]) &&
+            JS_IsNumber(argv[1]))
+        {
+            int32_t interval_ms;
+            JS_ToInt32(ctx, &interval_ms, argv[1]);
+            JSValue func = JS_DupValue(ctx, argv[0]);
+            
+            WXQJSSetTimeOut(ctx, func, this_val, interval_ms);
+        }
+    }
+    return JS_UNDEFINED;
+}
+#endif
 
 static JSValue js_SetNativeTimeout(JSContext *ctx, JSValueConst this_val,
                                    int argc, JSValueConst *argv) {
