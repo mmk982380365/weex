@@ -56,6 +56,7 @@ using WeexCore::bridge::script::ScriptSideInSimple;
 {
     if (self = [super init]) {
         script_side_ = WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side();
+        WeexRuntimeManager::Instance()->set_engine_type(ENGINE_QJS);
     }
     return self;
 }
