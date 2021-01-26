@@ -97,6 +97,8 @@
 		42CFDA0325B3405D00AC7AA0 /* time_point.cc in Sources */ = {isa = PBXBuildFile; fileRef = 42CFDA0125B3405D00AC7AA0 /* time_point.cc */; };
 		42CFDA0425B3405D00AC7AA0 /* time_point.h in Headers */ = {isa = PBXBuildFile; fileRef = 42CFDA0225B3405D00AC7AA0 /* time_point.h */; };
 		42CFDA0A25B3408500AC7AA0 /* time_unit.h in Headers */ = {isa = PBXBuildFile; fileRef = 42CFDA0925B3408500AC7AA0 /* time_unit.h */; };
+		42D6EF7E25C00ED00061CDD2 /* WXTimeOutModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 42D6EF7C25C00ED00061CDD2 /* WXTimeOutModule.m */; };
+		42D6EF7F25C00ED00061CDD2 /* WXTimeOutModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 42D6EF7D25C00ED00061CDD2 /* WXTimeOutModule.h */; };
 		4532670A213FC84A00DAA620 /* WXDisplayLinkManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 45326708213FC84900DAA620 /* WXDisplayLinkManager.h */; };
 		4532670B213FC84A00DAA620 /* WXDisplayLinkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 45326709213FC84900DAA620 /* WXDisplayLinkManager.m */; };
 		4532670C213FCF2300DAA620 /* WXDisplayLinkManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 45326708213FC84900DAA620 /* WXDisplayLinkManager.h */; };
@@ -1043,6 +1045,8 @@
 		42CFDA0125B3405D00AC7AA0 /* time_point.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = time_point.cc; sourceTree = "<group>"; };
 		42CFDA0225B3405D00AC7AA0 /* time_point.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = time_point.h; sourceTree = "<group>"; };
 		42CFDA0925B3408500AC7AA0 /* time_unit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = time_unit.h; sourceTree = "<group>"; };
+		42D6EF7C25C00ED00061CDD2 /* WXTimeOutModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXTimeOutModule.m; sourceTree = "<group>"; };
+		42D6EF7D25C00ED00061CDD2 /* WXTimeOutModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXTimeOutModule.h; sourceTree = "<group>"; };
 		45326708213FC84900DAA620 /* WXDisplayLinkManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXDisplayLinkManager.h; sourceTree = "<group>"; };
 		45326709213FC84900DAA620 /* WXDisplayLinkManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WXDisplayLinkManager.m; sourceTree = "<group>"; };
 		453F374B219A76A500A03F1D /* WXConvertUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WXConvertUtility.h; sourceTree = "<group>"; };
@@ -2131,6 +2135,8 @@
 				D334510B1D3E19B80083598A /* WXCanvasModule.m */,
 				74BB5FB71DFEE81A004FC3DF /* WXMetaModule.h */,
 				74BB5FB81DFEE81A004FC3DF /* WXMetaModule.m */,
+				42D6EF7D25C00ED00061CDD2 /* WXTimeOutModule.h */,
+				42D6EF7C25C00ED00061CDD2 /* WXTimeOutModule.m */,
 			);
 			path = Module;
 			sourceTree = "<group>";
@@ -2685,6 +2691,7 @@
 				59CE27E81CC387DB000BE37A /* WXEmbedComponent.h in Headers */,
 				B8D66C0F21255730003960BD /* core_side_in_platform.h in Headers */,
 				B8D66C9121255730003960BD /* render_factory_interface.h in Headers */,
+				42D6EF7F25C00ED00061CDD2 /* WXTimeOutModule.h in Headers */,
 				42ABAD9925B07ACE0017AD6E /* weex_context_holder.h in Headers */,
 				DCE2CF9B1F46D4220021BDC4 /* WXVoiceOverModule.h in Headers */,
 				453F3756219A76CA00A03F1D /* default_request_handler.h in Headers */,
@@ -3374,6 +3381,7 @@
 				ED053502207F4DEB007B4568 /* JSContext+Weex.m in Sources */,
 				2A60CE9D1C91733E00857B9F /* WXSwitchComponent.mm in Sources */,
 				744D61111E49979000B624B3 /* WXFooterComponent.m in Sources */,
+				42D6EF7E25C00ED00061CDD2 /* WXTimeOutModule.m in Sources */,
 				B8D66C0721255730003960BD /* core_environment.cpp in Sources */,
 				745B2D6F1E5A8E1E0092D38A /* WXRecyclerUpdateController.m in Sources */,
 				BDB1129B2459D71E008492F9 /* reactor_page.cpp in Sources */,
