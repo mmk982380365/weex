@@ -543,8 +543,6 @@ static JSValue js_CallAddElement(JSContext *ctx, JSValueConst this_val,
   WeexContextQJS::JSParams dom_str(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
   WeexContextQJS::JSParams index_str(ctx, argv[3], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
 
-  LOGE("dyyLog addElement %d", dom_str.size());
-
   script_bridge->core_side()->AddElement(
       id.value(), parent_ref.value(),
       dom_str.value(), dom_str.size(), index_str.value());

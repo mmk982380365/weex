@@ -72,6 +72,9 @@ class WeexContextQJS : public WeexContext {
 
     ~JSParams();
     const char *value() {
+      if (value_ == nullptr) {
+        return "";
+      }
       return value_;
     }
 
