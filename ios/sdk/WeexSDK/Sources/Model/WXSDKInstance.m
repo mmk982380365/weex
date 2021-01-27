@@ -755,7 +755,7 @@ typedef enum : NSUInteger {
         else
         {
             jsBundleString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            strongSelf.engineType = @"JSC";
+            //不指定 engine type，由外部 orange 配置决定
         }
         if (binaryData.length == 0 && !jsBundleString) {
             WX_MONITOR_FAIL_ON_PAGE(WXMTJSDownload, WX_ERR_JSBUNDLE_STRING_CONVERT, @"data converting to string failed.", strongSelf.pageName)
