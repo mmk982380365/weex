@@ -554,8 +554,6 @@ static JSValue js_CallAddElement(JSContext *ctx, JSValueConst this_val,
   WeexContextQJS::JSParams dom_str(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_WSON);
   WeexContextQJS::JSParams index_str(ctx, argv[3], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
 
-  LOGE("dyyLog addElement %d", dom_str.size());
-
   script_bridge->core_side()->AddElement(
       id.value(), parent_ref.value(),
       dom_str.value(), dom_str.size(), index_str.value());
@@ -731,10 +729,13 @@ static JSValue js_CallMoveElement(JSContext *ctx, JSValueConst this_val,
   WeexContextQJS::JSParams ref(ctx, argv[1], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
   WeexContextQJS::JSParams parent_ref(ctx, argv[2], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
   WeexContextQJS::JSParams index(ctx, argv[3], WeexContextQJS::JSParams::PARAMS_TYPE_JSON);
+
+  const char *indexChar = (index.value() == nullptr ? "\0" : index.value());
+
   script_bridge->core_side()->MoveElement(id.value(),
                                           ref.value(),
                                           parent_ref.value(),
-                                          atoi(index.value()));
+                                          atoi(indexChar));
 
   return JS_NewInt32(ctx, 0);
 }

@@ -129,7 +129,6 @@ WeexRuntimeManager::InstanceEngineData *WeexRuntimeManager::create_instance(std:
     }
   }
 
-  LOGE("dyyLog createInstance in mainProcess %d", run_in_main_process_mode);
   return create_instance(page_id,
                          engine_type,
                          run_in_main_process_mode,
