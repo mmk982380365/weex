@@ -315,8 +315,6 @@ std::unique_ptr<WeexJSResult> WeexRuntimeQJS::exeJSWithResult(const std::string 
 
   if (JS_IsException(funcVal)) {
     ReportException(thisContext, "exeJSWithResult", instanceId, script_bridge());
-  } else if (JS_IsException(ret)) {
-    ReportException(thisContext, "exeJSWithResult", instanceId, script_bridge());
   } else {
     convertJSValueToWeexJSResult(thisContext, ret, returnResult.get());
   }
