@@ -29,6 +29,7 @@ import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXJSEngineManager;
+import com.taobao.weex.adapter.IWXJSCLoader;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
@@ -584,6 +585,10 @@ public class WXSDKEngine implements Serializable {
 
   public static void setActivityNavBarSetter(IActivityNavBarSetter activityNavBarSetter) {
     WXSDKManager.getInstance().setActivityNavBarSetter(activityNavBarSetter);
+  }
+
+  public static void setJSCLoader(IWXJSCLoader jscLoader){
+    WXSDKManager.getInstance().setJSCLoader(jscLoader);
   }
 
   public static void reload(final Context context,String framework, boolean remoteDebug) {

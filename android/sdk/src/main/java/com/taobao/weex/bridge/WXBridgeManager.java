@@ -46,6 +46,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.adapter.IWXJSEngineManager;
+import com.taobao.weex.adapter.IWXJSCLoader;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
 import com.taobao.weex.adapter.IWXJscProcessManager;
@@ -2239,6 +2240,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     logDetail.name("initFramework");
     logDetail.taskStart();
     if (WXSDKEngine.isSoInitialized() && !isJSFrameworkInit()) {
+      IWXJSCLoader jscLoader = WXSDKManager.getInstance().getJSCLoader();
+      if(jscLoader != null && !jscLoader.isLoaded()){
+        jscLoader.doLoad();
+      }
       sInitFrameWorkTimeOrigin = System.currentTimeMillis();
       if (TextUtils.isEmpty(framework)) {
         // if (WXEnvironment.isApkDebugable()) {

@@ -33,6 +33,7 @@ import com.taobao.weex.adapter.ICrashInfoReporter;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXFoldDeviceAdapter;
 import com.taobao.weex.adapter.IWXJSEngineManager;
+import com.taobao.weex.adapter.IWXJSCLoader;
 import com.taobao.weex.adapter.IWXJscProcessManager;
 import com.taobao.weex.adapter.ITracingAdapter;
 import com.taobao.weex.adapter.IWXAccessibilityRoleAdapter;
@@ -580,12 +581,22 @@ public class WXSDKManager {
 
   private INavigator mNavigator;
 
+  private IWXJSCLoader mJSCLoader;
+
   public INavigator getNavigator() {
     return mNavigator;
   }
 
   public void setNavigator(INavigator mNavigator) {
     this.mNavigator = mNavigator;
+  }
+
+  public void setJSCLoader(IWXJSCLoader mJSCLoad){
+    this.mJSCLoader = mJSCLoad;
+  }
+
+  public IWXJSCLoader getJSCLoader(){
+    return mJSCLoader;
   }
 
   public IWXFoldDeviceAdapter getWXFoldDeviceAdapter() {
