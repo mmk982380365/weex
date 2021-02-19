@@ -148,9 +148,17 @@ public class WXStreamModule extends WXModule {
     String body = optionsObj.getString("body");
     String type = optionsObj.getString("type");
     int timeout = optionsObj.getIntValue("timeout");
+    String enableReferer = optionsObj.getString("referer");
 
     WXSDKInstance wxsdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
     if (wxsdkInstance != null) {
+      if(enableReferer != null && enableReferer.equals("true")){
+        Uri uri = Uri.parse(wxsdkInstance.getBundleUrl());
+        if(headers == null){
+          headers = new JSONObject();
+        }
+        headers.put("Referer",uri.getScheme() + "://" + uri.getAuthority() + uri.getPath());
+      }
       if (wxsdkInstance.getStreamNetworkHandler() != null) {
         String localUrl = wxsdkInstance.getStreamNetworkHandler().fetchLocal(url);
         if (!TextUtils.isEmpty(localUrl)) {
