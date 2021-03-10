@@ -127,18 +127,218 @@ int WeexRuntimeQJS::initFramework(const std::string &script,
 int WeexRuntimeQJS::initAppFramework(const std::string &instanceId,
                                      const std::string &appFramework,
                                      std::vector<std::pair<std::string, std::string>> params) {
-  return 0;
+// Create Worker Context
+  LOGE("Weex jsserver initAppFramework %s", instanceId.c_str());
+  auto holder = getLightAppContextHolder(instanceId);
+  if (holder == nullptr) {
+    holder = new WeexContextHolder(engine_vm<JSRuntime>(),
+                                   new WeexContextQJS(script_bridge()),
+                                   this->is_multi_process());
+    LOGE("Weex jsserver initAppFramework pHolder == null and id %s", instanceId.c_str());
+    bindLightAppContextHolder(instanceId, holder);
+  }
+
+  holder->initFromParams(params, true);
+
+  auto appWorkerObjectHolder = getLightAppContextHolder(instanceId);
+  if (appWorkerObjectHolder == nullptr) {
+    return static_cast<int32_t>(false);
+  }
+  auto
+      *thisContext = weex_js_global_context<JSContext>();
+
+  auto ret = JS_Eval(thisContext, appFramework.c_str(), appFramework.length(),
+                     "(app framework)", JS_EVAL_TYPE_GLOBAL);
+  finish_quickjs_PendingJob(engine_vm<JSRuntime>());
+
+  int retValue = 0;
+  if (JS_IsException(ret)) {
+    ReportException(thisContext, "exeJsService", "", script_bridge());
+    retValue = 0;
+  } else {
+    retValue = 1;
+  }
+  JS_FreeValue(thisContext, ret);
+  return retValue;
 }
+
 int WeexRuntimeQJS::createAppContext(const std::string &instanceId, const std::string &jsBundle) {
-  return 0;
+  if (instanceId.empty()) {
+    return static_cast<int32_t>(false);
+  } else {
+    std::string pre = "";
+    if (instanceId.length() > 6) {
+      pre = instanceId.substr(0, 7);
+    }
+
+    std::string get_context_fun_name;
+    std::string final_instanceId;
+    if (pre == "plugin_") {
+      LOGE("createAppContext __get_plugin_context__");
+      get_context_fun_name = "__get_plugin_context__";
+      final_instanceId = instanceId.substr(7, instanceId.length() - 7);
+    } else {
+      LOGE("createAppContext __get_app_context__");
+      get_context_fun_name = "__get_app_context__";
+      final_instanceId = instanceId;
+    }
+
+    // new a global object
+    // --------------------------------------------------
+    auto appWorkerObjectHolder = getLightAppContextHolder(final_instanceId);
+    if (appWorkerObjectHolder == nullptr) {
+      return static_cast<int32_t>(false);
+    }
+
+    auto *thisContext = weex_js_global_context<JSContext>();
+    if (thisContext == nullptr) {
+      return static_cast<int32_t>(false);
+    }
+
+
+    JSValue createInstanceContextFunc =
+            JS_GetProperty(thisContext, JS_GetGlobalObject(thisContext),
+                           JS_NewAtom(thisContext, "createInstanceContext"));
+
+    JSValue ret = JS_Call(thisContext, createInstanceContextFunc,
+                          JS_GetGlobalObject(thisContext), 0, NULL);
+    finish_quickjs_PendingJob(engine_vm<JSRuntime>());
+
+    JS_FreeValue(thisContext, createInstanceContextFunc);
+
+    if (JS_IsException(ret)) {
+      const JSValue &exception = JS_GetException(thisContext);
+      const char *string = JS_ToCString(thisContext, exception);
+      JS_FreeValue(thisContext, ret);
+      LOGE("createInstance jscall get error ret: %s", string);
+      return 0;
+    }
+
+    JSPropertyEnum *tab_atom;
+    uint32_t tab_atom_count;
+    if (JS_GetOwnPropertyNames(
+            thisContext, &tab_atom, &tab_atom_count, ret,
+            JS_GPN_STRING_MASK | JS_GPN_SYMBOL_MASK)) {
+      return 0;
+    }
+    // --------------------------------------------------
+
+    ret = JS_Eval(thisContext, jsBundle.c_str(), jsBundle.length(),
+                       "weex createAppContext", JS_EVAL_TYPE_GLOBAL);
+    finish_quickjs_PendingJob(engine_vm<JSRuntime>());
+
+    int retValue = 0;
+    if (JS_IsException(ret)) {
+      ReportException(thisContext, "exeJsService", "", script_bridge());
+      retValue = 0;
+    } else {
+      retValue = 1;
+    }
+    JS_FreeValue(thisContext, ret);
+    return retValue;
+  }
+  return static_cast<int32_t>(true);
 }
 int WeexRuntimeQJS::callJSOnAppContext(const std::string &instanceId,
                                        const std::string &func,
                                        std::vector<VALUE_WITH_TYPE *> &params) {
-  return 0;
+  if (instanceId == "") {
+    return static_cast<int32_t>(false);
+  } else {
+    auto appWorkerObjectHolder = getLightAppContextHolder(instanceId);
+    if (appWorkerObjectHolder == nullptr) {
+      return static_cast<int32_t>(false);
+    }
+
+    auto *thisContext = weex_js_global_context<JSContext>();
+    if (thisContext == NULL) {
+      return static_cast<int32_t>(false);
+    }
+
+    auto thisObject = JS_GetGlobalObject(thisContext);
+
+    const int size = (int) params.size();
+    JSValue jsValueArray[size];
+    for (size_t i = 0; i < size; i++) {
+      VALUE_WITH_TYPE *paramsObject = params[i];
+      switch (paramsObject->type) {
+        case ParamsType::DOUBLE:
+          jsValueArray[i] = JS_NewFloat64(thisContext, paramsObject->value.doubleValue);
+          break;
+        case ParamsType::STRING: {
+          auto string2String = weex::base::weexString2stdString(paramsObject->value.string);
+          jsValueArray[i] = JS_NewString(thisContext, string2String.c_str());
+        }
+          break;
+        case ParamsType::JSONSTRING: {
+          auto string2String = weex::base::weexString2stdString(paramsObject->value.string);
+          jsValueArray[i] = JS_ParseJSON(thisContext, string2String.c_str(),
+                                         string2String.length(), "t");
+        }
+          break;
+        case ParamsType::BYTEARRAYJSONSTRING:{
+            const WeexByteArray *array = paramsObject->value.byteArray;
+            const char *string = array->content;
+            jsValueArray[i] = JS_ParseJSON(thisContext, string, array->length, "t");
+        }
+          break;
+        case ParamsType::BYTEARRAY: {
+  #if OS_ANDROID
+          const WeexByteArray *array = paramsObject->value.byteArray;
+          wson_parser w(array->content, array->length);
+          auto string2String = w.toStringUTF8();
+          auto jsvalue = JS_ParseJSON(thisContext, string2String.c_str(),
+                                      string2String.length(), "t");
+          jsValueArray[i] = jsvalue;
+  #endif
+        }
+          break;
+          {
+            default:jsValueArray[i] = JS_UNDEFINED;
+            break;
+          }
+      }
+    }
+
+    auto ret = JS_Call(thisContext,
+                       JS_GetProperty(thisContext, thisObject,
+                                      JS_NewAtom(thisContext, func.c_str())),
+                       thisObject, size, jsValueArray);
+    if (JS_IsException(ret)) {
+      ReportException(thisContext, "callJSOnAppContext", instanceId, script_bridge());
+    }
+    finish_quickjs_PendingJob(engine_vm<JSRuntime>());
+
+    for (JSValue arg : jsValueArray) {
+      JS_FreeValue(thisContext, arg);
+    }
+
+    JS_FreeValue(thisContext, ret);
+    return 1;
+
+    
+  }
 }
 int WeexRuntimeQJS::destroyAppContext(const std::string &instanceId) {
-  return 0;
+auto appWorkerObjectHolder = getLightAppContextHolder(instanceId);
+  if (appWorkerObjectHolder == nullptr) {
+    return static_cast<int32_t>(false);
+  }
+
+  LOGE("Weex jsserver IPCJSMsg::DESTORYAPPCONTEXT end1 %s", instanceId.c_str());
+  std::map<std::string, WeexContext *>::iterator it_find_instance;
+
+  auto *globalContext = weex_js_global_context<JSContext>();
+  if (globalContext != nullptr) {
+    // LOGE("Weex jsserver IPCJSMsg::DESTORYAPPCONTEXT mAppInstanceGlobalObjectMap donnot contain and return");
+    appWorkerObjectHolder->erase(instanceId);
+  }
+
+  unbindLightAppContextHolder(instanceId);
+  delete appWorkerObjectHolder;
+  appWorkerObjectHolder = nullptr;
+
+  return static_cast<int32_t>(true);
 }
 int WeexRuntimeQJS::exeJsService(const std::string &source) {
   auto *globalContext = weex_js_global_context<JSContext>();
