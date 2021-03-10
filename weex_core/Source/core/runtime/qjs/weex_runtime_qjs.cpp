@@ -171,21 +171,21 @@ int WeexRuntimeQJS::createAppContext(const std::string &instanceId, const std::s
       pre = instanceId.substr(0, 7);
     }
 
-    std::string get_context_fun_name;
-    std::string final_instanceId;
+    std::string getContextFunctionName;
+    std::string finalInstanceId;
     if (pre == "plugin_") {
       LOGE("createAppContext __get_plugin_context__");
-      get_context_fun_name = "__get_plugin_context__";
-      final_instanceId = instanceId.substr(7, instanceId.length() - 7);
+      getContextFunctionName = "__get_plugin_context__";
+      finalInstanceId = instanceId.substr(7, instanceId.length() - 7);
     } else {
       LOGE("createAppContext __get_app_context__");
-      get_context_fun_name = "__get_app_context__";
-      final_instanceId = instanceId;
+      getContextFunctionName = "__get_app_context__";
+      finalInstanceId = instanceId;
     }
 
     // new a global object
     // --------------------------------------------------
-    auto appWorkerObjectHolder = getLightAppContextHolder(final_instanceId);
+    auto appWorkerObjectHolder = getLightAppContextHolder(finalInstanceId);
     if (appWorkerObjectHolder == nullptr) {
       return static_cast<int32_t>(false);
     }
@@ -198,7 +198,7 @@ int WeexRuntimeQJS::createAppContext(const std::string &instanceId, const std::s
 
     JSValue createInstanceContextFunc =
             JS_GetProperty(thisContext, JS_GetGlobalObject(thisContext),
-                           JS_NewAtom(thisContext, "createInstanceContext"));
+                           JS_NewAtom(thisContext, getContextFunctionName.c_str()));
 
     JSValue ret = JS_Call(thisContext, createInstanceContextFunc,
                           JS_GetGlobalObject(thisContext), 0, NULL);
