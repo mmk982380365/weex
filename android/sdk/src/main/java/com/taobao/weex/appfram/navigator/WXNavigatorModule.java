@@ -51,6 +51,34 @@ public class WXNavigatorModule extends WXModule {
     private final static String WEEX = "com.taobao.android.intent.category.WEEX";
     private final static String URL = "url";
 
+    public final static String POP_ANIMATION_TYPE = "popAnimationType";
+
+    @JSMethod(uiThread = false)
+    public void setPopAnimation(JSONObject options, JSCallback success, JSCallback failure) {
+        if (options != null) {
+            String type = options.getString("type");
+            JSCallback callback = success;
+            JSONObject result = new JSONObject();
+            if (!TextUtils.isEmpty(type)) {
+                if (mWXSDKInstance != null) {
+                    mWXSDKInstance.setContainerInfo(POP_ANIMATION_TYPE, type);
+                    result.put(CALLBACK_RESULT, MSG_SUCCESS);
+                } else {
+                    result.put(CALLBACK_RESULT, MSG_FAILED);
+                    callback = failure;
+                }
+            } else {
+                result.put(CALLBACK_RESULT, MSG_PARAM_ERR);
+                result.put(CALLBACK_MESSAGE, "The parameter is empty.");
+                callback = failure;
+            }
+
+            if (callback != null) {
+                callback.invoke(result);
+            }
+        }
+    }
+
     @JSMethod(uiThread = true)
     public void open(JSONObject options, JSCallback success, JSCallback failure) {
         if (options != null) {
