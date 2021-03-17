@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Store value of component style
@@ -61,11 +62,12 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   private ArrayMap<String, Object>  mBindingStyle;
 
   public WXStyle(){
-    mStyles = new ArrayMap<>();
+    mStyles = new ConcurrentHashMap<>();
   }
 
   public WXStyle(Map<String, Object> styles){
-    this.mStyles = styles;
+    this();
+    this.putAll(styles);
     processPesudoClasses(this.mStyles);
   }
 
