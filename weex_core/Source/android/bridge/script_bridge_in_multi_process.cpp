@@ -24,6 +24,7 @@
 #include "android/base/string/string_utils.h"
 #include "android/bridge/multi_process_initializer.h"
 #include "android/bridge/script/script_side_in_multi_process.h"
+#include "android/bridge/script/qjs/script_side_in_qjs.h"
 #include "android/multiprocess/weex_js_connection.h"
 #include "android/utils/ipc_string_result.h"
 #include "base/android/log_utils.h"
@@ -33,6 +34,7 @@
 #include "base/android/jni/android_jni.h"
 #include "core/bridge/script/core_side_in_script.h"
 #include "core/manager/weex_core_manager.h"
+#include "core/config/core_environment.h"
 #include "third_party/IPC/IPCArguments.h"
 #include "third_party/IPC/IPCHandler.h"
 #include "third_party/IPC/IPCMessageJS.h"
@@ -684,6 +686,9 @@ ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
     set_script_side_main_process_only(new bridge::script::ScriptSideInSimple(true));
   }
   set_core_side(new CoreSideInScript);
+  if (WXCoreEnvironment::getInstance()->EnableQJSRuntime()) {
+    set_script_side_qjs(new WeexCore::bridge::script::ScriptSideInQJS);
+  }
   std::unique_ptr<MultiProcessAndSoInitializer> initializer(
       new MultiProcessAndSoInitializer);
 

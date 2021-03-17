@@ -621,6 +621,12 @@ std::vector<WeexCore::ScriptBridge::ScriptSide *> CoreSideInPlatform::GetScriptS
           ->script_bridge()
           ->script_side();
 
+  bool put_script_side_qjs = false;
+  // 全局是否开启 qjs runtime，未开启必为 nullptr
+  ScriptBridge::ScriptSide *script_side_qjs = WeexCoreManager::Instance()
+      ->script_bridge()
+      ->script_side_qjs();
+
   bool put_script_side_main_process_only = false;
   ScriptBridge::ScriptSide *script_side_main_process =
       WeexCoreManager::Instance()
@@ -629,10 +635,20 @@ std::vector<WeexCore::ScriptBridge::ScriptSide *> CoreSideInPlatform::GetScriptS
   if (page_id == nullptr || strlen(page_id) == 0) {
     put_script_side = true;
     put_script_side_main_process_only = true;
+    put_script_side_qjs = true;
   } else {
     put_script_side_main_process_only = script_side_main_process != nullptr &&
         WeexRuntimeManager::Instance()->is_force_in_main_process(page_id);
     put_script_side = !put_script_side_main_process_only;
+
+    // 当前页面是否走 weex2.0 渲染
+    std::string enable_unicorn_weex_render_cfg =
+        RenderManager::GetInstance()->getPageArgument(std::string(page_id),
+                                                      "enable_unicorn_weex_render");
+    bool enable_unicorn_weex_render = enable_unicorn_weex_render_cfg == "true";
+    put_script_side_qjs = script_side_qjs != nullptr &&
+        enable_unicorn_weex_render && WeexCoreManager::Instance()->unicorn_weex_action_ptr() > 0;
+    put_script_side = !put_script_side_qjs;
   }
 
   if (put_script_side && script_side != nullptr) {
@@ -641,6 +657,10 @@ std::vector<WeexCore::ScriptBridge::ScriptSide *> CoreSideInPlatform::GetScriptS
 
   if (put_script_side_main_process_only && script_side_main_process != nullptr) {
     ret.push_back(script_side_main_process);
+  }
+
+  if (put_script_side_qjs && script_side_qjs != nullptr) {
+    ret.push_back(script_side_qjs);
   }
   return ret;
 }

@@ -18,17 +18,12 @@
  */
 package com.taobao.weex.performance;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
-
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
+
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -40,6 +35,12 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class WXInstanceApm {
 
@@ -179,6 +180,9 @@ public class WXInstanceApm {
         IApmGenerator generator = WXSDKManager.getInstance().getApmGenerater();
         if (null != generator) {
             apmInstance = generator.generateApmInstance(WEEX_PAGE_TOPIC);
+            if (apmInstance != null) {
+                apmInstance.onStart(mInstanceId);
+            }
         }
     }
 
@@ -400,9 +404,9 @@ public class WXInstanceApm {
             apmInstance.onEnd();
         }
         mEnd = true;
-        if (WXEnvironment.isApkDebugable()){
+//        if (WXEnvironment.isApkDebugable()){
             printLog();
-        }
+//        }
     }
 
     public void doDelayCollectData(){
@@ -422,14 +426,19 @@ public class WXInstanceApm {
         Long endDownLoad = stageMap.get(KEY_PAGE_STAGES_DOWN_BUNDLE_END);
         Long interaction = stageMap.get(KEY_PAGE_STAGES_INTERACTION);
         Long containerReady = stageMap.get(KEY_PAGE_STAGES_CONTAINER_READY);
+        Long endLoadBundle = stageMap.get(KEY_PAGE_STAGES_LOAD_BUNDLE_END);
+        Long endExecuteBundle = stageMap.get(KEY_PAGE_STAGES_END_EXCUTE_BUNDLE);
         if (null != endDownLoad && null != startDownLoad){
-            WXLogUtils.d("test->", "downLoadTime: "+ (endDownLoad - startDownLoad));
+            WXLogUtils.e("test->", "downLoadTime: "+ (endDownLoad - startDownLoad));
+        }
+        if (null != endLoadBundle && null != endExecuteBundle) {
+            WXLogUtils.e("test->", "bundleExecuteTime:" + (endExecuteBundle - endLoadBundle));
         }
         if (null != endDownLoad && null != interaction){
-            WXLogUtils.d("test->", "renderTime: "+ (interaction - endDownLoad));
+            WXLogUtils.e("test->", "renderTime: "+ (interaction - endDownLoad));
         }
         if (null != containerReady && null !=interaction){
-            WXLogUtils.d("test->", "showTime: "+ (interaction - containerReady));
+            WXLogUtils.e("test->", "showTime: "+ (interaction - containerReady));
         }
 
     }

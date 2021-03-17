@@ -45,20 +45,49 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXConfigAdapter;
-import com.taobao.weex.adapter.IWXJSEngineManager;
 import com.taobao.weex.adapter.IWXJSCLoader;
+import com.taobao.weex.adapter.IWXJSEngineManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
 import com.taobao.weex.adapter.IWXJscProcessManager;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
-import com.taobao.weex.common.*;
+import com.taobao.weex.common.IWXBridge;
+import com.taobao.weex.common.IWXDebugConfig;
+import com.taobao.weex.common.WXConfig;
+import com.taobao.weex.common.WXErrorCode;
+import com.taobao.weex.common.WXException;
+import com.taobao.weex.common.WXJSBridgeMsgType;
+import com.taobao.weex.common.WXJSExceptionInfo;
+import com.taobao.weex.common.WXRefreshData;
+import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.common.WXRuntimeException;
+import com.taobao.weex.common.WXThread;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.performance.WXStateRecord;
 import com.taobao.weex.ui.WXComponentRegistry;
-import com.taobao.weex.ui.WXRenderManager;
-import com.taobao.weex.ui.action.*;
+import com.taobao.weex.ui.action.ActionReloadPage;
+import com.taobao.weex.ui.action.BasicGraphicAction;
+import com.taobao.weex.ui.action.GraphicActionAddChildToRichtext;
+import com.taobao.weex.ui.action.GraphicActionAddElement;
+import com.taobao.weex.ui.action.GraphicActionAddEvent;
+import com.taobao.weex.ui.action.GraphicActionAppendTreeCreateFinish;
+import com.taobao.weex.ui.action.GraphicActionCreateBody;
+import com.taobao.weex.ui.action.GraphicActionCreateFinish;
+import com.taobao.weex.ui.action.GraphicActionLayout;
+import com.taobao.weex.ui.action.GraphicActionMoveElement;
+import com.taobao.weex.ui.action.GraphicActionRefreshFinish;
+import com.taobao.weex.ui.action.GraphicActionRemoveChildFromRichtext;
+import com.taobao.weex.ui.action.GraphicActionRemoveElement;
+import com.taobao.weex.ui.action.GraphicActionRemoveEvent;
+import com.taobao.weex.ui.action.GraphicActionRenderSuccess;
+import com.taobao.weex.ui.action.GraphicActionUpdateAttr;
+import com.taobao.weex.ui.action.GraphicActionUpdateRichtextAttr;
+import com.taobao.weex.ui.action.GraphicActionUpdateRichtextStyle;
+import com.taobao.weex.ui.action.GraphicActionUpdateStyle;
+import com.taobao.weex.ui.action.GraphicPosition;
+import com.taobao.weex.ui.action.GraphicSize;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.module.WXDomModule;
 import com.taobao.weex.utils.FeatureSwitches;
@@ -83,7 +112,16 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -1754,6 +1792,22 @@ public class WXBridgeManager implements Callback, BactchExecutor {
            options.remove("extraOption");
         }
 
+        Object enable_unicorn_weex_render = options.get("enable_unicorn_weex_render");
+        if (enable_unicorn_weex_render != null) {
+          if(extraOption == null) {
+            extraOption = new HashMap<String, Object>();
+          }
+          ((Map) extraOption).put("enable_unicorn_weex_render", String.valueOf(enable_unicorn_weex_render));
+          Object enable_qjs_bin_cache = options.get("enable_qjs_bin_cache");
+          if (enable_qjs_bin_cache != null) {
+            ((Map) extraOption).put("enable_qjs_bin_cache", String.valueOf(enable_qjs_bin_cache));
+          }
+          Object qjs_bin_cache_key = options.get("qjs_bin_cache_key");
+          if (qjs_bin_cache_key != null) {
+            ((Map) extraOption).put("qjs_bin_cache_key", String.valueOf(qjs_bin_cache_key));
+          }
+        }
+
         if(extraOption == null) {
           extraOption = new HashMap<String, Object>();
         }
@@ -1761,15 +1815,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         boolean is_pre_init_mode = false;
         if(extraOption instanceof Map) {
 
-          String key_enable_unicorn_weex_render = "enable_unicorn_weex_render";
           String key_run_in_main_process = "run_in_main_process";
-
-          Object enable_unicorn_weex_render = options.get(key_enable_unicorn_weex_render);
-          if (enable_unicorn_weex_render != null) {
-            ((Map) extraOption).put(key_enable_unicorn_weex_render, String.valueOf(enable_unicorn_weex_render));
-            ((Map) extraOption).put(key_run_in_main_process, String.valueOf(enable_unicorn_weex_render));
-          }
-
           Object run_in_main_process = options.get(key_run_in_main_process);
           if ((WXSDKManager.getInstance().getWXJSEngineManager().enableMainProcessScriptSide()
                   && WXSDKManager.getInstance().getWXJSEngineManager().forceAllPageRunInMainProcessScriptSide())
@@ -1778,8 +1824,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           }
 
           if (instance.isRunInMainProcess()
-                  || "true".equals(String.valueOf(run_in_main_process))
-                  || "true".equals(String.valueOf(enable_unicorn_weex_render))) {
+                  || "true".equals(String.valueOf(run_in_main_process))) {
             IWXJSEngineManager.EngineType jsEngineType = instance.getJSEngineType();
             if (jsEngineType == IWXJSEngineManager.EngineType.JavaScriptCore) {
               instance.setJSEngineType(IWXJSEngineManager.EngineType.QuickJS);
@@ -1870,8 +1915,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           args = Arrays.copyOf(args,args.length+1);
           args[args.length -1 ] = scriptType;
 
-          int ret = invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
           instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
+          int ret = invokeCreateInstanceContext(instance.getInstanceId(), null, "createInstanceContext", args, false);
           if(ret == 0) {
             String err = "[WXBridgeManager] invokeCreateInstance : " + instance.getTemplateInfo();
             WXLogUtils.e("Instance " + instance.getInstanceId() + "Render error : " + err);
@@ -1893,8 +1938,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           WXLogUtils.d("Instance " + instance.getInstanceId() + "Did not Render in SandBox Mode And Render Type is "
                 + type + " Render Strategy is " + instance.getRenderStrategy());
           instance.getApmForInstance().onStage("StartInvokeExecJSBadBundleType");
-          invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           instance.getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_END);
+          invokeExecJS(instance.getInstanceId(), null, METHOD_CREATE_INSTANCE, args, false);
           return;
         }
       } catch (Throwable e) {
@@ -2470,6 +2515,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     customOptions.put("engine_type", String.valueOf(jsEngineType));
 
     WXLogUtils.e("weex","enableAlarmSignal:"+enableAlarmSignal);
+
+    String enableQJSRuntime = config.get("enable_qjs_runtime");
+    if (!TextUtils.isEmpty(enableQJSRuntime)) {
+      customOptions.put("enable_qjs_runtime", enableQJSRuntime);
+    }
 
     wxParams.setOptions(customOptions);
     wxParams.setNeedInitV8(WXSDKManager.getInstance().needInitV8());

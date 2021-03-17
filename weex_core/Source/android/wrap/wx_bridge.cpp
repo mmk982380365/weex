@@ -701,7 +701,7 @@ static jint CreateInstanceContext(JNIEnv *env, jobject jcaller,
         byte_code_mode = true;
       }
 
-      if (key == "enable_unicorn_weex_render") {
+      if (key == "enable_unicorn_weex_render" || key == "enable_qjs_bin_cache" || key == "qjs_bin_cache_key") {
         RenderManager::GetInstance()->setPageArgument(std::string(scoped_id.getChars()), key, string);
       }
 

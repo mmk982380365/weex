@@ -868,7 +868,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     return isPreDownLoad;
   }
 
-  public void onInstanceReady(){
+  public void onInstanceReady() {
     WXLogUtils.d("test->","onInstanceReady");
     mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_CONTAINER_READY);
     if (!isPreInit && !isPreDownLoad){

@@ -480,6 +480,8 @@ std::vector<std::pair<std::string, std::string>> initFromParam(
             WeexCoreManager::Instance()->set_unicorn_weex_action_ptr(std::stol(value));
           } else if (key == "enableMainProcessScriptSide") {
             WeexRuntimeManager::Instance()->set_enable_main_process_script_side(value == "true");
+          } else if (key == "enable_qjs_runtime") {
+            WXCoreEnvironment::getInstance()->EnableQJSRuntime(value == "true");
           }
         }
       }

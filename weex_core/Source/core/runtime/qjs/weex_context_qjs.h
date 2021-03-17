@@ -26,7 +26,7 @@
 #include "base/log_defines.h"
 extern "C" {
 #if OS_ANDROID
-#include "quickjs.h"
+#include "include/qjs/quickjs.h"
 #elif OS_IOS
 #import <AliQuickJS/quickjs.h>
 #endif

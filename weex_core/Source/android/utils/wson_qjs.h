@@ -25,7 +25,7 @@
 #include <string>
 #include "wson/wson.h"
 extern "C" {
-#include "quickjs.h"
+#include "include/qjs/quickjs.h"
 }
 
 wson_buffer *toWsonBuffer(JSContext *ctx, JSValue value);

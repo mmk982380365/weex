@@ -109,6 +109,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wson)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/json11)
 #link_directories(${LOCAL_LIBRARIES_DIR})
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/qjs/libs/${ANDROID_ABI})
 
 SET(FINAL_ADD_LIBRARY
         ${COMMON_SRCS}
@@ -120,7 +121,7 @@ if (ANDROID)
     ## add_subdirectory for subdirectory has a CMakeLists.txt
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/IPC)
     # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/android/jsengine)
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/quickjs)
+    # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/quickjs)
     ## include_directories for include head file
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/IPC)
 
@@ -195,6 +196,7 @@ if (ANDROID)
             android/bridge/platform/android_side.cpp
             android/bridge/platform/android_bridge.cpp
             android/bridge/script/script_side_in_multi_process.cpp
+            android/bridge/script/qjs/script_side_in_qjs.cpp
             android/bridge/script_bridge_in_multi_process.cpp
             android/bridge/script_bridge_in_simple.cpp
             core/bridge/script/script_side_in_simple.cpp

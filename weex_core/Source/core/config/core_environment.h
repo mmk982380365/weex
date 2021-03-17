@@ -58,7 +58,15 @@ namespace WeexCore {
 
     bool mUseRuntimeApi;
 
+    bool mEnableQJSRuntime;
+
   public:
+    bool EnableQJSRuntime() const {
+      return mEnableQJSRuntime;
+    }
+    void EnableQJSRuntime(bool enable) {
+      mEnableQJSRuntime = enable;
+    }
 
     bool SetPlatform(std::string platformName);
 
