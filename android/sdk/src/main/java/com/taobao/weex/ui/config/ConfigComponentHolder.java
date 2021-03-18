@@ -140,9 +140,9 @@ public class ConfigComponentHolder implements IFComponentHolder {
                 arrays = new String[methods.size()];
                 methods.toArray(arrays);
             }
-            if(WXEnvironment.isApkDebugable()){
-                WXLogUtils.d(TAG, "resolve component " + type + " className " + className +  " methods " + methods);
-            }
+//            if(WXEnvironment.isApkDebugable()){
+//                WXLogUtils.d(TAG, "resolve component " + type + " className " + className +  " methods " + methods);
+//            }
             return new ConfigComponentHolder(type, appendTree, className, arrays);
         }catch (Exception e){
             WXLogUtils.e(TAG, e);

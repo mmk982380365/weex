@@ -45,10 +45,6 @@ public class WXComponentFactory {
     if (instance == null || TextUtils.isEmpty(basicComponentData.mComponentType)) {
       return null;
     }
-    if ("gcanvas".equals(basicComponentData.mComponentType)){
-      updateUseGCanvasModuleStatus(instance);
-    }
-
     IFComponentHolder holder = WXComponentRegistry.getComponent(basicComponentData.mComponentType);
     if (holder == null) {
       if (WXEnvironment.isApkDebugable()) {
@@ -75,13 +71,4 @@ public class WXComponentFactory {
     return null;
   }
 
-  private static void updateUseGCanvasModuleStatus(WXSDKInstance instance){
-    try{
-      instance.getApmForInstance().addProperty(WXInstanceApm.KEY_PAGE_PROPERTIES_USE_GCANVAS_MODULE,1);
-      instance.getApmForInstance().addProperty(WXInstanceApm.KEY_PAGE_PROPERTIES_CANVAS_MODULE_NAME,"gcanvas");
-      WXLogUtils.e("find gcanvas component was created");
-    }catch (Exception e){
-      e.printStackTrace();
-    }
-  }
 }

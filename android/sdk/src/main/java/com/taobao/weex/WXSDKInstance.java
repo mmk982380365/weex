@@ -1827,9 +1827,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         performance.args=getBundleUrl();
         mUserTrackAdapter.commit(mContext,null,IWXUserTrackAdapter.JS_BRIDGE,performance,getUserTrackParams());
       }
-      if (WXEnvironment.isApkDebugable()){
-        WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
-      }
+//      if (WXEnvironment.isApkDebugable()){
+//        WXLogUtils.d(WXLogUtils.WEEX_PERF_TAG, mWXPerformance.toString());
+//      }
     }
     if(WXEnvironment.isPerf()){
       WXLogUtils.e("weex_perf",mWXPerformance.getPerfData());

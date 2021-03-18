@@ -369,9 +369,9 @@ public class WXRecyclerTemplateList extends WXVContainer<BounceRecyclerView> imp
                 if(getHostView() != null && getHostView().getRecyclerViewBaseAdapter() != null){
                     getHostView().getRecyclerViewBaseAdapter().notifyDataSetChanged();
                 }
-                if(WXEnvironment.isOpenDebugLog() && ENABLE_TRACE_LOG){
-                    WXLogUtils.d(TAG, "WXTemplateList notifyDataSetChanged");
-                }
+//                if(WXEnvironment.isOpenDebugLog() && ENABLE_TRACE_LOG){
+//                    WXLogUtils.d(TAG, "WXTemplateList notifyDataSetChanged");
+//                }
             }
         };
         return bounceRecyclerView;

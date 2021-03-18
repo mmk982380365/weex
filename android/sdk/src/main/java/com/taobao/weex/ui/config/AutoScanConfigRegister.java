@@ -102,9 +102,9 @@ public class AutoScanConfigRegister {
                         if (TextUtils.isEmpty(config)) {
                             continue;
                         }
-                        if (WXEnvironment.isApkDebugable()) {
-                            WXLogUtils.d(TAG, configFile + " find config " + config);
-                        }
+//                        if (WXEnvironment.isApkDebugable()) {
+//                            WXLogUtils.d(TAG, configFile + " find config " + config);
+//                        }
                         JSONObject object = JSON.parseObject(config);
                         if (object.containsKey("modules")) {
                             JSONArray array = object.getJSONArray("modules");
