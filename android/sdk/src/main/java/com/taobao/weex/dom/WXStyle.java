@@ -371,12 +371,20 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     if(addBindingStyleIfStatement(key, value)){
       return null;
     }
+    if(key == null || value == null){
+      return null;
+    }
     return mStyles.put(key,value);
   }
 
   @Override
   public void putAll(Map<? extends String, ?> map) {
-    this.mStyles.putAll(map);
+    for (Map.Entry<? extends String, ?> e : map.entrySet()){
+      if(e.getKey() == null || e.getValue() == null){
+        continue;
+      }
+      mStyles.put(e.getKey(), e.getValue());
+    }
   }
 
   /**
@@ -385,7 +393,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
    * @param byPesudo
    */
   public void putAll(Map<? extends String, ?> map, boolean byPesudo) {
-    this.mStyles.putAll(map);
+    putAll(map);
     if (!byPesudo) {
       processPesudoClasses(map);
     }
@@ -443,7 +451,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     }
 
     if (tempMap != null && !tempMap.isEmpty()) {
-      this.mStyles.putAll(tempMap);
+      this.putAll(tempMap);
     }
   }
 
@@ -531,7 +539,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   @Override
   public WXStyle clone(){
     WXStyle style = new WXStyle();
-    style.mStyles.putAll(this.mStyles);
+    style.putAll(this.mStyles);
     if(mBindingStyle != null){
       style.mBindingStyle = new ArrayMap<>(mBindingStyle);
     }

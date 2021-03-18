@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
@@ -72,17 +71,15 @@ public class WXAttr implements Map<String, Object>,Cloneable {
   private WXStatement mStatement;
 
   public WXAttr(){
-    attr = new ConcurrentHashMap<>();
+    attr = new HashMap<>();
   }
 
   public WXAttr(@NonNull Map<String,Object> standardMap) {
-    this();
-    attr.putAll(standardMap);
+    attr = standardMap;
   }
 
   public WXAttr(@NonNull Map<String,Object> standardMap, int extra){
-    this();
-    attr.putAll(standardMap);
+    attr = standardMap;
   }
 
   public static String getPrefix(Map<String, Object> attr) {
