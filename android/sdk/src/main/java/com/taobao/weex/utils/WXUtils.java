@@ -594,4 +594,8 @@ public class WXUtils {
     return  sInterval + SystemClock.uptimeMillis();
   }
 
+  public static long getFixUnixTime(long interval) {
+    return  sInterval + interval;
+  }
+
 }

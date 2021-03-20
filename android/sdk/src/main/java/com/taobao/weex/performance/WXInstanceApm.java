@@ -79,6 +79,8 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STAGES_NEW_FSRENDER = "wxNewFsRender";
     public static final String KEY_PAGE_STAGES_END_EXCUTE_BUNDLE = "wxEndExecuteBundle";
     public static final String KEY_PAGE_STAGES_INTERACTION = "wxInteraction";
+    // wxInteractionTimeStamp 这个字段目前用于与 Weex2.0 wxInteraction 做对照，有可能存在不准确的情况
+    public static final String KEY_PAGE_STAGES_INTERACTION_TM = "wxInteractionTimeStamp";
     public static final String KEY_PAGE_STAGES_DESTROY = "wxDestroy";
     public static final String WEEX_FIRSTSCREENPAINT = "Weex_firstScreenPaint";
 
@@ -428,6 +430,7 @@ public class WXInstanceApm {
         Long containerReady = stageMap.get(KEY_PAGE_STAGES_CONTAINER_READY);
         Long endLoadBundle = stageMap.get(KEY_PAGE_STAGES_LOAD_BUNDLE_END);
         Long endExecuteBundle = stageMap.get(KEY_PAGE_STAGES_END_EXCUTE_BUNDLE);
+        Long interactionTM = stageMap.get(KEY_PAGE_STAGES_INTERACTION_TM);
         if (null != endDownLoad && null != startDownLoad){
             WXLogUtils.e("test->", "downLoadTime: "+ (endDownLoad - startDownLoad));
         }
@@ -440,7 +443,9 @@ public class WXInstanceApm {
         if (null != containerReady && null !=interaction){
             WXLogUtils.e("test->", "showTime: "+ (interaction - containerReady));
         }
-
+        if (null != containerReady && null !=interactionTM){
+            WXLogUtils.e("test->", "showTimeTM: "+ (interactionTM - containerReady));
+        }
     }
 
     public void arriveNewFsRenderTime(){
