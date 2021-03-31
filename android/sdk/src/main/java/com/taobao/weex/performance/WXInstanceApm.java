@@ -83,6 +83,10 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STAGES_INTERACTION_TM = "wxInteractionTimeStamp";
     public static final String KEY_PAGE_STAGES_DESTROY = "wxDestroy";
     public static final String WEEX_FIRSTSCREENPAINT = "Weex_firstScreenPaint";
+    public static final String KEY_PAGE_STAGES_UNICORN_ENGINE_INIT_START = "wxUnicornEngineInitStart";
+    public static final String KEY_PAGE_STAGES_UNICORN_ENGINE_INIT_END = "wxUnicornEngineInitEnd";
+    public static final String KEY_PAGE_STAGES_CREATE_INSTANCE_START = "wxCreateInstanceStart";
+    public static final String KEY_PAGE_STAGES_CREATE_INSTANCE_END = "wxCreateInstanceEnd";
 
     //Custom preprocessing start, called when activity created or other time. Called by other activity
     public static final String KEY_PAGE_STAGES_CUSTOM_PREPROCESS_START = "wxCustomPreprocessStart";
@@ -129,7 +133,8 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STATS_COMPONENT_CREATE_COST = "wxComponentCost";
     public static final String KEY_PAGE_STATS_EXECUTE_JS_CALLBACK_COST = "wxExecJsCallBack";
     public static final String KEY_PAGE_STATS_LAYOUT_TIME = "wxLayoutTime";
-
+    public static final String KEY_PAGE_STATS_SCRIPT_USE_QJS_BYTE_CODE = "wxScriptUseQJSByteCode";
+    public static final String KEY_PAGE_STATS_API_USE_QJS_BYTE_CODE = "wxApiUseQJSByteCode";
 
     /************** value *****************/
     public static final String VALUE_ERROR_CODE_DEFAULT = "0";
@@ -431,6 +436,8 @@ public class WXInstanceApm {
         Long endLoadBundle = stageMap.get(KEY_PAGE_STAGES_LOAD_BUNDLE_END);
         Long endExecuteBundle = stageMap.get(KEY_PAGE_STAGES_END_EXCUTE_BUNDLE);
         Long interactionTM = stageMap.get(KEY_PAGE_STAGES_INTERACTION_TM);
+        Double scriptUseQJSByteCode = recordStatsMap.get(KEY_PAGE_STATS_SCRIPT_USE_QJS_BYTE_CODE);
+        Double apiUseQJSByteCode = recordStatsMap.get(KEY_PAGE_STATS_API_USE_QJS_BYTE_CODE);
         if (null != endDownLoad && null != startDownLoad){
             WXLogUtils.e("test->", "downLoadTime: "+ (endDownLoad - startDownLoad));
         }
@@ -445,6 +452,12 @@ public class WXInstanceApm {
         }
         if (null != containerReady && null !=interactionTM){
             WXLogUtils.e("test->", "showTimeTM: "+ (interactionTM - containerReady));
+        }
+        if (scriptUseQJSByteCode != null) {
+            WXLogUtils.e("test->", "scriptUseQJSByteCode: "+ scriptUseQJSByteCode);
+        }
+        if (apiUseQJSByteCode != null) {
+            WXLogUtils.e("test->", "apiUseQJSByteCode: "+ apiUseQJSByteCode);
         }
     }
 

@@ -510,6 +510,10 @@ int ScriptSideInQJS::CreateInstance(const char *instanceId,
                                     const char *extendsApi,
                                     std::vector<std::pair<std::string, std::string>> params) {
   LOGE("create instance start");
+  WeexCoreManager::Instance()
+      ->script_bridge()
+      ->core_side()
+      ->CallNative(instanceId, "CreateInstance", "CreateInstance");
   auto* globalContext = global_context_;
   JSContext* thisContext;
   if (instanceId == nullptr || strlen(instanceId) == 0) {
@@ -571,15 +575,25 @@ int ScriptSideInQJS::CreateInstance(const char *instanceId,
     JS_FreeValue(thisContext, thisObject);
   }
 
+  bool api_use_qjs_byte_code = false;
   if (extendsApi != nullptr && strlen(extendsApi) > 0) {
     LOGE("create instance execute extends api in qjs start %d", strlen(extendsApi));
-    if (!ExecuteExtendsScript(thisContext, instanceId, extendsApi)) {
+    if (!ExecuteExtendsScript(thisContext, instanceId, extendsApi, api_use_qjs_byte_code)) {
       return 0;
     }
   }
+  WeexCoreManager::Instance()
+      ->script_bridge()
+      ->core_side()
+      ->CallNative(instanceId, "ApiUseQJSByteCode", api_use_qjs_byte_code ? "1" : "0");
 
   LOGE("create instance execute script in qjs start");
-  int retValue = ExecuteScript(thisContext, instanceId, script);
+  bool script_use_qjs_byte_code = false;
+  int retValue = ExecuteScript(thisContext, instanceId, script, script_use_qjs_byte_code);
+  WeexCoreManager::Instance()
+      ->script_bridge()
+      ->core_side()
+      ->CallNative(instanceId, "ScriptUseQJSByteCode", script_use_qjs_byte_code ? "1" : "0");
   LOGE("create instance execute script in qjs end");
   WeexCoreManager::Instance()
       ->script_bridge()
@@ -658,8 +672,10 @@ void ScriptSideInQJS::SetLogType(const int logLevel, const bool isPerf) {
 
 int ScriptSideInQJS::ExecuteExtendsScript(JSContext* ctx,
                                           const char* instance_id,
-                                          const char* script) {
+                                          const char* script,
+                                          bool& use_qjs_byte_code) {
   int ret_value = 0;
+  use_qjs_byte_code = false;
   JSValue value;
   if (!cached_extends_qjs_byte_code_) {
     value = JS_Eval(ctx, script,
@@ -683,6 +699,7 @@ int ScriptSideInQJS::ExecuteExtendsScript(JSContext* ctx,
     if (JS_IsException(value)) {
       ReportException(ctx, "ExecuteExtendsScript_JS_EvalBinary", instance_id, bridge());
     } else {
+      use_qjs_byte_code = true;
       ret_value = 1;
     }
   }
@@ -692,7 +709,9 @@ int ScriptSideInQJS::ExecuteExtendsScript(JSContext* ctx,
 
 int ScriptSideInQJS::ExecuteScript(JSContext* ctx,
                                    const char* instance_id,
-                                   const char* script) {
+                                   const char* script,
+                                   bool& use_qjs_byte_code) {
+  use_qjs_byte_code = false;
   std::string enable_qjs_bin_cache_cfg =
       RenderManager::GetInstance()->getPageArgument(std::string(instance_id),
                                                     "enable_qjs_bin_cache");
@@ -716,6 +735,7 @@ int ScriptSideInQJS::ExecuteScript(JSContext* ctx,
         ReportException(ctx, "ExecuteScript_JS_EvalBinary", instance_id, bridge());
       } else {
         ret_value = 1;
+        use_qjs_byte_code = true;
       }
       LOGE("execute script in qjs eval binary end");
     }

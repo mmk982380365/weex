@@ -282,6 +282,30 @@ public class WXBridge implements IWXBridge {
       return IWXBridge.INSTANCE_RENDERING;
     }
 
+    if (tasks != null && "CreateInstance".equals(new String(tasks))) {
+      WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if(sdkInstance != null) {
+        sdkInstance.createInstanceStart();
+      }
+      return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    if (tasks != null && "ScriptUseQJSByteCode".equals(new String(tasks))) {
+      WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if(sdkInstance != null) {
+        sdkInstance.addStatusScriptUseQJSByteCode(callback);
+      }
+      return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    if (tasks != null && "ApiUseQJSByteCode".equals(new String(tasks))) {
+      WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if(sdkInstance != null) {
+        sdkInstance.addStatusApiUseQJSByteCode(callback);
+      }
+      return IWXBridge.INSTANCE_RENDERING;
+    }
+
     return callNative(instanceId, (JSONArray) JSON.parseArray(new String(tasks)), callback);
   }
 

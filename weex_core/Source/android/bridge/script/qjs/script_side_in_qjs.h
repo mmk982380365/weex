@@ -136,10 +136,12 @@ class ScriptSideInQJS : public ScriptBridge::ScriptSide {
                                            WeexJSResult* jsResult);
   int ExecuteScript(JSContext* ctx,
                     const char* instance_id,
-                    const char* script);
+                    const char* script,
+                    bool& use_qjs_byte_code);
   int ExecuteExtendsScript(JSContext* ctx,
-                    const char* instance_id,
-                    const char* script);
+                           const char* instance_id,
+                           const char* script,
+                           bool& use_qjs_byte_code);
 
   std::vector<std::pair<std::string, std::string>> init_framework_args_;
   std::map<const char*, JSContext*> js_context_map_;

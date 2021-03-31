@@ -629,6 +629,19 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     WXLogUtils.d("createInstanceFuncHeartBeat: " + mInstanceId);
     this.createInstanceHeartBeat = true;
     getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_END_EXCUTE_BUNDLE);
+    getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_CREATE_INSTANCE_END);
+  }
+
+  public void createInstanceStart() {
+    getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_CREATE_INSTANCE_START);
+  }
+
+  public void addStatusScriptUseQJSByteCode(String useByteCode) {
+    getApmForInstance().addStats(WXInstanceApm.KEY_PAGE_STATS_SCRIPT_USE_QJS_BYTE_CODE, Double.parseDouble(useByteCode));
+  }
+
+  public void addStatusApiUseQJSByteCode(String useByteCode) {
+    getApmForInstance().addStats(WXInstanceApm.KEY_PAGE_STATS_API_USE_QJS_BYTE_CODE, Double.parseDouble(useByteCode));
   }
 
   public void addOnInstanceVisibleListener(OnInstanceVisibleListener l){
