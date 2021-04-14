@@ -35,6 +35,7 @@ import com.taobao.weex.performance.WXInstanceApm;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXHeader;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.flat.WidgetContainer;
@@ -145,7 +146,15 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
         }
     }
 
-    public int getLocationFromStart(){
+    @WXComponentProp(name = Constants.Name.SCROLL_SNAP_IGNORE)
+    public void setScrollSnapIgnore(boolean ignore) {
+        View host = getHostView();
+        if (host != null) {
+            host.setTag(Constants.Name.SCROLL_SNAP_IGNORE);
+        }
+    }
+
+    public int getLocationFromStart() {
         return mLastLocationY;
     }
 

@@ -252,6 +252,12 @@ public class Constants {
     String NEST_SCROLLING_ENABLED = "nestedScrollingEnabled";
 
     String ORIENTATION  = "orientation";
+
+    String SCROLL_SNAP = "scrollSnap";
+    String SCROLL_PADDING_TOP = "scrollPaddingTop";
+    String SCROLL_PADDING_BOTTOM = "scrollPaddingBottom";
+    String SCROLL_SNAP_ALIGN = "scrollSnapAlign";
+    String SCROLL_SNAP_IGNORE = "scrollSnapIgnore";
   }
 
   public interface Value {
@@ -333,6 +339,7 @@ public class Constants {
     String PAUSE_EVENT = "WXApplicationWillResignActiveEvent";
     String RETURN = "return";
     String KEYBOARD = "keyboard";
+    String SNAP_END = "snapend";
 
     String UNSTICKY = "unsticky";
     String STICKY = "sticky";

@@ -100,9 +100,27 @@ public class ScrollStartEndHelper implements Runnable{
             component.fireEvent(Constants.Event.SCROLL_END, getScrollEvent(this.x, this.y));
 
         }
+        if(component instanceof BasicListComponent && ((BasicListComponent) component).enableScrollSnap()){
+            if(component.getEvents().contains(Constants.Event.SNAP_END)){
+                component.fireEvent(Constants.Event.SNAP_END, getSnapEvent());
+            }
+        }
         hasStart = false;
         hasScrollEnd = false;
 
+    }
+
+    private Map<String, Object> getSnapEvent() {
+        if (component instanceof BasicListComponent) {
+            BasicListComponent basicListComponent = (BasicListComponent) component;
+            if (basicListComponent.getHostView() instanceof ListComponentView) {
+                ListComponentView componentView = (ListComponentView) basicListComponent.getHostView();
+                if (componentView != null) {
+                    return basicListComponent.getSnapEvent();
+                }
+            }
+        }
+        return null;
     }
 
     private Map<String, Object> getScrollEvent(int offsetX, int offsetY){

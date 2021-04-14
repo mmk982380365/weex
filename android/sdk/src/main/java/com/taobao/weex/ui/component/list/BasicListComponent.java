@@ -169,6 +169,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   private  Runnable keepPositionCellRunnable = null;
   private  long keepPositionLayoutDelay = 150;
 
+  private ListSnapHelper mListSnapHelper;
+  private Boolean enableScrollSnap = false;
+
 
   public BasicListComponent(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
     super(instance, parent, basicComponentData);
@@ -435,9 +438,84 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         if (result != null)
           setShowScrollbar(result);
         return true;
+      case Constants.Name.DISABLE_APPEAR_BUBBLE:
+        Boolean flag = WXUtils.getBoolean(param,null);
+        if(flag != null)
+          setDisableAppearBubble(flag);
+        return true;
+      case Constants.Name.SCROLL_SNAP:
+        Boolean scroll_snap = WXUtils.getBoolean(param, false);
+        setScrollSnap(scroll_snap);
+        return true;
+      case Constants.Name.SCROLL_SNAP_ALIGN:
+        String scroll_snap_align = WXUtils.getString(param, null);
+        setScrollSnapAlign(scroll_snap_align);
+        return true;
+      case Constants.Name.SCROLL_PADDING_TOP:
+        int scroll_padding_top = WXUtils.getInt(param);
+        setScrollSnapPaddingTop(scroll_padding_top);
+        return true;
+      case Constants.Name.SCROLL_PADDING_BOTTOM:
+        int scroll_padding_bottom = WXUtils.getInt(param);
+        setScrollSnapPaddingBottom(scroll_padding_bottom);
+        return true;
     }
-    return super.setProperty(key, param);
+      return super.setProperty(key, param);
   }
+
+    @WXComponentProp(name = Constants.Name.SCROLL_SNAP)
+    public void setScrollSnap(boolean scroll_snap) {
+        if(enableScrollSnap){
+            return;
+        }
+        WXRecyclerView inner = getHostView().getInnerView();
+        if (scroll_snap) {
+          if(mListSnapHelper == null){
+            mListSnapHelper = new ListSnapHelper();
+
+          }
+            enableScrollSnap = true;
+            mListSnapHelper.attachToRecyclerView(inner);
+        }
+    }
+
+
+    @WXComponentProp(name = Constants.Name.SCROLL_SNAP)
+    public void setScrollSnapPaddingTop(int padding) {
+        if(mListSnapHelper == null){
+          mListSnapHelper = new ListSnapHelper();
+        }
+      mListSnapHelper.setPaddingTop((int)WXViewUtils.getRealPxByWidth(padding, getInstance().getInstanceViewPortWidth()));
+    }
+
+    @WXComponentProp(name = Constants.Name.SCROLL_SNAP)
+    public void setScrollSnapPaddingBottom(int padding) {
+        if(mListSnapHelper == null){
+          mListSnapHelper = new ListSnapHelper();
+        }
+        mListSnapHelper.setPaddingBottom((int)WXViewUtils.getRealPxByWidth(padding, getInstance().getInstanceViewPortWidth()));
+
+    }
+
+    @WXComponentProp(name = Constants.Name.SCROLL_SNAP_ALIGN)
+    public void setScrollSnapAlign(String scroll_snap_align) {
+        if(mListSnapHelper == null){
+          mListSnapHelper = new ListSnapHelper();
+        }
+        if (mListSnapHelper != null) {
+            switch (scroll_snap_align) {
+                case "start":
+                    mListSnapHelper.setSnapAlign(ListSnapHelper.SNAP_ALIGN_START);
+                    break;
+                case "center":
+                    mListSnapHelper.setSnapAlign(ListSnapHelper.SNAP_ALIGN_CENTER);
+                    break;
+                case "bottom":
+                    mListSnapHelper.setSnapAlign(ListSnapHelper.SNAP_ALIGN_BOTTOM);
+                    break;
+            }
+        }
+    }
 
   @WXComponentProp(name = Constants.Name.SCROLLABLE)
   public void setScrollable(boolean scrollable) {
@@ -1366,10 +1444,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     int contentWidth = recyclerView.getMeasuredWidth() + recyclerView.computeHorizontalScrollRange();
     int contentHeight = 0;
     for (int i = 0; i < getChildCount(); i++) {
-      WXComponent child = getChild(i);
-      if (child != null) {
-        contentHeight += child.getLayoutHeight();
-      }
+        WXComponent child = getChild(i);
+        if (child != null) {
+            contentHeight += child.getLayoutHeight();
+        }
     }
 
     Map<String, Object> event = new HashMap<>(3);
@@ -1386,6 +1464,18 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     event.put(Constants.Name.ISDRAGGING, recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING);
     return event;
   }
+
+    public Map<String, Object> getSnapEvent() {
+        int position = 0;
+        if(mListSnapHelper != null){
+            position = mListSnapHelper.getSnapPosition();
+        }
+        Map<String, Object> event = new HashMap<>(2);
+
+        event.put("section", 0);
+        event.put("row", position);
+        return event;
+    }
 
   private boolean shouldReport(int offsetX, int offsetY) {
     if (mLastReport.x == -1 && mLastReport.y == -1) {
@@ -1467,9 +1557,13 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
   }
 
   public ScrollStartEndHelper getScrollStartEndHelper() {
-    if(mScrollStartEndHelper == null){
-      mScrollStartEndHelper = new ScrollStartEndHelper(this);
-    }
-    return mScrollStartEndHelper;
+        if (mScrollStartEndHelper == null) {
+            mScrollStartEndHelper = new ScrollStartEndHelper(this);
+        }
+        return mScrollStartEndHelper;
   }
+  public Boolean enableScrollSnap(){
+      return this.enableScrollSnap;
+  }
+
 }
