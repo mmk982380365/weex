@@ -518,6 +518,7 @@ std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::CreateInstance(
               exe = std::move(extendsApi), p = std::move(params)] {
             Instance()->script_side()->CreateInstance(
                 id.get(), fun.get(), s.get(), sl, op.get(), init.get(), exe.get(), p);
+                dynamic_cast<CoreSideInMultiProcess *>(Instance()->core_side())->HeartBeat(id.get());
           }));
   return createInt32Result(1);
 }
