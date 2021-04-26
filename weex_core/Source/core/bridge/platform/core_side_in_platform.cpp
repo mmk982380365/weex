@@ -453,6 +453,18 @@ int CoreSideInPlatform::ExecJS(const char *instanceId, const char *nameSpace,
                                const char *func,
                                std::vector<VALUE_WITH_TYPE *> &params) {
 
+  std::string funString(func);
+  if ("createInstance" == funString) {
+    std::string page_id(weex::base::value_or_empty(instanceId));
+    auto instanceData = WeexRuntimeManager::Instance()->instance_engine_data(page_id);
+    if (instanceData == nullptr) {
+      std::vector<std::pair<
+          std::string,
+          std::string>> tempParams;
+      instanceData = WeexRuntimeManager::Instance()->create_instance(page_id, tempParams);
+    }
+  }
+
   const std::vector<WeexCore::ScriptBridge::ScriptSide *>
       &script_side_vector = GetScriptSide(instanceId);
   int ret = 0;
