@@ -461,7 +461,7 @@ int CoreSideInPlatform::ExecJS(const char *instanceId, const char *nameSpace,
       std::vector<std::pair<
           std::string,
           std::string>> tempParams;
-      instanceData = WeexRuntimeManager::Instance()->create_instance(page_id, tempParams);
+      WeexRuntimeManager::Instance()->create_instance(page_id, tempParams);
     }
   }
 

@@ -108,9 +108,10 @@ int bridge::script::ScriptSideInSimple::ExecJS(const char *instanceId,
         std::vector<std::pair<
             std::string,
             std::string>> tempParams;
-        instanceData = WeexRuntimeManager::Instance()->create_instance(page_id, tempParams);
+        WeexRuntimeManager::Instance()->create_instance(page_id, tempParams);
       }
     }
+    runtime_map = WeexRuntimeManager::Instance()->runtime_from_page_id(instanceId);
   }
 
   for (auto &runtime : runtime_map) {
