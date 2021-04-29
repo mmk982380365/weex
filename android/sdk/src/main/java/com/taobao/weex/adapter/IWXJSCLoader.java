@@ -20,5 +20,6 @@ package com.taobao.weex.adapter;
 
 public interface IWXJSCLoader {
     Boolean isLoaded();
+    Boolean isRemoteJscUsed();
     void doLoad();
 }

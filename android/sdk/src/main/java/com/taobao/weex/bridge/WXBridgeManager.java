@@ -2288,6 +2288,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       IWXJSCLoader jscLoader = WXSDKManager.getInstance().getJSCLoader();
       if(jscLoader != null && !jscLoader.isLoaded()){
         jscLoader.doLoad();
+        return;
       }
       sInitFrameWorkTimeOrigin = System.currentTimeMillis();
       if (TextUtils.isEmpty(framework)) {
