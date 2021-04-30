@@ -415,13 +415,10 @@ public class WXBridge implements IWXBridge {
       WXStateRecord.getInstance().recordAction(instanceId,"callNativeModule:"+module+"."+method);
       long start = WXUtils.getFixUnixTime();
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-      if (instance == null) {
-        instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
-      }
       JSONArray argArray = null;
       if (arguments != null){
         // TODO use a better way
-        if (instance!=null && (instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER
+        if (instance!=null && (instance.isWidget() || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER
                 || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY || instance.getReactorPageManager() != null)) {
           try {
             argArray = (JSONArray) JSON.parse(new String(arguments, "UTF-8"));

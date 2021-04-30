@@ -266,7 +266,14 @@ public class WXSDKManager {
   }
 
   public @Nullable WXSDKInstance getSDKInstance(String instanceId) {
-    return instanceId == null? null : mWXRenderManager.getWXSDKInstance(instanceId);
+    WXSDKInstance instance = null;
+    if (!TextUtils.isEmpty(instanceId)) {
+      instance = mWXRenderManager.getWXSDKInstance(instanceId);
+      if (instance == null) {
+        instance =  getAllInstanceMap().get(instanceId);
+      }
+    }
+    return instance;
   }
 
   public void postOnUiThread(Runnable runnable, long delayMillis) {
