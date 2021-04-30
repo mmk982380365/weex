@@ -415,6 +415,9 @@ public class WXBridge implements IWXBridge {
       WXStateRecord.getInstance().recordAction(instanceId,"callNativeModule:"+module+"."+method);
       long start = WXUtils.getFixUnixTime();
       WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+      if (instance == null) {
+        instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
+      }
       JSONArray argArray = null;
       if (arguments != null){
         // TODO use a better way
