@@ -464,9 +464,8 @@ public class WXBridge implements IWXBridge {
             WXUtils.getFixUnixTime()-start
         );
       }
-
       recordNativeModuleEnd(instance, record);
-      if (instance!=null && (instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER
+      if (instance!=null && (instance.isWidget() || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER
           || instance.getRenderStrategy()== WXRenderStrategy.DATA_RENDER_BINARY || instance.getReactorPageManager() != null)){
         try {
           if(object == null){

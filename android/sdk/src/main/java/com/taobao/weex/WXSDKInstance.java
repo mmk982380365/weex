@@ -340,6 +340,15 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     return null;
   }
 
+  private boolean isWidget = false;
+
+  public void setIsWidget(boolean flag){
+    this.isWidget = flag;
+  }
+  public Boolean isWidget() {
+    return this.isWidget;
+  }
+
 
 
   /**
