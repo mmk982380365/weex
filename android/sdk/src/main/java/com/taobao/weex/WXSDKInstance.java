@@ -167,6 +167,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   private @NonNull
   FlatGUIContext mFlatGUIContext =new FlatGUIContext();
 
+  private UnicornJSInvoker mUnicornJSInvoker;
+
   private Map<String,String> mContainerInfo;
 
   public boolean isNewFsEnd = false;
@@ -2820,5 +2822,19 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       this.moduleName = moduleName;
       this.callback = callback;
     }
+  }
+
+  public void setUnicornJSInvoker(UnicornJSInvoker invoker) {
+    mUnicornJSInvoker = invoker;
+  }
+
+  public UnicornJSInvoker getUnicornJSInvoker() {
+    return mUnicornJSInvoker;
+  }
+
+  public interface UnicornJSInvoker {
+    public void invokeCallback(String instanceId,
+                               String callbackId,
+                               Object args);
   }
 }

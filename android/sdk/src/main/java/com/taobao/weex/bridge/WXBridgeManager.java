@@ -1504,6 +1504,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       //assert mode == WXEaglePlugin.EAGLE_AND_SCRIPT
     } else if(instance != null && instance.getReactorPageManager() != null) {
         instance.getReactorPageManager().invokeCallBack(callback, JSON.toJSONString(data));
+    } else if (instance != null && instance.getUnicornJSInvoker() != null) {
+      instance.getUnicornJSInvoker().invokeCallback(instanceId, callback, data);
+      return;
     }
     addJSTask(METHOD_CALLBACK, instanceId, callback, data, keepAlive);
     sendMessage(instanceId, WXJSBridgeMsgType.CALL_JS_BATCH);
