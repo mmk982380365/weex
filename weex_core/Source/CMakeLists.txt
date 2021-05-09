@@ -17,6 +17,7 @@
 # under the License.
 #
 cmake_minimum_required(VERSION 3.4.1)
+set(WEEXCORE_LIBRARY_NAME_QJS weexcoreqjs)
 set(WEEXCORE_LIBRARY_NAME weexcore)
 set(WEEX_CORE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -125,7 +126,7 @@ if (ANDROID)
     ## include_directories for include head file
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/IPC)
 
-    set(PORT JSCOnly)
+#    set(PORT JSCOnly)
     add_definitions(-DPRINT_LOG_CACHEFILE=0)
     add_definitions(-DOS_ANDROID)
     #add_definitions(-DNDEBUG)
@@ -184,7 +185,7 @@ if (ANDROID)
     include_directories(${WEEX_CORE_SOURCE_DIR}/include/wtf)
 
 
-    set(ANDROID_SRCS
+    set(ANDROID_SRCS_WITHOUT_JSC
             android/weex_extend_js_api.h
             android/weex_extend_js_api.cpp
             android/base/string/scoped_jstring_utf8.cpp
@@ -236,6 +237,20 @@ if (ANDROID)
             core/runtime/weex_runtime_manager.cpp
             core/runtime/weex_runtime_manager.h
 
+
+            core/runtime/qjs/weex_runtime_qjs.h
+            core/runtime/qjs/weex_runtime_qjs.cpp
+            core/runtime/qjs/weex_context_qjs.h
+            core/runtime/qjs/weex_context_qjs.cpp
+
+            android/multiprocess/weex_progress_env.h
+            android/multiprocess/weex_progress_env.cpp
+
+            android/utils/wson_qjs.h
+            android/utils/wson_qjs.cpp
+            )
+
+    set(ANDROID_SRCS_JSC
             android/jsengine/jsc/weex_runtime_jsc.h
             android/jsengine/jsc/weex_runtime_jsc.cpp
             android/jsengine/jsc/weex_utils_jsc.h
@@ -244,26 +259,14 @@ if (ANDROID)
             android/jsengine/jsc/weex_global_object.cpp
             android/jsengine/jsc/weex_context_jsc.h
             android/jsengine/jsc/weex_context_jsc.cpp
-
-            core/runtime/qjs/weex_runtime_qjs.h
-            core/runtime/qjs/weex_runtime_qjs.cpp
-            core/runtime/qjs/weex_context_qjs.h
-            core/runtime/qjs/weex_context_qjs.cpp
-
             android/jsengine/jsc/args.h
             android/jsengine/jsc/args.cpp
             android/jsengine/jsc/weex_console_object.h
             android/jsengine/jsc/weex_console_object.cpp
-            android/multiprocess/weex_progress_env.h
-            android/multiprocess/weex_progress_env.cpp
             android/jsengine/jsc/weex_simple_object.h
             android/jsengine/jsc/weex_simple_object.cpp
-
-
             android/utils/wson_jsc.h
             android/utils/wson_jsc.cpp
-            android/utils/wson_qjs.h
-            android/utils/wson_qjs.cpp
             )
 
     link_directories(${LOCAL_LIBRARIES_DIR})
@@ -271,18 +274,21 @@ if (ANDROID)
     SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}" CACHE STRING "toolchain_exelinkflags" FORCE)
     SET(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS} -shared")
 
-    SET(FINAL_ADD_LIBRARY
+    SET(FINAL_ADD_LIBRARY_WITHOUTJSC
             ${FINAL_ADD_LIBRARY}
-            ${ANDROID_SRCS}
+            ${ANDROID_SRCS_WITHOUT_JSC}
+            )
+    SET(FINAL_ADD_LIBRARY
+            ${FINAL_ADD_LIBRARY_WITHOUTJSC}
+            ${ANDROID_SRCS_JSC}
             )
 
-    SET(FINAL_TARGET_LINK_LIBRARIES
+    SET(FINAL_TARGET_LINK_LIBRARIES_WITHOUTJSC
             ${FINAL_TARGET_LINK_LIBRARIES}
             weexbase
             wson
             android
             weexipc
-            JavaScriptCore
             quickjs
             WTF
             log
@@ -293,6 +299,11 @@ if (ANDROID)
             c
             z
             )
+    SET(FINAL_TARGET_LINK_LIBRARIES
+    ${FINAL_TARGET_LINK_LIBRARIES_WITHOUTJSC}
+    JavaScriptCore
+    )
+
 endif (ANDROID)
 
 #if(iOS)
@@ -303,6 +314,12 @@ endif (ANDROID)
 add_library(${WEEXCORE_LIBRARY_NAME} SHARED ${FINAL_ADD_LIBRARY})
 target_include_directories(${WEEXCORE_LIBRARY_NAME} PUBLIC .)
 target_link_libraries(${WEEXCORE_LIBRARY_NAME} ${FINAL_TARGET_LINK_LIBRARIES})
+
+add_library(${WEEXCORE_LIBRARY_NAME_QJS} SHARED ${FINAL_ADD_LIBRARY_WITHOUTJSC})
+target_include_directories(${WEEXCORE_LIBRARY_NAME_QJS} PUBLIC .)
+target_link_libraries(${WEEXCORE_LIBRARY_NAME_QJS} ${FINAL_TARGET_LINK_LIBRARIES_WITHOUTJSC})
+
+
 # Enable it for smaller so.
 # set_target_properties(${WEEXCORE_LIBRARY_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
