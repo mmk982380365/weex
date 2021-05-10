@@ -258,6 +258,8 @@ public class Constants {
     String SCROLL_PADDING_BOTTOM = "scrollPaddingBottom";
     String SCROLL_SNAP_ALIGN = "scrollSnapAlign";
     String SCROLL_SNAP_IGNORE = "scrollSnapIgnore";
+
+    String SCROLL_DIRECT_CHILD_APPEAR_ONLY = "scrollDirectChildAppear";
   }
 
   public interface Value {

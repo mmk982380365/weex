@@ -94,6 +94,8 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
    * */
   private ScrollStartEndHelper mScrollStartEndHelper;
 
+  private Boolean directChildAppearOnly = true;
+
   private GestureDetector mGestureDetector;
 
   private int pageSize = 0;
@@ -681,7 +683,10 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
         int accuracy = WXUtils.getInteger(param, 10);
         setOffsetAccuracy(accuracy);
         return true;
-        default:
+      case Constants.Name.SCROLL_DIRECT_CHILD_APPEAR_ONLY:
+        directChildAppearOnly = WXUtils.getBoolean(param, true);
+        return true;
+      default:
           break;
     }
     return super.setProperty(key, param);
@@ -917,7 +922,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
   private boolean checkItemVisibleInScroller(WXComponent component) {
     boolean visible = false;
     while (component != null && !(component instanceof WXScroller)) {
-      if (component.getParent() instanceof WXScroller) {
+      if (component.getParent() instanceof WXScroller || !directChildAppearOnly) {
         if (mOrientation == Constants.Orientation.HORIZONTAL) {
           int offsetLeft = (int) component.getLayoutPosition().getLeft() - getScrollX();
           visible = (offsetLeft > 0 - component.getLayoutWidth() && offsetLeft < getLayoutWidth());
@@ -925,6 +930,9 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
           int offsetTop = (int) component.getLayoutPosition().getTop() - getScrollY();
           visible = (offsetTop > 0 - component.getLayoutHeight() && offsetTop < getLayoutHeight());
         }
+      }
+      if(!directChildAppearOnly){
+        return visible;
       }
       component = component.getParent();
     }
