@@ -232,7 +232,7 @@ public class WXSDKEngine implements Serializable {
                 sm.getWXStatisticsListener());
         final IWXUserTrackAdapter userTrackAdapter= config!=null?config.getUtAdapter():null;
         final int version = 1;
-        if(!WXSDKManager.getInstance().forceQJSOnly()){
+        if(WXSDKManager.getInstance().forceQJSOnly()){
           V8_SO_NAME = CORE_QJS_SO_NAME;
         }
         else{
@@ -651,7 +651,7 @@ public class WXSDKEngine implements Serializable {
   }
 
   public static IWXJSEngineManager.EngineType defaultEngineType() {
-    if(!WXSDKManager.getInstance().forceQJSOnly()) {
+    if(WXSDKManager.getInstance().forceQJSOnly()) {
       return IWXJSEngineManager.EngineType.QuickJS;
     }
     else return IWXJSEngineManager.EngineType.JavaScriptCore;
