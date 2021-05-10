@@ -138,6 +138,7 @@ public class WXEnvironment {
   private static String sGlobalFontFamily;
 
   public static final String CORE_SO_NAME = "weexcore";
+  public static final String CORE_QJS_SO_NAME = "weexcoreqjs";
   public static final String CORE_JSS_SO_NAME = "weexcore";
   public static final String CORE_JSB_SO_NAME = "weexjsb";
   public static final String CORE_JST_SO_NAME = "weexjst";

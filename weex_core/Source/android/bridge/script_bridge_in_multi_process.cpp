@@ -689,9 +689,9 @@ ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
   if (WXCoreEnvironment::getInstance()->EnableQJSRuntime()) {
     set_script_side_qjs(new WeexCore::bridge::script::ScriptSideInQJS);
   }
+#if USE_JSC
   std::unique_ptr<MultiProcessAndSoInitializer> initializer(
       new MultiProcessAndSoInitializer);
-
   LOGD("ScriptBridgeInMultiProcess");
   bool passable = initializer->Init(
       [this](IPCHandler *handler) { RegisterIPCCallback(handler); },
@@ -710,6 +710,7 @@ ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
             ->ReportException(page_id, func, exception_string);
       });
   set_is_passable(passable);
+#endif
 }
 
 ScriptBridgeInMultiProcess::~ScriptBridgeInMultiProcess() {

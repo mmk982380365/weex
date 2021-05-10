@@ -314,6 +314,8 @@ endif (ANDROID)
 add_library(${WEEXCORE_LIBRARY_NAME} SHARED ${FINAL_ADD_LIBRARY})
 target_include_directories(${WEEXCORE_LIBRARY_NAME} PUBLIC .)
 target_link_libraries(${WEEXCORE_LIBRARY_NAME} ${FINAL_TARGET_LINK_LIBRARIES})
+set_target_properties(${WEEXCORE_LIBRARY_NAME} PROPERTIES COMPILE_FLAGS "-DUSE_JSC=1")
+
 
 add_library(${WEEXCORE_LIBRARY_NAME_QJS} SHARED ${FINAL_ADD_LIBRARY_WITHOUTJSC})
 target_include_directories(${WEEXCORE_LIBRARY_NAME_QJS} PUBLIC .)
@@ -336,7 +338,7 @@ if (ANDROID)
             )
 
     target_link_libraries(${WEEXJSSERVERSTUB_NAME}
-            ${WEEXCORE_LIBRARY_NAME}
+            ${WEEXCORE_LIBRARY_NAME_QJS}
             )
 
     if (APPLE)
@@ -352,7 +354,7 @@ if (ANDROID)
             android/multiprocess/weex_js_server_main_stub.cpp)
 
     target_link_libraries(${WEEXJSSERVERSTUB_NAME_BELOW_L}
-            ${WEEXCORE_LIBRARY_NAME}
+            ${WEEXCORE_LIBRARY_NAME_QJS}
             )
 
     if (APPLE)
@@ -362,3 +364,10 @@ if (ANDROID)
                 )
     endif ()
 endif (ANDROID)
+set_target_properties(${WEEXCORE_LIBRARY_NAME_QJS}
+    PROPERTIES NO_SONAME
+    TRUE)
+set_target_properties(${WEEXCORE_LIBRARY_NAME_QJS}
+    PROPERTIES
+    LINK_FLAGS "-Wl,-soname,libweexcore.so"
+    )

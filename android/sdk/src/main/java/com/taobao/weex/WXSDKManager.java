@@ -622,4 +622,11 @@ public class WXSDKManager {
       }
       return mFontAdapter;
   }
+
+  public Boolean canUseJSC(){
+    if(mJSCLoader!= null && !mJSCLoader.isLoaded()){
+      return false;
+    }
+    return true;
+  }
 }

@@ -19,8 +19,9 @@
 //
 // Created by Darin on 2018/7/22.
 //
-
+#if USE_JSC
 #include "android/utils/wson_jsc.h"
+#endif
 
 #include <memory>
 #include "weex_progress_env.h"
@@ -50,5 +51,8 @@ bool WeexProgressEnv::is_app_crashed() {
   return crashed;
 }
 WeexProgressEnv::~WeexProgressEnv() {
+#if USE_JSC
   wson::destory();
+#endif
+
 }

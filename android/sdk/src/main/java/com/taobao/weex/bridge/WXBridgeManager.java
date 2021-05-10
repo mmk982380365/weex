@@ -45,7 +45,6 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXConfigAdapter;
-import com.taobao.weex.adapter.IWXJSCLoader;
 import com.taobao.weex.adapter.IWXJSEngineManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
 import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
@@ -127,6 +126,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import static com.taobao.weex.WXEnvironment.CORE_QJS_SO_NAME;
 import static com.taobao.weex.bridge.WXModuleManager.createDomModule;
 
 /**
@@ -1814,20 +1814,25 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
         boolean is_pre_init_mode = false;
         if(extraOption instanceof Map) {
-
           String key_run_in_main_process = "run_in_main_process";
-          Object run_in_main_process = options.get(key_run_in_main_process);
-          if ((WXSDKManager.getInstance().getWXJSEngineManager().enableMainProcessScriptSide()
-                  && WXSDKManager.getInstance().getWXJSEngineManager().forceAllPageRunInMainProcessScriptSide())
-                  || run_in_main_process != null) {
-            ((Map) extraOption).put(key_run_in_main_process, String.valueOf(run_in_main_process));
+          if(!WXSDKManager.getInstance().canUseJSC() || WXSDKEngine.getCoreSoName() == CORE_QJS_SO_NAME){
+            ((Map) extraOption).put(key_run_in_main_process, "true");
+            instance.setJSEngineType(IWXJSEngineManager.EngineType.QuickJS);
           }
+          else {
+            Object run_in_main_process = options.get(key_run_in_main_process);
+            if ((WXSDKManager.getInstance().getWXJSEngineManager().enableMainProcessScriptSide()
+                    && WXSDKManager.getInstance().getWXJSEngineManager().forceAllPageRunInMainProcessScriptSide())
+                    || run_in_main_process != null) {
+              ((Map) extraOption).put(key_run_in_main_process, String.valueOf(run_in_main_process));
+            }
 
-          if (instance.isRunInMainProcess()
-                  || "true".equals(String.valueOf(run_in_main_process))) {
-            IWXJSEngineManager.EngineType jsEngineType = instance.getJSEngineType();
-            if (jsEngineType == IWXJSEngineManager.EngineType.JavaScriptCore) {
-              instance.setJSEngineType(IWXJSEngineManager.EngineType.QuickJS);
+            if (instance.isRunInMainProcess()
+                    || "true".equals(String.valueOf(run_in_main_process))) {
+              IWXJSEngineManager.EngineType jsEngineType = instance.getJSEngineType();
+              if (jsEngineType == IWXJSEngineManager.EngineType.JavaScriptCore) {
+                instance.setJSEngineType(IWXJSEngineManager.EngineType.QuickJS);
+              }
             }
           }
 
@@ -2285,10 +2290,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     logDetail.name("initFramework");
     logDetail.taskStart();
     if (WXSDKEngine.isSoInitialized() && !isJSFrameworkInit()) {
-      IWXJSCLoader jscLoader = WXSDKManager.getInstance().getJSCLoader();
-      if(jscLoader != null && !jscLoader.isLoaded()){
-        jscLoader.doLoad();
-        return;
+      if(!WXSDKManager.getInstance().canUseJSC()){
+        WXSDKManager.getInstance().getJSCLoader().doLoad();
       }
       sInitFrameWorkTimeOrigin = System.currentTimeMillis();
       if (TextUtils.isEmpty(framework)) {

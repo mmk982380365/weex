@@ -25,7 +25,7 @@
 #include "base/string_util.h"
 #include "script_side_in_simple.h"
 
-#if OS_ANDROID
+#if OS_ANDROID && USE_JSC
 #include "android/jsengine/jsc/weex_runtime_jsc.h"
 #elif OS_IOS
 #endif
@@ -38,10 +38,10 @@ int bridge::script::ScriptSideInSimple::InitFramework(const char *script,
       main_process_only_ ? ENGINE_QJS : WeexRuntimeManager::Instance()->supported_jsengine_type();
   if (engine_type & ENGINE_JSC) {
     LOGE("Init JSC")
-#if OS_ANDROID
+#if OS_ANDROID && USE_JSC
     WeexRuntimeManager::Instance()
         ->add_weex_runtime(new WeexRuntimeJSC(this->bridge(), false));
-#elif OS_IOS
+#elif OS_IOS || !USE_JSC
       engine_type = ENGINE_QJS;
 #endif
   }

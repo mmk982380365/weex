@@ -105,12 +105,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.taobao.weex.WXEnvironment.CORE_QJS_SO_NAME;
 import static com.taobao.weex.WXEnvironment.CORE_SO_NAME;
 
 public class WXSDKEngine implements Serializable {
 
   public static final String JS_FRAMEWORK_RELOAD="js_framework_reload";
-  private static final String V8_SO_NAME = CORE_SO_NAME;
+  private static String V8_SO_NAME = CORE_SO_NAME;
   private volatile static boolean mIsInit = false;
   private volatile static boolean mIsSoInit = false;
   private static final Object mLock = new Object();
@@ -150,6 +151,10 @@ public class WXSDKEngine implements Serializable {
 
       return mIsInit && WXEnvironment.JsFrameworkInit;
     }
+  }
+
+  public static String getCoreSoName(){
+    return V8_SO_NAME;
   }
 
   public static boolean isSoInitialized(){
@@ -227,6 +232,12 @@ public class WXSDKEngine implements Serializable {
                 sm.getWXStatisticsListener());
         final IWXUserTrackAdapter userTrackAdapter= config!=null?config.getUtAdapter():null;
         final int version = 1;
+        if(!WXSDKManager.getInstance().canUseJSC()){
+          V8_SO_NAME = CORE_QJS_SO_NAME;
+        }
+        else{
+          V8_SO_NAME = CORE_SO_NAME;
+        }
         mIsSoInit = WXSoInstallMgrSdk.initSo(V8_SO_NAME, version, userTrackAdapter);
         WXSoInstallMgrSdk.copyJssRuntimeSo();
         if(config!=null) {
@@ -641,6 +652,9 @@ public class WXSDKEngine implements Serializable {
   }
 
   public static IWXJSEngineManager.EngineType defaultEngineType() {
-    return IWXJSEngineManager.EngineType.JavaScriptCore;
+    if(!WXSDKManager.getInstance().canUseJSC()) {
+      return IWXJSEngineManager.EngineType.QuickJS;
+    }
+    else return IWXJSEngineManager.EngineType.JavaScriptCore;
   }
 }
