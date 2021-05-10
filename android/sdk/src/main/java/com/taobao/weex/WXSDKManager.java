@@ -629,4 +629,14 @@ public class WXSDKManager {
     }
     return true;
   }
+
+  private static volatile Boolean setQJSOnly = false;
+  private static volatile Boolean hasInited = false;
+  public synchronized Boolean forceQJSOnly() {
+    if (!hasInited && !canUseJSC()) {
+      setQJSOnly = true;
+    }
+    hasInited = true;
+    return setQJSOnly;
+  }
 }
