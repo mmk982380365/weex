@@ -726,11 +726,11 @@ int ScriptSideInQJS::ExecuteScript(JSContext* ctx,
 
   JSValue value;
   if (enable_qjs_bin_cache) {
-    uint8_t* cached_data = cached_qjs_byte_code_[qjs_bin_cache_key];
-    if (cached_data) {
+    QJSByteCode cached_data = cached_qjs_byte_code_[qjs_bin_cache_key];
+    if (cached_data.buf && cached_data.buf_len > 0) {
       LOGE("execute script in qjs eval binary start");
       value =
-          JS_EvalBinary(ctx, cached_data, script != nullptr ? strlen(script) : 0);
+          JS_EvalBinary(ctx, cached_data.buf, cached_data.buf_len);
       if (JS_IsException(value)) {
         ReportException(ctx, "ExecuteScript_JS_EvalBinary", instance_id, bridge());
       } else {
@@ -755,7 +755,7 @@ int ScriptSideInQJS::ExecuteScript(JSContext* ctx,
         LOGE("execute script in qjs write cache start");
         size_t ret_buf_len;
         uint8_t* ret_buf = JS_WriteObject(ctx, &ret_buf_len, value, JS_WRITE_OBJ_BYTECODE);
-        cached_qjs_byte_code_[qjs_bin_cache_key] = ret_buf;
+        cached_qjs_byte_code_[qjs_bin_cache_key] = {.buf = ret_buf, .buf_len = ret_buf_len};
         LOGE("execute script in qjs write cache end");
 
         LOGE("execute script in qjs eval func start");

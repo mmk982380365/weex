@@ -119,6 +119,10 @@ class ScriptSideInQJS : public ScriptBridge::ScriptSide {
 //  int64_t JsAction(long ctxContainer, int32_t jsActionType, const char* arg) final { return 0; }
 
  private:
+  struct QJSByteCode {
+    uint8_t* buf;
+    size_t buf_len;
+  };
   JSContext* CreateContext(JSRuntime* engine_vm);
   void InitWXEnvironment(std::vector<std::pair<std::string, std::string>>& params,
                          JSContext* context,
@@ -147,7 +151,7 @@ class ScriptSideInQJS : public ScriptBridge::ScriptSide {
   std::map<const char*, JSContext*> js_context_map_;
   JSRuntime* js_engine_vm_ = nullptr;
   JSContext* global_context_ = nullptr;
-  std::unordered_map<std::string, uint8_t*> cached_qjs_byte_code_;
+  std::unordered_map<std::string, QJSByteCode> cached_qjs_byte_code_;
   uint8_t* cached_extends_qjs_byte_code_ = nullptr;
 };
 }  // namespace script
