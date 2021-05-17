@@ -436,7 +436,11 @@ public class WXBridge implements IWXBridge {
 
       JSONObject optionsObj = null;
       if (options != null) {
-        optionsObj = (JSONObject) WXWsonJSONSwitch.parseWsonOrJSON(options);
+        if (instance.isWidget()) {
+          optionsObj = (JSONObject) JSON.parse(new String(options, "UTF-8"));
+        } else {
+          optionsObj = (JSONObject) WXWsonJSONSwitch.parseWsonOrJSON(options);
+        }
       } else if (argArray != null) {
         final WXSDKInstance sdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
         if (sdkInstance != null) {
