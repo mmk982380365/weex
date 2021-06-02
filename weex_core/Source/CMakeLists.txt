@@ -58,6 +58,7 @@ add_compile_options(-fexceptions)
 
 set(COMMON_SRCS
         ./core/render/manager/render_manager.cpp
+        ./core/render/page/reactor_page.cpp
         ./core/render/page/render_page.cpp
         ./core/render/page/render_page_base.cpp
         ./core/render/page/render_page_custom.cpp
