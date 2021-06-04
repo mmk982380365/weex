@@ -1505,7 +1505,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     } else if(instance != null && instance.getReactorPageManager() != null) {
         instance.getReactorPageManager().invokeCallBack(callback, JSON.toJSONString(data));
     } else if (instance != null && instance.getUnicornJSInvoker() != null) {
-      instance.getUnicornJSInvoker().invokeCallback(instanceId, callback, data);
+      instance.getUnicornJSInvoker().invokeCallback(instanceId, callback, data, keepAlive);
       return;
     }
     addJSTask(METHOD_CALLBACK, instanceId, callback, data, keepAlive);
