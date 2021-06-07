@@ -409,7 +409,7 @@ afterEvaluate { project ->
         copy{
             from transformNativeLibsWithMergeJniLibsForRelease
             into new File(project.buildDir, "unstrippedSo")
-            include '**/libweexjss.so', '**/libweexcore.so', '**/libquickjs.so'
+            include '**/libweexjss.so', '**/libweexcore.so', '**/libquickjs.so', '**/libweexcoreqjs.so'
             eachFile {
                 it.path = "${it.relativePath.segments[-2]}_${it.name}"
             }
@@ -431,7 +431,7 @@ afterEvaluate { project ->
             copy{
                 from transformNativeLibsWithMergeJniLibsForRelease
                 into new File(project.buildDir, "unstrippedSo")
-                include '**/armeabi-v7a/libweexjss.so', '**/armeabi-v7a/libweexcore.so', '**/armeabi-v7a/libquickjs.so'
+                include '**/armeabi-v7a/libweexjss.so', '**/armeabi-v7a/libweexcore.so', '**/armeabi-v7a/libquickjs.so','**/armeabi-v7a/libweexcoreqjs.so'
                 eachFile {
                     it.path = "armeabi_${it.name}"
                 }
