@@ -707,6 +707,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     if(mTimeCalculator == null) {
       mTimeCalculator = new TimeCalculator(this);
     }
+    registerGlobalReceiver();
   }
 
   /**
@@ -1495,7 +1496,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
             WXLogUtils.w("Warning :Component tree has not build completely,onActivityCreate can not be call!");
         }
     }
+  }
 
+  private void registerGlobalReceiver() {
     mGlobalEventReceiver=new WXGlobalEventReceiver(this);
     try {
       getContext().registerReceiver(mGlobalEventReceiver, new IntentFilter(WXGlobalEventReceiver.EVENT_ACTION));
@@ -1504,7 +1507,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       WXLogUtils.e(e.getMessage());
       mGlobalEventReceiver = null;
     }
-
   }
 
   @Override
