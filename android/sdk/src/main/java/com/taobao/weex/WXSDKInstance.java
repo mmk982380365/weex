@@ -1082,6 +1082,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
         }
       }, wxJscProcessManager.rebootTimeout());
     }
+    updateEaglePoint(true,flag);
   }
 
 
@@ -1220,6 +1221,33 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     mApmForInstance.onStage(WXInstanceApm.KEY_PAGE_STAGES_DOWN_BUNDLE_START);
     adapter.sendRequest(wxRequest, (IWXHttpAdapter.OnHttpListener) mHttpListener);
     logDetail.taskEnd();
+    updateEaglePoint(false,flag);
+  }
+
+  private void updateEaglePoint(boolean isRenderByTemplate, WXRenderStrategy strategy){
+    try{
+      if (strategy == null) {
+        return;
+      }
+      if (strategy != WXRenderStrategy.DATA_RENDER) {
+        return;
+      }
+      Context context = getContext();
+      if (context == null) {
+        return;
+      }
+      String contextName = context.getClass().getName();
+      WXInstanceApm instanceApm = this.getApmForInstance();
+      if (instanceApm == null) {
+        return;
+      }
+      instanceApm.addProperty("isEagle",1);
+      instanceApm.addProperty("eagleContextName",contextName);
+      instanceApm.addProperty("isRenderByTemplate",isRenderByTemplate);
+      instanceApm.addProperty("eagleRenderData",isRenderByTemplate ? "" : getBundleUrl());
+    }catch (Throwable throwable){
+      throwable.printStackTrace();
+    }
   }
 
   private WXHttpListener mHttpListener = null;
