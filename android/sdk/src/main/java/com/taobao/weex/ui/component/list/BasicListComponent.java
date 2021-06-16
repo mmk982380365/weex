@@ -460,6 +460,14 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         int scroll_padding_bottom = WXUtils.getInt(param);
         setScrollSnapPaddingBottom(scroll_padding_bottom);
         return true;
+      case Constants.Name.SCROLL_SNAP_TRIGGER:
+        int scroll_padding_trigger = WXUtils.getInt(param);
+        setScrollSnapTrigger(scroll_padding_trigger);
+        return true;
+      case Constants.Name.SCROLL_SNAP_TRIGGER_REVERSE:
+        int scroll_padding_trigger_reverse = WXUtils.getInt(param);
+        setScrollSnapTriggerReverse(scroll_padding_trigger_reverse);
+        return true;
     }
       return super.setProperty(key, param);
   }
@@ -481,7 +489,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
     }
 
 
-    @WXComponentProp(name = Constants.Name.SCROLL_SNAP)
+    @WXComponentProp(name = Constants.Name.SCROLL_PADDING_TOP)
     public void setScrollSnapPaddingTop(int padding) {
         if(mListSnapHelper == null){
           mListSnapHelper = new ListSnapHelper();
@@ -489,7 +497,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       mListSnapHelper.setPaddingTop((int)WXViewUtils.getRealPxByWidth(padding, getInstance().getInstanceViewPortWidth()));
     }
 
-    @WXComponentProp(name = Constants.Name.SCROLL_SNAP)
+    @WXComponentProp(name = Constants.Name.SCROLL_PADDING_BOTTOM)
     public void setScrollSnapPaddingBottom(int padding) {
         if(mListSnapHelper == null){
           mListSnapHelper = new ListSnapHelper();
@@ -497,6 +505,22 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         mListSnapHelper.setPaddingBottom((int)WXViewUtils.getRealPxByWidth(padding, getInstance().getInstanceViewPortWidth()));
 
     }
+
+  @WXComponentProp(name = Constants.Name.SCROLL_SNAP_TRIGGER)
+  public void setScrollSnapTrigger(int trigger) {
+    if(mListSnapHelper == null){
+      mListSnapHelper = new ListSnapHelper();
+    }
+    mListSnapHelper.setTrigger((int)WXViewUtils.getRealPxByWidth(trigger, getInstance().getInstanceViewPortWidth()));
+  }
+
+  @WXComponentProp(name = Constants.Name.SCROLL_SNAP_TRIGGER_REVERSE)
+  public void setScrollSnapTriggerReverse(int trigger) {
+    if(mListSnapHelper == null){
+      mListSnapHelper = new ListSnapHelper();
+    }
+    mListSnapHelper.setTriggerReverse((int)WXViewUtils.getRealPxByWidth(trigger, getInstance().getInstanceViewPortWidth()));
+  }
 
     @WXComponentProp(name = Constants.Name.SCROLL_SNAP_ALIGN)
     public void setScrollSnapAlign(String scroll_snap_align) {

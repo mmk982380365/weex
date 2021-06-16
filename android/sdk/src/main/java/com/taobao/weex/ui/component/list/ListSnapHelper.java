@@ -37,7 +37,8 @@ public class ListSnapHelper extends PagerSnapHelper {
     public final static int SNAP_ALIGN_BOTTOM = 2;
     private int mAlign = 0;
     private int mSnapPositon = 0;
-    private int SCROLL_SNAP_MIN_OFFSET = 50;
+    private int mSnapTrigger = 50;
+    private int mSnapTriggerReverse = 50;
 
 
     public void setPaddingTop(int paddingTop) {
@@ -46,6 +47,14 @@ public class ListSnapHelper extends PagerSnapHelper {
 
     public void setPaddingBottom(int paddingBottom) {
         this.mPaddingBottom = paddingBottom;
+    }
+
+    public void setTrigger(int trigger) {
+        this.mSnapTrigger = trigger;
+    }
+
+    public void setTriggerReverse(int trigger) {
+        this.mSnapTriggerReverse = trigger;
     }
 
     public void setSnapAlign(int align) {
@@ -129,13 +138,17 @@ public class ListSnapHelper extends PagerSnapHelper {
             return null;
         }
         if(closestChild != null){
-            int scrollOffset = absClosest - SCROLL_SNAP_MIN_OFFSET;
+            int scrollOffset = disClosest < 0 ? absClosest - mSnapTrigger : absClosest - mSnapTriggerReverse;
             if(scrollOffset > 0 && layoutManager.getPosition(layoutManager.getChildAt(0)) > 0 && layoutManager.getPosition(layoutManager.getChildAt(childCount - 1)) < layoutManager.getItemCount() - 1){
+                View tempCild;
                 if(disClosest < 0){
-                    closestChild = layoutManager.getChildAt(closetIndex + 1);
+                    tempCild = layoutManager.getChildAt(closetIndex + 1);
                 }
                 else{
-                    closestChild = layoutManager.getChildAt(closetIndex - 1);
+                    tempCild = layoutManager.getChildAt(closetIndex - 1);
+                }
+                if(tempCild != null) {
+                    closestChild = tempCild;
                 }
             }
             mSnapPositon = layoutManager.getPosition(closestChild);
