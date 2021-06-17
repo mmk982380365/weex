@@ -29,7 +29,7 @@
 class WeexRuntimeJSC : public WeexRuntime {
  public:
 
-  explicit WeexRuntimeJSC(WeexCore::ScriptBridge *script_bridge,
+  explicit WeexRuntimeJSC(std::shared_ptr<WeexCore::ScriptBridge> script_bridge,
                           bool isMultiProgress = true);
 
   ~WeexRuntimeJSC() {}

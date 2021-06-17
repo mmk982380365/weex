@@ -32,7 +32,7 @@ class ScriptBridge;
 
 class WeexContext {
  public:
-  explicit WeexContext(ScriptBridge *script_bridge) {
+  explicit WeexContext(std::shared_ptr<WeexCore::ScriptBridge> script_bridge) {
     this->script_bridge_ = script_bridge;
   }
 
@@ -56,7 +56,7 @@ class WeexContext {
   virtual void RunGC(void *engine_vm) = 0;
 
   virtual ~WeexContext() { this->js_context_ = nullptr; };
-  inline WeexCore::ScriptBridge *script_bridge() { return script_bridge_; }
+  inline std::shared_ptr<WeexCore::ScriptBridge> script_bridge() { return script_bridge_; }
 
   inline void *js_context() { return js_context_; }
   void SetJSContext(void *js_context) {
@@ -69,7 +69,7 @@ class WeexContext {
 
  private:
   void *js_context_;
-  WeexCore::ScriptBridge *script_bridge_;
+  std::shared_ptr<WeexCore::ScriptBridge> script_bridge_;
 };
 
 #endif //WEEX_PROJECT_WEEX_CONTEXT_H

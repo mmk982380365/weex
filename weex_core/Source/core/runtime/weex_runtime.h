@@ -40,7 +40,7 @@ enum JSEngineType {
 class WeexRuntime {
 
  public:
-  explicit WeexRuntime(WeexCore::ScriptBridge *script_bridge,
+  explicit WeexRuntime(std::shared_ptr<WeexCore::ScriptBridge> script_bridge,
                        bool isMultiProgress = true) {
     this->script_bridge_ = script_bridge;
     this->is_multiprocess_ = isMultiProgress;
@@ -164,7 +164,7 @@ class WeexRuntime {
     weex_context_holder_ = std::move(weex_context_holder);
   }
 
-  inline WeexCore::ScriptBridge *script_bridge() {
+  inline std::shared_ptr<WeexCore::ScriptBridge> script_bridge() {
     return script_bridge_;
   }
 
@@ -203,7 +203,7 @@ class WeexRuntime {
   JSEngineType js_engine_type_;
   std::unique_ptr<WeexContextHolder> weex_context_holder_;
   std::map<std::string, std::unique_ptr<WeexContextHolder>> light_app_context_holder_map_;
-  WeexCore::ScriptBridge *script_bridge_;
+  std::shared_ptr<WeexCore::ScriptBridge> script_bridge_;
   void *js_runtime_;
   bool is_multiprocess_;
 };

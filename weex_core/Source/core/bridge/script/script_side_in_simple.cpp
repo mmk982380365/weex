@@ -40,7 +40,7 @@ int bridge::script::ScriptSideInSimple::InitFramework(const char *script,
     LOGE("Init JSC")
 #if OS_ANDROID && USE_JSC
     WeexRuntimeManager::Instance()
-        ->add_weex_runtime(new WeexRuntimeJSC(this->bridge(), false));
+        ->add_weex_runtime(new WeexRuntimeJSC(this->bridge_ptr(), false));
 #elif OS_IOS || !USE_JSC
       engine_type = ENGINE_QJS;
 #endif
@@ -49,7 +49,7 @@ int bridge::script::ScriptSideInSimple::InitFramework(const char *script,
   if (engine_type & ENGINE_QJS) {
     LOGE("Init QJS")
     WeexRuntimeManager::Instance()
-        ->add_weex_runtime(new WeexRuntimeQJS(this->bridge(), false));
+        ->add_weex_runtime(new WeexRuntimeQJS(this->bridge_ptr(), false));
   }
 
   auto runtime_map = WeexRuntimeManager::Instance()->runtime_from_page_id("");

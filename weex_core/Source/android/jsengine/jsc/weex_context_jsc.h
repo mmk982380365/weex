@@ -29,7 +29,7 @@
 
 class WeexContextJSC : public WeexContext {
  public:
-  explicit WeexContextJSC(ScriptBridge* script_bridge) : WeexContext(script_bridge) {
+  explicit WeexContextJSC(std::shared_ptr<WeexCore::ScriptBridge> script_bridge) : WeexContext(script_bridge) {
   }
   void initGlobalContextFunctions() override;
   void initInstanceContextFunctions() override;

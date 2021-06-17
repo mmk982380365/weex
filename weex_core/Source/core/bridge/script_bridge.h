@@ -172,12 +172,15 @@ class ScriptBridge {
 
     virtual void SetLogType(const int logLevel, const bool isPerf) = 0;
     virtual void CompileQuickJSBin(const char *key, const char *script) = 0;
-    inline ScriptBridge *bridge() { return bridge_; }
-
+    inline ScriptBridge *bridge() { return bridge_.get(); }
+    inline std::shared_ptr<WeexCore::ScriptBridge> bridge_ptr() {
+      return bridge_;
+    }
    private:
-    ScriptBridge *bridge_;
+      std::shared_ptr<WeexCore::ScriptBridge> bridge_;
     friend class ScriptBridge;
-    inline void set_bridge(ScriptBridge *bridge) { bridge_ = bridge; }
+    inline void set_bridge(ScriptBridge *bridge) {   bridge_.reset(bridge);
+    }
     DISALLOW_COPY_AND_ASSIGN(ScriptSide);
   };
 

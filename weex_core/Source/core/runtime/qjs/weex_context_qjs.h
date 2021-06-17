@@ -40,7 +40,7 @@ extern "C" {
 
 class WeexContextQJS : public WeexContext {
  public:
-  explicit WeexContextQJS(ScriptBridge *script_bridge) : WeexContext(script_bridge) {
+  explicit WeexContextQJS(std::shared_ptr<WeexCore::ScriptBridge> script_bridge) : WeexContext(script_bridge) {
     timer_function_id_ = 0;
   }
 

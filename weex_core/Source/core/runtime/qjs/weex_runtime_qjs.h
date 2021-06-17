@@ -26,7 +26,7 @@
 
 class WeexRuntimeQJS : public WeexRuntime {
  public:
-  explicit WeexRuntimeQJS(WeexCore::ScriptBridge *script_bridge,
+  explicit WeexRuntimeQJS(std::shared_ptr<WeexCore::ScriptBridge> script_bridge,
                           bool isMultiProgress = true);
 
   ~WeexRuntimeQJS() {};
