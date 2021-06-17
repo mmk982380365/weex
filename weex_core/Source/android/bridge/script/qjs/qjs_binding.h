@@ -57,7 +57,7 @@ static std::shared_ptr<WeexCore::ScriptBridge> script_bridge(JSContext* ctx) {
 
 static void ReportException(JSContext* context,
                             const std::string &funcName,
-                            const std::string &page_id, std::shared_ptr<WeexCore::ScriptBridge> bridge) {
+                            const std::string &page_id,const std::shared_ptr<WeexCore::ScriptBridge> &bridge) {
   const JSValue &exception = JS_GetException(context);
   const char* exception_info = JS_ToCString(context, exception);
   JSValue name = JS_GetPropertyStr(context, exception, "name");
