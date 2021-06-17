@@ -145,7 +145,7 @@ WeexGlobalObject::WeexGlobalObject(VM &vm, Structure *structure)
   Base::finishCreation(vm);
 }
 
-void WeexGlobalObject::SetScriptBridge(std::shared_ptr<WeexCore::ScriptBridge> script_bridge) {
+void WeexGlobalObject::SetScriptBridge(const std::shared_ptr<WeexCore::ScriptBridge> &script_bridge) {
   script_bridge_ = script_bridge;
 }
 

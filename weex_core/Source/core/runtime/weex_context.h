@@ -32,7 +32,7 @@ class ScriptBridge;
 
 class WeexContext {
  public:
-  explicit WeexContext(std::shared_ptr<WeexCore::ScriptBridge> script_bridge) {
+  explicit WeexContext(const std::shared_ptr<WeexCore::ScriptBridge> &script_bridge) {
     this->script_bridge_ = script_bridge;
   }
 

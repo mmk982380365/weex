@@ -81,7 +81,7 @@ class WeexGlobalObject : public JSGlobalObject {
   void initGlobalContextFunctions();
 
   inline std::shared_ptr<WeexCore::ScriptBridge> js_bridge() { return script_bridge_; }
-  void SetScriptBridge(std::shared_ptr<WeexCore::ScriptBridge> script_bridge);
+  void SetScriptBridge(const std::shared_ptr<WeexCore::ScriptBridge> &script_bridge);
 
   // store js timer function
   void addTimer(uint32_t function_id, JSC::Strong<JSC::Unknown> &&function);

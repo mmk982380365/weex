@@ -40,7 +40,7 @@ enum JSEngineType {
 class WeexRuntime {
 
  public:
-  explicit WeexRuntime(std::shared_ptr<WeexCore::ScriptBridge> script_bridge,
+  explicit WeexRuntime(const std::shared_ptr<WeexCore::ScriptBridge> &script_bridge,
                        bool isMultiProgress = true) {
     this->script_bridge_ = script_bridge;
     this->is_multiprocess_ = isMultiProgress;

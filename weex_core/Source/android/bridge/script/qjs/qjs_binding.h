@@ -37,7 +37,7 @@ namespace script {
   (reinterpret_cast<void (*)(std::string, std::string, JSContext*, JSValueConst*, int)> \
   (WeexCore::WeexCoreManager::Instance()->unicorn_weex_action_ptr()))
 
-static WeexCore::ScriptBridge* script_bridge(JSContext* ctx) {
+static std::shared_ptr<WeexCore::ScriptBridge> script_bridge(JSContext* ctx) {
   if (ctx == nullptr) {
     return nullptr;
   }
@@ -57,7 +57,7 @@ static WeexCore::ScriptBridge* script_bridge(JSContext* ctx) {
 
 static void ReportException(JSContext* context,
                             const std::string &funcName,
-                            const std::string &page_id, WeexCore::ScriptBridge* bridge) {
+                            const std::string &page_id, std::shared_ptr<WeexCore::ScriptBridge> bridge) {
   const JSValue &exception = JS_GetException(context);
   const char* exception_info = JS_ToCString(context, exception);
   JSValue name = JS_GetPropertyStr(context, exception, "name");
@@ -86,7 +86,7 @@ static void ReportException(JSContext* context,
 
 static JSValue js_CallNativeComponent(JSContext* ctx, JSValueConst this_val,
                                       int argc, JSValueConst* argv) {
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -97,7 +97,7 @@ static JSValue js_CallNativeComponent(JSContext* ctx, JSValueConst this_val,
 
 static JSValue js_CallAddElement(JSContext* ctx, JSValueConst this_val,
                                  int argc, JSValueConst* argv) {
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -108,7 +108,7 @@ static JSValue js_CallAddElement(JSContext* ctx, JSValueConst this_val,
 
 static JSValue js_CallCreateBody(JSContext* ctx, JSValueConst this_val,
                                  int argc, JSValueConst* argv) {
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -119,7 +119,7 @@ static JSValue js_CallCreateBody(JSContext* ctx, JSValueConst this_val,
 
 static JSValue js_CallCreateFinish(JSContext* ctx, JSValueConst this_val,
                                    int argc, JSValueConst* argv) {
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -130,7 +130,7 @@ static JSValue js_CallCreateFinish(JSContext* ctx, JSValueConst this_val,
 static JSValue js_CallUpdateAttrs(JSContext* ctx, JSValueConst this_val,
                                   int argc, JSValueConst* argv) {
 
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -142,7 +142,7 @@ static JSValue js_CallUpdateAttrs(JSContext* ctx, JSValueConst this_val,
 static JSValue js_CallUpdateStyle(JSContext* ctx, JSValueConst this_val,
                                   int argc, JSValueConst* argv) {
 
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -153,7 +153,7 @@ static JSValue js_CallUpdateStyle(JSContext* ctx, JSValueConst this_val,
 
 static JSValue js_CallRemoveElement(JSContext* ctx, JSValueConst this_val,
                                     int argc, JSValueConst* argv) {
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -164,7 +164,7 @@ static JSValue js_CallRemoveElement(JSContext* ctx, JSValueConst this_val,
 
 static JSValue js_CallMoveElement(JSContext* ctx, JSValueConst this_val,
                                   int argc, JSValueConst* argv) {
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -175,7 +175,7 @@ static JSValue js_CallMoveElement(JSContext* ctx, JSValueConst this_val,
 
 static JSValue js_CallAddEvent(JSContext* ctx, JSValueConst this_val, int argc,
                                JSValueConst* argv) {
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -186,7 +186,7 @@ static JSValue js_CallAddEvent(JSContext* ctx, JSValueConst this_val, int argc,
 
 static JSValue js_CallRemoveEvent(JSContext* ctx, JSValueConst this_val,
                                   int argc, JSValueConst* argv) {
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -197,7 +197,7 @@ static JSValue js_CallRemoveEvent(JSContext* ctx, JSValueConst this_val,
 
 static JSValue js_CallNative(JSContext* ctx, JSValueConst this_val, int argc,
                              JSValueConst* argv) {
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -216,7 +216,7 @@ static JSValue js_CallNative(JSContext* ctx, JSValueConst this_val, int argc,
 
 static JSValue js_CallNativeModule(JSContext* ctx, JSValueConst this_val,
                                    int argc, JSValueConst* argv) {
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -292,7 +292,7 @@ static JSValue js_SetTimeoutNative(JSContext* ctx, JSValueConst this_val,
   WeexCore::bridge::script::ScriptSideInQJS::JSParams
       time(ctx, argv[1], WeexCore::bridge::script::ScriptSideInQJS::JSParams::PARAMS_TYPE_JSON);
 
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge != nullptr)
     bridge->core_side()->SetTimeout(callback_id.value(),
                                     time.value());
@@ -302,7 +302,7 @@ static JSValue js_SetTimeoutNative(JSContext* ctx, JSValueConst this_val,
 static JSValue js_CallUpdateFinish(JSContext* ctx, JSValueConst this_val,
                                    int argc, JSValueConst* argv) {
 
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -322,7 +322,7 @@ static JSValue js_CallUpdateFinish(JSContext* ctx, JSValueConst this_val,
 
 static JSValue js_CallRefreshFinish(JSContext* ctx, JSValueConst this_val,
                                     int argc, JSValueConst* argv) {
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -343,7 +343,7 @@ static JSValue js_CallRefreshFinish(JSContext* ctx, JSValueConst this_val,
 static JSValue js_SetIntervalWeex(JSContext* ctx, JSValueConst this_val,
                                   int argc, JSValueConst* argv) {
 
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -360,7 +360,7 @@ static JSValue js_SetIntervalWeex(JSContext* ctx, JSValueConst this_val,
 
 static JSValue js_ClearIntervalWeex(JSContext* ctx, JSValueConst this_val,
                                     int argc, JSValueConst* argv) {
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }
@@ -454,7 +454,7 @@ static void BindConsoleLog(JSContext* ctx) {
 
 static JSValue js_NativeLog(JSContext* ctx, JSValueConst this_val, int argc,
                             JSValueConst* argv) {
-  ScriptBridge* bridge = script_bridge(ctx);
+  std::shared_ptr<WeexCore::ScriptBridge> bridge = script_bridge(ctx);
   if (bridge == nullptr) {
     return JS_UNDEFINED;
   }

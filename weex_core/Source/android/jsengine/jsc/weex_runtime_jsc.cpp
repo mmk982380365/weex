@@ -38,7 +38,7 @@ static void _getArgListFromJSParams(MarkedArgumentBuffer *obj,
                                     ExecState *state,
                                     const std::vector<VALUE_WITH_TYPE *> &params);
 
-WeexRuntimeJSC::WeexRuntimeJSC(std::shared_ptr<WeexCore::ScriptBridge> script_bridge,
+WeexRuntimeJSC::WeexRuntimeJSC(const std::shared_ptr<WeexCore::ScriptBridge> &script_bridge,
                                bool isMultiProgress) : WeexRuntime(script_bridge, isMultiProgress) {
   set_engine_type(JSEngineType::ENGINE_JSC);
   initJSC(isMultiProgress);

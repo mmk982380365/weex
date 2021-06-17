@@ -29,7 +29,7 @@
 #include "core/runtime/weex_runtime_manager.h"
 
 namespace WeexCore {
-class ScriptBridge {
+class ScriptBridge : public std::enable_shared_from_this<ScriptBridge>{
  public:
   class CoreSide {
    public:
@@ -99,12 +99,12 @@ class ScriptBridge {
 
     virtual void CompileQuickJSCallback(const char *key, const char *bytecode, int length) = 0;
 
-    inline ScriptBridge *bridge() { return bridge_; }
+    inline std::shared_ptr<WeexCore::ScriptBridge> bridge() { return bridge_; }
 
-   private:
-    ScriptBridge *bridge_;
+  private:
+      std::shared_ptr<WeexCore::ScriptBridge> bridge_;
     friend class ScriptBridge;
-    inline void set_bridge(ScriptBridge *bridge) { bridge_ = bridge; }
+    inline void set_bridge(const std::shared_ptr<WeexCore::ScriptBridge> &bridge) { bridge_ = bridge; }
     DISALLOW_COPY_AND_ASSIGN(CoreSide);
   };
 
@@ -172,15 +172,13 @@ class ScriptBridge {
 
     virtual void SetLogType(const int logLevel, const bool isPerf) = 0;
     virtual void CompileQuickJSBin(const char *key, const char *script) = 0;
-    inline ScriptBridge *bridge() { return bridge_.get(); }
-    inline std::shared_ptr<WeexCore::ScriptBridge> bridge_ptr() {
+    inline std::shared_ptr<WeexCore::ScriptBridge> bridge() {
       return bridge_;
     }
    private:
       std::shared_ptr<WeexCore::ScriptBridge> bridge_;
     friend class ScriptBridge;
-    inline void set_bridge(ScriptBridge *bridge) {   bridge_.reset(bridge);
-    }
+    inline void set_bridge(const std::shared_ptr<WeexCore::ScriptBridge> &bridge) { bridge_ = bridge;}
     DISALLOW_COPY_AND_ASSIGN(ScriptSide);
   };
 
@@ -191,22 +189,22 @@ class ScriptBridge {
 
   inline void set_core_side(CoreSide *core_side) {
     core_side_.reset(core_side);
-    core_side_->set_bridge(this);
+    core_side_->set_bridge(shared_from_this());
   }
 
   inline void set_script_side(ScriptSide *script_side) {
     script_side_.reset(script_side);
-    script_side_->set_bridge(this);
+    script_side_->set_bridge(shared_from_this());
   }
 
   inline void set_script_side_qjs(ScriptSide *script_side) {
     script_side_qjs_.reset(script_side);
-    script_side_qjs_->set_bridge(this);
+    script_side_qjs_->set_bridge(shared_from_this());
   }
 
   inline void set_script_side_main_process_only(ScriptSide *script_side) {
     script_side_main_process_.reset(script_side);
-    script_side_main_process_->set_bridge(this);
+    script_side_main_process_->set_bridge(shared_from_this());
   }
 
   ScriptBridge() : is_passable_(true) {}

@@ -32,7 +32,7 @@
 #endif
 static void ReportException(JSContext *context,
                             const std::string &funcName,
-                            const std::string &page_id, std::shared_ptr<WeexCore::ScriptBridge> bridge) {
+                            const std::string &page_id, const std::shared_ptr<WeexCore::ScriptBridge> &bridge) {
   const JSValue &exception = JS_GetException(context);
   const char *exception_info = JS_ToCString(context, exception);
   JSValue name = JS_GetPropertyStr(context, exception, "name");
@@ -100,7 +100,7 @@ static inline void convertJSValueToWeexJSResult(JSContext *ctx,
 #endif
 }
 
-WeexRuntimeQJS::WeexRuntimeQJS(std::shared_ptr<WeexCore::ScriptBridge> script_bridge,
+WeexRuntimeQJS::WeexRuntimeQJS(const std::shared_ptr<WeexCore::ScriptBridge> &script_bridge,
                                bool isMultiProgress) : WeexRuntime(script_bridge, isMultiProgress) {
   set_js_runtime(JS_NewRuntime());
   set_weex_context_holder(std::make_unique<WeexContextHolder>(engine_vm<JSRuntime>(),
