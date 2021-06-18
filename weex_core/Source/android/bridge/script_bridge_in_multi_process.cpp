@@ -681,6 +681,9 @@ std::unique_ptr<IPCResult> CompileQuickJSBinCallback(IPCArguments *arguments) {
 }
 
 ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
+}
+
+void ScriptBridgeInMultiProcess::Init(){
   if (WeexRuntimeManager::Instance()->is_enable_main_process_script_side()) {
     set_script_side_main_process_only(new bridge::script::ScriptSideInSimple(true));
   }

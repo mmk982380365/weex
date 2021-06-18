@@ -33,8 +33,9 @@ class ScriptBridgeInMultiProcess : public ScriptBridge {
   ScriptBridgeInMultiProcess();
   ~ScriptBridgeInMultiProcess();
   void RegisterIPCCallback(IPCHandler *handler);
+  void Init();
 
- private:
+private:
   std::unique_ptr<WeexJSConnection> connection_;
   DISALLOW_COPY_AND_ASSIGN(ScriptBridgeInMultiProcess);
 };

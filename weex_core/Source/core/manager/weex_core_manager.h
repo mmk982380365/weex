@@ -55,7 +55,7 @@ class WeexCoreManager {
 
   inline std::shared_ptr<WeexCore::ScriptBridge> script_bridge() { return script_bridge_; }
 
-  inline void set_script_bridge(std::shared_ptr<WeexCore::ScriptBridge> script_bridge) {
+  inline void set_script_bridge(const std::shared_ptr<WeexCore::ScriptBridge> &script_bridge) {
     script_bridge_= script_bridge;
   }
 

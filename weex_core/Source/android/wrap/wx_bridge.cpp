@@ -365,8 +365,10 @@ static jint InitFramework(JNIEnv *env, jobject object, jstring script,
   // Set project mode
   WeexCoreManager::Instance()->set_project_mode(
       WeexCoreManager::ProjectMode::MULTI_PROCESS);
+  std::shared_ptr<WeexCore::ScriptBridgeInMultiProcess> script_bridge = std::shared_ptr<WeexCore::ScriptBridgeInMultiProcess>(new ScriptBridgeInMultiProcess);
   WeexCoreManager::Instance()->set_script_bridge(
-          std::shared_ptr<WeexCore::ScriptBridge>(new ScriptBridgeInMultiProcess));
+          script_bridge);
+  script_bridge->Init();
 
 //
 //  // It means initialization failed when any bridge is not passable
