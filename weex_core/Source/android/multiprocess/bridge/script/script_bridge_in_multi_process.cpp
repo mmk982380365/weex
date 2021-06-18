@@ -109,7 +109,9 @@ static inline const char *GetUTF8StringFromIPCArg(IPCArguments *arguments, size_
 
 ScriptBridgeInMultiProcess *ScriptBridgeInMultiProcess::g_instance = NULL;
 
-ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
+ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() { }
+
+void ScriptBridgeInMultiProcess::Init() {
   task_queue_thread_ = std::make_unique<weex::base::Thread>(weex::base::MessageLoop::DEFAULT);
   task_queue_thread_->Start();
   LOGE("thread isStarted and task_queue_thread_ %u", pthread_self());
@@ -225,6 +227,18 @@ void ScriptBridgeInMultiProcess::RegisterIPCCallback(IPCHandler *handler) {
                            setLogType);
   handler->registerHandler(static_cast<uint32_t>(IPCJSMsg::COMPILEQUICKJSBIN),
                            compileQuickJSBin);
+}
+
+std::shared_ptr<ScriptBridgeInMultiProcess> ScriptBridgeInMultiProcess::Instance() {
+  static std::once_flag once_flag;
+  static std::shared_ptr<ScriptBridgeInMultiProcess> s_bridge_instance = nullptr;
+  std::call_once(once_flag, []() -> void {
+    if (!s_bridge_instance) {
+      s_bridge_instance = std::make_shared<ScriptBridgeInMultiProcess>();
+      s_bridge_instance->Init();
+    }
+  });
+  return s_bridge_instance;
 }
 
 std::unique_ptr<IPCResult> ScriptBridgeInMultiProcess::InitFramework(

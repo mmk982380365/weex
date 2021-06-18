@@ -35,12 +35,9 @@ namespace bridge {
 namespace js {
 class ScriptBridgeInMultiProcess : public WeexCore::ScriptBridge {
  public:
-  static ScriptBridgeInMultiProcess *Instance() {
-    if (g_instance == NULL) {
-      g_instance = new ScriptBridgeInMultiProcess();
-    }
-    return g_instance;
-  }
+  static std::shared_ptr<ScriptBridgeInMultiProcess> Instance();
+
+  void Init();
 
   weex::base::Thread *js_thread() {
     return task_queue_thread_.get();
