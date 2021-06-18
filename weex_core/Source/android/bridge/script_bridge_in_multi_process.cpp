@@ -681,7 +681,6 @@ std::unique_ptr<IPCResult> CompileQuickJSBinCallback(IPCArguments *arguments) {
 }
 
 ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
-  set_script_side(new bridge::script::ScriptSideInMultiProcess);
   if (WeexRuntimeManager::Instance()->is_enable_main_process_script_side()) {
     set_script_side_main_process_only(new bridge::script::ScriptSideInSimple(true));
   }
@@ -690,6 +689,7 @@ ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
     set_script_side_qjs(new WeexCore::bridge::script::ScriptSideInQJS);
   }
 #if USE_JSC
+  set_script_side(new bridge::script::ScriptSideInMultiProcess);
   std::unique_ptr<MultiProcessAndSoInitializer> initializer(
       new MultiProcessAndSoInitializer);
   LOGD("ScriptBridgeInMultiProcess");

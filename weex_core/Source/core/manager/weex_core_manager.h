@@ -53,15 +53,10 @@ class WeexCoreManager {
     platform_bridge_ = bridge;
   }
 
-  inline ScriptBridge *script_bridge() { return script_bridge_; }
+  inline std::shared_ptr<WeexCore::ScriptBridge> script_bridge() { return script_bridge_; }
 
-  inline void set_script_bridge(ScriptBridge *script_bridge) {
-    ScriptBridge* pre_script_bridge  =  script_bridge_;
-    script_bridge_ = script_bridge;
-    if (nullptr != pre_script_bridge && do_release_map()){
-        delete pre_script_bridge;
-        pre_script_bridge = nullptr;
-    }
+  inline void set_script_bridge(std::shared_ptr<WeexCore::ScriptBridge> script_bridge) {
+    script_bridge_= script_bridge;
   }
 
   inline void set_measure_function_adapter(MeasureFunctionAdapter *adapter) {
@@ -94,7 +89,7 @@ class WeexCoreManager {
  private:
   PlatformBridge *platform_bridge_;
   MeasureFunctionAdapter *measure_function_adapter_;
-  ScriptBridge *script_bridge_;
+  std::shared_ptr<WeexCore::ScriptBridge> script_bridge_;
   ProjectMode project_mode_;
   weex::base::Thread *script_thread_;
   volatile bool release_map_;
