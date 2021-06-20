@@ -23,6 +23,7 @@
 #ifndef WEEX_PROJECT_WEEX_CONTEXT_QJS_H
 #define WEEX_PROJECT_WEEX_CONTEXT_QJS_H
 #include "core/runtime/weex_context.h"
+#include "core/runtime/qjs/weex_timer_manager_qjs.h"
 #include "base/log_defines.h"
 extern "C" {
 #if OS_ANDROID
@@ -41,7 +42,7 @@ extern "C" {
 class WeexContextQJS : public WeexContext {
  public:
   explicit WeexContextQJS(const std::shared_ptr<WeexCore::ScriptBridge> &script_bridge) : WeexContext(script_bridge) {
-    timer_function_id_ = 0;
+      timer_manager = std::shared_ptr<WeexTimerManagerQJS>(new WeexTimerManagerQJS);
   }
 
   void initGlobalContextFunctions() override;
@@ -62,6 +63,11 @@ class WeexContextQJS : public WeexContext {
   void Release() override;
 
   void RunGC(void *engine_vm) override;
+
+  std::shared_ptr<WeexTimerManagerQJS> get_timer_manager(){
+      return timer_manager;
+  }
+
 
  public:
   class JSParams {
@@ -96,44 +102,19 @@ class WeexContextQJS : public WeexContext {
 #endif
   };
 
-  uint32_t gen_timer_function_id() {
-    return ++timer_function_id_;
-  }
 
-  JSValue get_timer_function(uint32_t function_id) {
-    auto iter = timer_function_.find(function_id);
-    if (iter == timer_function_.end()) {
-      return JS_UNDEFINED;
-    }
-    return timer_function_[function_id];
-  }
-
-  JSValue remove_timer(uint32_t function_id) {
-    auto iter = timer_function_.find(function_id);
-    if (iter == timer_function_.end()) {
-      LOGE("timer do not exist!");
-      return JS_UNDEFINED;
-    }
-    JSValue function = timer_function_[function_id];
-    timer_function_.erase(function_id);
-    return function;
-  }
-
-  inline void add_timer(uint32_t function_id, JSValue func) {
-    timer_function_[function_id] = func;
-  }
 
   ~WeexContextQJS() {
-    timer_function_.clear();
     if (js_context()) {
       JSContext *context = static_cast<JSContext *>(js_context());
       JS_FreeContext(context);
     }
+    timer_manager->clear_timer();
   }
  private:
   JSContext *createContext(JSRuntime *engine_vm);
-  std::map<uint32_t, JSValue> timer_function_;
-  uint32_t timer_function_id_;
+  std::shared_ptr<WeexTimerManagerQJS> timer_manager;
+
 };
 
 #endif //WEEX_PROJECT_WEEX_CONTEXT_QJS_H

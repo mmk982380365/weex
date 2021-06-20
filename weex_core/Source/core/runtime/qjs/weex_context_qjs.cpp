@@ -373,7 +373,6 @@ void WeexContextQJS::initWxEnvironment(std::vector<std::pair<std::string, std::s
 WeexContext *WeexContextQJS::cloneWeexContext(const std::string &page_id,
                                               bool initContext,
                                               bool forAppContext) {
-
   WeexContext *weexContext = new WeexContextQJS(this->script_bridge());
   auto *ctx = static_cast<JSContext *>(js_context());
   JSContext *newContext = createContext(JS_GetRuntime(ctx));
@@ -834,13 +833,18 @@ static void setNativeTimer(int32_t funcId,
                            WeexContextQJS *weexContext,
                            bool repeat) {
   auto *ctx = static_cast<JSContext *>(weexContext->js_context());
+  auto context_timer_manager = weexContext->get_timer_manager();
   weex::base::MessageLoop::GetCurrent()->PostDelayedTask(
       [id = funcId,
           jsContext = weexContext,
+          timer_manager = context_timer_manager,
           re = repeat,
           timeout = timeoutNumber,
           thisObj = JS_DupValue(ctx, this_obj)] {
-        JSValue function = jsContext->get_timer_function(id);
+        JSValue function = timer_manager->get_timer_function(id);
+        if(function == JS_UNDEFINED){
+          return;
+        }
         auto *context = static_cast<JSContext *>(jsContext->js_context());
         if (!JS_IsFunction(context, function)) {
           return;
@@ -880,7 +884,7 @@ static void setNativeTimer(int32_t funcId,
         if (re) {
           setNativeTimer(id, timeout, thisObj, jsContext, re);
         } else {
-          jsContext->remove_timer(id);
+          timer_manager->remove_timer(id);
           if (JS_IsFunction(context, function)) {
             JS_FreeValue(context, function);
           }
@@ -915,8 +919,8 @@ static JSValue addNativeTimer(JSContext *ctx, JSValueConst this_val,
 
   int32_t timeoutNumber;
   JS_ToInt32(ctx, &timeoutNumber, timeout);
-  uint32_t funcId = weexContext->gen_timer_function_id();
-  weexContext->add_timer(funcId, JS_DupValue(ctx, jsFunction));
+  uint32_t funcId = weexContext->get_timer_manager()->gen_timer_function_id();
+  weexContext->get_timer_manager()->add_timer(funcId, JS_DupValue(ctx, jsFunction));
   setNativeTimer(funcId, timeoutNumber, this_val, weexContext, repeat);
   return JS_NewInt32(ctx, funcId);
 }
@@ -964,7 +968,7 @@ static JSValue js_ClearNativeTimeout(JSContext *ctx, JSValueConst this_val,
   }
   int32_t id;
   JS_ToInt32(ctx, &id, funcId);
-  JSValue timerFunction = weexContext->remove_timer(id);
+  JSValue timerFunction = weexContext->get_timer_manager()->remove_timer(id);
   if (JS_IsFunction(ctx, timerFunction)) {
     JS_FreeValue(ctx, timerFunction);
   }
