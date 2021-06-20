@@ -842,7 +842,7 @@ static void setNativeTimer(int32_t funcId,
           timeout = timeoutNumber,
           thisObj = JS_DupValue(ctx, this_obj)] {
         JSValue function = timer_manager->get_timer_function(id);
-        if(function == JS_UNDEFINED){
+        if(JS_IsUndefined(function)){
           return;
         }
         auto *context = static_cast<JSContext *>(jsContext->js_context());
