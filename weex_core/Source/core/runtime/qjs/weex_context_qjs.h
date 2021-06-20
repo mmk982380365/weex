@@ -35,6 +35,7 @@ extern "C" {
 
 #if OS_ANDROID
 #include <wson.h>
+#include <base/message_loop/message_loop.h>
 #include "wson_parser.h"
 #include "android/utils/wson_qjs.h"
 #endif
@@ -109,7 +110,9 @@ class WeexContextQJS : public WeexContext {
       JSContext *context = static_cast<JSContext *>(js_context());
       JS_FreeContext(context);
     }
-    timer_manager->clear_timer();
+    weex::base::MessageLoop::GetCurrent()->PostTask([m_timer_manager = timer_manager]{
+        m_timer_manager->clear_timer();
+    });
   }
  private:
   JSContext *createContext(JSRuntime *engine_vm);
