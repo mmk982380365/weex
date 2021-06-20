@@ -46,10 +46,10 @@ RenderObject::~RenderObject() {
     this->styles_ = nullptr;
   }
 
-  if (this->attributes_ != nullptr) {
-    delete this->attributes_;
-    this->attributes_ = nullptr;
-  }
+  // if (this->attributes_ != nullptr) {
+  //   delete this->attributes_;
+  //   this->attributes_ = nullptr;
+  // }
 
   if (this->events_ != nullptr) {
     delete this->events_;
