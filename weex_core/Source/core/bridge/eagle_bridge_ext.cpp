@@ -46,10 +46,19 @@ std::function<void(const char*, const char*)> CreatePageDownloadExec(const char*
                 opts_json.object_items());
         opts_map["bundleType"] = bundleType;
         std::vector<std::pair<std::string, std::string>> params;
-        WeexCoreManager::Instance()
-            ->script_bridge()
-            ->script_side()
-            ->CreateInstance(instanceId.c_str(), func.c_str(), result, strlen(result),
+        auto instance = WeexCoreManager::Instance();
+        if (!instance) {
+            return;
+        }
+        auto script_bridge = instance->script_bridge();
+        if (!script_bridge) {
+            return;
+        }
+        auto script_side = script_bridge->script_side();
+        if (!script_side) {
+            return;
+        }
+        script_side->CreateInstance(instanceId.c_str(), func.c_str(), result, strlen(result),
                              opts_json.dump().c_str(), initData.c_str(),
                              strcmp("Rax", bundleType) ? "\0" : extendsApi.c_str(),
                              params);
