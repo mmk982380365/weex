@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <core/bridge/platform/core_side_in_platform.h>
 #include "third_party/json11/json11.hpp"
 #include "core/bridge/eagle_bridge.h"
 #include "base/string_util.h"
@@ -474,25 +475,18 @@ bool EagleBridge::WeexCoreHandler::UpdateStyle(const std::string& page_id, const
 int EagleBridge::WeexCoreHandler::ExecJS(const char* instanceId, const char* nameSpace,
                                          const char* func,
                                          std::vector<ValueWithType*>& params) {
-
-  auto instance = WeexCoreManager::Instance();
-  if (!instance) {
-      return -1;
+  const std::vector<WeexCore::ScriptBridge::ScriptSide *>
+          &script_side_vector = WeexCore::CoreSideInPlatform::GetScriptSide(instanceId);
+  int ret = 0;
+  for (const auto &it : script_side_vector) {
+    ret = it->ExecJS(
+            instanceId,
+            nameSpace,
+            func,
+            params
+    );
   }
-  auto script_bridge = instance->script_bridge();
-  if (!script_bridge) {
-      return -1;
-  }
-  auto script_side = script_bridge->script_side();
-  if (!script_side) {
-      return -1;
-  }
-  return script_side->ExecJS(
-      instanceId,
-      nameSpace,
-      func,
-      params
-  );
+  return ret;
 }
 
 //FIXME Please don't call this method, which will cause downgrade of Weex.

@@ -134,7 +134,7 @@ class CoreSideInPlatform : public PlatformBridge::CoreSide {
   void SetLogType(const int logType, const bool isPerf) override;
   void CompileQuickJSBin(const char *key, const char *script) override;
   double GetLayoutTime(const char *instanceId) const override;
-  std::vector<WeexCore::ScriptBridge::ScriptSide *> GetScriptSide(const char *page_id);
+  static std::vector<WeexCore::ScriptBridge::ScriptSide *> GetScriptSide(const char *page_id);
 
  private:
   DISALLOW_COPY_AND_ASSIGN(CoreSideInPlatform);

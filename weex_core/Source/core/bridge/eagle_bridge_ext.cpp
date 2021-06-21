@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+#include <core/bridge/platform/core_side_in_platform.h>
 #include "core/bridge/eagle_bridge_ext.h"
 #include "third_party/json11/json11.hpp"
 #include "core/manager/weex_core_manager.h"
@@ -46,22 +47,14 @@ std::function<void(const char*, const char*)> CreatePageDownloadExec(const char*
                 opts_json.object_items());
         opts_map["bundleType"] = bundleType;
         std::vector<std::pair<std::string, std::string>> params;
-        auto instance = WeexCoreManager::Instance();
-        if (!instance) {
-            return;
-        }
-        auto script_bridge = instance->script_bridge();
-        if (!script_bridge) {
-            return;
-        }
-        auto script_side = script_bridge->script_side();
-        if (!script_side) {
-            return;
-        }
-        script_side->CreateInstance(instanceId.c_str(), func.c_str(), result, strlen(result),
-                             opts_json.dump().c_str(), initData.c_str(),
-                             strcmp("Rax", bundleType) ? "\0" : extendsApi.c_str(),
-                             params);
+        const std::vector<WeexCore::ScriptBridge::ScriptSide *>
+            &script_side_vector = WeexCore::CoreSideInPlatform::GetScriptSide(instanceId.c_str());
+        for (const auto &it : script_side_vector) {
+            it->CreateInstance(instanceId.c_str(), func.c_str(), result, strlen(result),
+                                     opts_json.dump().c_str(), initData.c_str(),
+                                     strcmp("Rax", bundleType) ? "\0" : extendsApi.c_str(),
+                                     params);
+          }
       };
   return exec_js;
 }
@@ -106,8 +99,11 @@ void RefreshPageEagle(const char* page_id, const char* init_data) {
       reinterpret_cast<const uint16_t*>(utf16_key.c_str()), utf16_key.size());
   msg.push_back(args);
 
-  WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side()->ExecJS(
-      page_id, "", "callJS", msg);
+  const std::vector<WeexCore::ScriptBridge::ScriptSide *>
+            &script_side_vector = WeexCore::CoreSideInPlatform::GetScriptSide(page_id);
+  for (const auto &it : script_side_vector) {
+      it->ExecJS(page_id, "", "callJS", msg);
+  }
   freeParams(msg);
 }
 #endif
