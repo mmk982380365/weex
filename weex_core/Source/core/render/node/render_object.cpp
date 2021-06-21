@@ -46,6 +46,7 @@ RenderObject::~RenderObject() {
     this->styles_ = nullptr;
   }
 
+  // TODO: revert-me
   // if (this->attributes_ != nullptr) {
   //   delete this->attributes_;
   //   this->attributes_ = nullptr;

@@ -474,7 +474,20 @@ bool EagleBridge::WeexCoreHandler::UpdateStyle(const std::string& page_id, const
 int EagleBridge::WeexCoreHandler::ExecJS(const char* instanceId, const char* nameSpace,
                                          const char* func,
                                          std::vector<ValueWithType*>& params) {
-  return WeexCore::WeexCoreManager::Instance()->script_bridge()->script_side()->ExecJS(
+
+  auto instance = WeexCoreManager::Instance();
+  if (!instance) {
+      return -1;
+  }
+  auto script_bridge = instance->script_bridge();
+  if (!script_bridge) {
+      return -1;
+  }
+  auto script_side = script_bridge->script_side();
+  if (!script_side) {
+      return -1;
+  }
+  return script_side->ExecJS(
       instanceId,
       nameSpace,
       func,
