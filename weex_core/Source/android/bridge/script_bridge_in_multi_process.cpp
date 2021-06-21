@@ -692,9 +692,8 @@ void ScriptBridgeInMultiProcess::Init(){
   if (WXCoreEnvironment::getInstance()->EnableQJSRuntime()) {
     set_script_side_qjs(new WeexCore::bridge::script::ScriptSideInQJS);
   }
-  set_script_side(new bridge::script::ScriptSideInMultiProcess);
-
 #if USE_JSC
+  set_script_side(new bridge::script::ScriptSideInMultiProcess);
   std::unique_ptr<MultiProcessAndSoInitializer> initializer(
       new MultiProcessAndSoInitializer);
   LOGD("ScriptBridgeInMultiProcess");
