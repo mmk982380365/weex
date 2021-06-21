@@ -684,15 +684,17 @@ ScriptBridgeInMultiProcess::ScriptBridgeInMultiProcess() {
 }
 
 void ScriptBridgeInMultiProcess::Init(){
+  ScriptSide* scriptSideInSimple = new bridge::script::ScriptSideInSimple(true);
   if (WeexRuntimeManager::Instance()->is_enable_main_process_script_side()) {
-    set_script_side_main_process_only(new bridge::script::ScriptSideInSimple(true));
+    set_script_side_main_process_only(scriptSideInSimple);
   }
   set_core_side(new CoreSideInScript);
   if (WXCoreEnvironment::getInstance()->EnableQJSRuntime()) {
     set_script_side_qjs(new WeexCore::bridge::script::ScriptSideInQJS);
   }
-#if USE_JSC
   set_script_side(new bridge::script::ScriptSideInMultiProcess);
+
+#if USE_JSC
   std::unique_ptr<MultiProcessAndSoInitializer> initializer(
       new MultiProcessAndSoInitializer);
   LOGD("ScriptBridgeInMultiProcess");
@@ -713,6 +715,8 @@ void ScriptBridgeInMultiProcess::Init(){
             ->ReportException(page_id, func, exception_string);
       });
   set_is_passable(passable);
+#else
+  set_script_side(scriptSideInSimple);
 #endif
 }
 
