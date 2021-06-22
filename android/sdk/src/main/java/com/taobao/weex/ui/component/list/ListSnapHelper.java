@@ -18,6 +18,7 @@
  */
 package com.taobao.weex.ui.component.list;
 
+import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.OrientationHelper;
@@ -26,6 +27,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.taobao.weex.R;
 import com.taobao.weex.common.Constants;
 
 public class ListSnapHelper extends PagerSnapHelper {
@@ -37,6 +39,7 @@ public class ListSnapHelper extends PagerSnapHelper {
     public final static int SNAP_ALIGN_BOTTOM = 2;
     private int mAlign = 0;
     private int mSnapPositon = 0;
+    private int mCurrentPosition = 0;
     private int mSnapTrigger = 50;
     private int mSnapTriggerReverse = 50;
 
@@ -64,7 +67,6 @@ public class ListSnapHelper extends PagerSnapHelper {
     public int getSnapPosition(){
         return mSnapPositon;
     }
-
     private int getContainerBaseLine(RecyclerView.LayoutManager layoutManager, int align) {
         OrientationHelper helper = getVerticalHelper(layoutManager);
         switch (align) {
@@ -106,6 +108,13 @@ public class ListSnapHelper extends PagerSnapHelper {
         }
     }
 
+    private Boolean checkSnapIgnore(View view) {
+        if(view == null){
+            return false;
+        }
+        return TextUtils.equals(Constants.Name.SCROLL_SNAP_IGNORE,String.valueOf(view.getTag(R.id.weex_snap_ignore)));
+    }
+
 
     @Nullable
     @Override
@@ -134,10 +143,11 @@ public class ListSnapHelper extends PagerSnapHelper {
                 closetIndex = i;
             }
         }
-        if(TextUtils.equals(Constants.Name.SCROLL_SNAP_IGNORE, String.valueOf(closestChild.getTag()))){
-            return null;
-        }
         if(closestChild != null){
+            if(checkSnapIgnore(closestChild)){
+                mCurrentPosition = layoutManager.getPosition(closestChild);
+                return null;
+            }
             int scrollOffset = disClosest < 0 ? absClosest - mSnapTrigger : absClosest - mSnapTriggerReverse;
             if(scrollOffset > 0 && layoutManager.getPosition(layoutManager.getChildAt(0)) > 0 && layoutManager.getPosition(layoutManager.getChildAt(childCount - 1)) < layoutManager.getItemCount() - 1){
                 View tempCild;
@@ -152,8 +162,34 @@ public class ListSnapHelper extends PagerSnapHelper {
                 }
             }
             mSnapPositon = layoutManager.getPosition(closestChild);
+            mCurrentPosition = mSnapPositon;
         }
         return closestChild;
+    }
+
+    @Override
+    public int findTargetSnapPosition(RecyclerView.LayoutManager layoutManager, int velocityX, int velocityY) {
+        final int itemCount = layoutManager.getItemCount();
+        if (itemCount == 0) {
+            return RecyclerView.NO_POSITION;
+        }
+        View currentView = layoutManager.findViewByPosition(mCurrentPosition);
+        if(checkSnapIgnore(currentView)) {
+            return RecyclerView.NO_POSITION;
+        }
+        final boolean forwardDirection = velocityY > 0;
+        boolean reverseLayout = false;
+        if ((layoutManager instanceof RecyclerView.SmoothScroller.ScrollVectorProvider)) {
+            RecyclerView.SmoothScroller.ScrollVectorProvider vectorProvider =
+                    (RecyclerView.SmoothScroller.ScrollVectorProvider) layoutManager;
+            PointF vectorForEnd = vectorProvider.computeScrollVectorForPosition(itemCount - 1);
+            if (vectorForEnd != null) {
+                reverseLayout = vectorForEnd.x < 0 || vectorForEnd.y < 0;
+            }
+        }
+        return reverseLayout
+                ? (forwardDirection ? mCurrentPosition - 1 : mCurrentPosition + 1)
+                : (forwardDirection ? mCurrentPosition + 1 : mCurrentPosition - 1);
     }
 
     private OrientationHelper getVerticalHelper(RecyclerView.LayoutManager layoutManager) {
@@ -161,6 +197,15 @@ public class ListSnapHelper extends PagerSnapHelper {
             mVerticalHelper = OrientationHelper.createVerticalHelper(layoutManager);
         }
         return mVerticalHelper;
+    }
+
+    public void scrollToElement(@NonNull RecyclerView.LayoutManager layoutManager,int position){
+        RecyclerView.SmoothScroller smoothScroller = createScroller(layoutManager);
+        if (smoothScroller == null) {
+            return;
+        }
+        smoothScroller.setTargetPosition(position);
+        layoutManager.startSmoothScroll(smoothScroller);
     }
 
     @Nullable

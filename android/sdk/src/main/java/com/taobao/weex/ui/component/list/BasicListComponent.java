@@ -658,7 +658,7 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
       }
     }
 
-    final int offset = (int) offsetFloat;
+    int offset = (int) offsetFloat;
 
     T bounceRecyclerView = getHostView();
     if (bounceRecyclerView == null) {
@@ -682,6 +682,10 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
         return;
       }
       final WXRecyclerView view = bounceRecyclerView.getInnerView();
+      if(enableScrollSnap && mListSnapHelper != null) {
+        mListSnapHelper.scrollToElement(view.getLayoutManager(), pos);
+        return;
+      }
       view.scrollTo(smooth, pos, offset, getOrientation());
     }
   }

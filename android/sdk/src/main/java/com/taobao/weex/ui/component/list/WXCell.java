@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.taobao.weex.R;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
@@ -150,7 +151,7 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     public void setScrollSnapIgnore(boolean ignore) {
         View host = getHostView();
         if (host != null) {
-            host.setTag(Constants.Name.SCROLL_SNAP_IGNORE);
+            host.setTag(R.id.weex_snap_ignore, Constants.Name.SCROLL_SNAP_IGNORE);
         }
     }
 

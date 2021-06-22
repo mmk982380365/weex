@@ -18,4 +18,5 @@ under the License.
 -->
 <resources>
     <!--<string name="app_name">Weex Library</string>-->
+    <item name="weex_snap_ignore" type="id"></item>
 </resources>
