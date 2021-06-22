@@ -1,0 +1,1 @@
+adb push sdk/build/intermediates/cmake/release/obj/arm64-v8a/*.so /data/local/tmp/
