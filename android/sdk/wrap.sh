@@ -1,4 +1,8 @@
 #!/system/bin/sh
+
+cmd=$1
+shift
+
 HERE="$(cd "$(dirname "$0")" && pwd)"
 export ASAN_OPTIONS=log_to_syslog=false,allow_user_segv_handler=1,use_sigaltstack=0
 ASAN_LIB=$(ls $HERE/libclang_rt.asan-*-android.so)
@@ -8,4 +12,13 @@ if [ -f "$HERE/libc++_shared.so" ]; then
 else
     export LD_PRELOAD="$ASAN_LIB"
 fi
-"$@"
+
+os_version=$(getprop ro.build.version.sdk)
+if [ "$os_version" -eq "27" ]; then
+    cmd="$cmd -Xrunjdwp:transport=dt_android_adb,suspend=n,server=y -Xcompiler-option --debuggable $@"
+elif [ "$os_version" -eq "28" ]; then
+    cmd="$cmd -XjdwpProvider:adbconnection -XjdwpOptions:suspend=n,server=y -Xcompiler-option --debuggable $@"
+else
+    cmd="$cmd -XjdwpProvider:adbconnection $@"
+fi
+exec $cmd

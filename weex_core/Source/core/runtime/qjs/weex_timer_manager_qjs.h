@@ -20,6 +20,9 @@
 // Created by Huiying Jiang on 2021/6/20.
 //
 
+#include <map>
+#include <mutex>
+
 #ifndef WEEX_PROJECT_WEEX_TIMER_MANAGER_QJS_H
 #define WEEX_PROJECT_WEEX_TIMER_MANAGER_QJS_H
 #include "base/log_defines.h"
@@ -39,6 +42,7 @@ extern "C" {
 class WeexTimerManagerQJS{
 private:
     std::map<uint32_t, JSValue> timer_function_;
+    std::mutex timer_functions_op_mutex_;
     uint32_t timer_function_id_;
 
 public:
@@ -50,28 +54,32 @@ public:
     }
 
     JSValue get_timer_function(uint32_t function_id) {
+        std::unique_lock<std::mutex> scoped_lock(timer_functions_op_mutex_);
         auto iter = timer_function_.find(function_id);
         if (iter == timer_function_.end()) {
             return JS_UNDEFINED;
         }
-        return timer_function_[function_id];
+        return iter->second;
     }
 
     JSValue remove_timer(uint32_t function_id) {
+        std::unique_lock<std::mutex> scoped_lock(timer_functions_op_mutex_);
         auto iter = timer_function_.find(function_id);
         if (iter == timer_function_.end()) {
             LOGE("timer do not exist!");
             return JS_UNDEFINED;
         }
-        JSValue function = timer_function_[function_id];
+        JSValue function = iter->second;
         timer_function_.erase(function_id);
         return function;
     }
 
     inline void add_timer(uint32_t function_id, JSValue func) {
+        std::unique_lock<std::mutex> scoped_lock(timer_functions_op_mutex_);
         timer_function_[function_id] = func;
     }
     void clear_timer() {
+        std::unique_lock<std::mutex> scoped_lock(timer_functions_op_mutex_);
         timer_function_.clear();
     }
 };

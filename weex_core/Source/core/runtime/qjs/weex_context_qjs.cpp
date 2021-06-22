@@ -924,10 +924,8 @@ static JSValue addNativeTimer(JSContext *ctx, JSValueConst this_val,
   JS_ToInt32(ctx, &timeoutNumber, timeout);
   auto timer_manager = weexContext->get_timer_manager();
   uint32_t funcId = timer_manager->gen_timer_function_id();
-  weex::base::MessageLoop::GetCurrent()->PostTask([m_timer_manager = timer_manager, jsContext = weexContext ,timeout = timeoutNumber,val = this_val, repe = repeat, func_id= funcId, js_ctx = ctx, function = jsFunction] {
-      m_timer_manager->add_timer(func_id, JS_DupValue(js_ctx, function));
-      setNativeTimer(func_id, timeout, val, jsContext, repe);
-  });
+  timer_manager->add_timer(funcId, JS_DupValue(ctx, jsFunction));
+  setNativeTimer(funcId, timeoutNumber, this_val, weexContext, repeat);
   return JS_NewInt32(ctx, funcId);
 }
 
