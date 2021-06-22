@@ -503,7 +503,7 @@ static JSValue js_CallNativeModule(JSContext *ctx, JSValueConst this_val,
                     result->value.byteArray->length);
       auto string2String = w.toStringUTF8();
       auto jsvalue2 = JS_ParseJSON(ctx,string2String.c_str(),string2String.length(),"t");
-      LOGE("native BYTEARRAY , call native moudle %s",string2String.c_str());
+      //LOGE("native BYTEARRAY , call native moudle %s",string2String.c_str());
       ret = jsvalue2;
       if (JS_IsException(jsvalue2) || JS_IsError(ctx,jsvalue2)){
         ret = JS_NewString(ctx, string2String.c_str());
