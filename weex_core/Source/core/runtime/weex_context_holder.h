@@ -23,6 +23,7 @@
 #ifndef WEEXV8_WEEXOBJECTHOLDER_H
 #define WEEXV8_WEEXOBJECTHOLDER_H
 
+#include <mutex>
 #include "weex_context.h"
 class WeexContextHolder {
  public:
@@ -62,10 +63,11 @@ class WeexContextHolder {
   }
 
   inline void erase(const std::string &page_id) {
-
     auto iterator = weex_context_map.find(page_id);
     if (iterator != weex_context_map.end()) {
       WeexContext *weexContext = weex_context_map[page_id];
+      auto context_mutex = weexContext->context_mutex();
+      std::unique_lock<std::shared_ptr<std::mutex>> scoped_lock(context_mutex);
       this->weex_context_map.erase(page_id);
 #if OS_ANDROID
         if (page_id.length() > 0) {

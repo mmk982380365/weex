@@ -837,13 +837,17 @@ static void setNativeTimer(int32_t funcId,
                            bool repeat) {
   auto *ctx = static_cast<JSContext *>(weexContext->js_context());
   auto context_timer_manager = weexContext->get_timer_manager();
-  weex::base::MessageLoop::GetCurrent()->PostDelayedTask(
+  auto context_mutex = weexContext->context_mutex();
+    weex::base::MessageLoop::GetCurrent()->PostDelayedTask(
       [id = funcId,
           jsContext = weexContext,
+          mutex_ = context_mutex,
           timer_manager = context_timer_manager,
           re = repeat,
           timeout = timeoutNumber,
           thisObj = JS_DupValue(ctx, this_obj)] {
+        auto mutex_ptr = static_cast<std::shared_ptr<std::mutex>>(mutex_);
+        std::unique_lock<std::shared_ptr<std::mutex>> scoped_lock(mutex_ptr);
         JSValue function = timer_manager->get_timer_function(id);
         if(JS_IsUndefined(function)){
           return;

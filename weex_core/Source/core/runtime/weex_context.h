@@ -34,6 +34,7 @@ class WeexContext {
  public:
   explicit WeexContext(const std::shared_ptr<WeexCore::ScriptBridge> &script_bridge) {
     this->script_bridge_ = script_bridge;
+    this->weex_context_mutex = std::shared_ptr<std::mutex>(new std::mutex());
   }
 
   virtual void initGlobalContextFunctions() = 0;
@@ -55,6 +56,8 @@ class WeexContext {
 
   virtual void RunGC(void *engine_vm) = 0;
 
+  std::shared_ptr<std::mutex> context_mutex() { return weex_context_mutex;}
+
   virtual ~WeexContext() { this->js_context_ = nullptr; };
   inline std::shared_ptr<WeexCore::ScriptBridge> script_bridge() { return script_bridge_; }
 
@@ -70,6 +73,7 @@ class WeexContext {
  private:
   void *js_context_;
   std::shared_ptr<WeexCore::ScriptBridge> script_bridge_;
+  std::shared_ptr<std::mutex> weex_context_mutex;
 };
 
 #endif //WEEX_PROJECT_WEEX_CONTEXT_H

@@ -50,6 +50,9 @@ std::function<void(const char*, const char*)> CreatePageDownloadExec(const char*
         const std::vector<WeexCore::ScriptBridge::ScriptSide *>
             &script_side_vector = WeexCore::CoreSideInPlatform::GetScriptSide(instanceId.c_str());
         for (const auto &it : script_side_vector) {
+            if(it == nullptr){
+                return;
+            }
             it->CreateInstance(instanceId.c_str(), func.c_str(), result, strlen(result),
                                      opts_json.dump().c_str(), initData.c_str(),
                                      strcmp("Rax", bundleType) ? "\0" : extendsApi.c_str(),
