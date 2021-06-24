@@ -67,7 +67,7 @@ class WeexContextHolder {
     if (iterator != weex_context_map.end()) {
       WeexContext *weexContext = weex_context_map[page_id];
       auto context_mutex = weexContext->context_mutex();
-      std::unique_lock<std::shared_ptr<std::mutex>> scoped_lock(context_mutex);
+      std::unique_lock<std::mutex> scoped_lock(*context_mutex.get());
       this->weex_context_map.erase(page_id);
 #if OS_ANDROID
         if (page_id.length() > 0) {

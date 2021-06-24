@@ -25,6 +25,7 @@
 
 #include "include/WeexApiHeader.h"
 #include <string>
+#include <mutex>
 
 namespace WeexCore {
 class ScriptBridge;

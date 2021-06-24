@@ -847,7 +847,7 @@ static void setNativeTimer(int32_t funcId,
           timeout = timeoutNumber,
           thisObj = JS_DupValue(ctx, this_obj)] {
         auto mutex_ptr = static_cast<std::shared_ptr<std::mutex>>(mutex_);
-        std::unique_lock<std::shared_ptr<std::mutex>> scoped_lock(mutex_ptr);
+          std::unique_lock<std::mutex> scoped_lock(*mutex_ptr.get());
         JSValue function = timer_manager->get_timer_function(id);
         if(JS_IsUndefined(function)){
           return;
