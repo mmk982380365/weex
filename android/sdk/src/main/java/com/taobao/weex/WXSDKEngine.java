@@ -22,6 +22,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Build;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
@@ -217,6 +218,7 @@ public class WXSDKEngine implements Serializable {
               null);
     }
     WXEnvironment.JsFrameworkInit = false;
+    initWeexCore();
 
     WXBridgeManager.getInstance().postWithName(new Runnable() {
       @Override
@@ -266,6 +268,19 @@ public class WXSDKEngine implements Serializable {
     },null,"doInitWeexSdkInternal");
     WXStateRecord.getInstance().startJSThreadWatchDog();
     register();
+  }
+  private static void initWeexCore() {
+    if(WXSDKManager.getInstance().forceQJSOnly()) {
+      try {
+        if (Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
+          WXSoInstallMgrSdk.copyAndloadWeexCoreQJS();
+        } else {
+          System.loadLibrary(CORE_QJS_SO_NAME);
+        }
+      }catch (Throwable e){
+        WXLogUtils.e("initWeexCore" , e.getMessage());
+      }
+    }
   }
 
   @Deprecated

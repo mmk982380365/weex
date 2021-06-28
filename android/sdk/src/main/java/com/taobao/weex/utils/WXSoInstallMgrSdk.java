@@ -26,18 +26,24 @@ import android.os.Build;
 import android.text.TextUtils;
 import com.taobao.weex.IWXStatisticsListener;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXErrorCode;
 import dalvik.system.PathClassLoader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -115,11 +121,9 @@ public class WXSoInstallMgrSdk {
     }
 
     // copy startup so
-    if (WXEnvironment.CORE_SO_NAME.equals(libName)) {
+    if (WXEnvironment.CORE_SO_NAME.equals(libName) || WXEnvironment.CORE_QJS_SO_NAME.equals(libName)) {
       copyStartUpSo();
     }
-
-
     boolean InitSuc = false;
       try {
         // If a library loader adapter exists, use this adapter to load library
@@ -332,6 +336,30 @@ public class WXSoInstallMgrSdk {
     }
   }
 
+  public static String copyWeexCoreQJSSo() {
+    try {
+      String cacheFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
+      String dirName = "weexcore";
+      File desDir = new File(cacheFile, dirName);
+      if (!desDir.exists()) {
+        desDir.mkdirs();
+      }
+      String weexcoreqjs = ((PathClassLoader) (WXFileUtils.class.getClassLoader())).findLibrary(WXEnvironment.CORE_QJS_SO_NAME);
+      File oldFile = new File(weexcoreqjs);
+      if (!oldFile.exists()) {
+        return "";
+      }
+      File newFile = new File(desDir, "libweexcore.so");
+      WXFileUtils.copyFileWithException(oldFile, newFile);
+      return desDir.getAbsolutePath();
+    }catch (Exception e) {
+      WXLogUtils.e("copy libweexcoreqjs failed! " + e.getMessage());
+      return "";
+    }
+  }
+
+
+
   private static String _getFieldReflectively(Build build, String fieldName) {
     try {
       final Field field = Build.class.getField(fieldName);
@@ -476,6 +504,69 @@ public class WXSoInstallMgrSdk {
       WXLogUtils.e("", e);
     }
     return initSuc;
+  }
+
+  public static void addNativeLibraryDirs(File pathDir) {
+    if (pathDir == null) {
+      return;
+    }
+    try {
+      //set nativeLibraryDirectories
+      PathClassLoader pathClassLoader = (PathClassLoader) WXEnvironment.class.getClassLoader();
+      Field declaredField = Class.forName("dalvik.system.BaseDexClassLoader").getDeclaredField("pathList");
+      declaredField.setAccessible(true);
+      Object pathList = declaredField.get(pathClassLoader);
+      // 获取当前类的属性
+      Field nativeLibraryDirectories = pathList.getClass().getDeclaredField(
+              "nativeLibraryDirectories");
+      nativeLibraryDirectories.setAccessible(true);
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        // 获取 DEXPATHList中的属性值
+        File[] files = (File[]) ((Field) nativeLibraryDirectories).get(pathList);
+        Object newfiles = Array.newInstance(File.class, files.length + 1);
+        // 添加自定义.so路径
+        Array.set(newfiles, 0, pathDir);
+        // 将系统自己的追加上
+        for (int i = 1; i < files.length + 1; i++) {
+          Array.set(newfiles, i, files[i - 1]);
+        }
+        // 将系统自己的追加上
+        nativeLibraryDirectories.set(pathList, newfiles);
+      } else {
+        ArrayList<File> originFiles = (ArrayList<File>) nativeLibraryDirectories.get(pathList);
+        ArrayList<File> files = (ArrayList<File>) originFiles.clone();
+        files.add(0, pathDir);
+        nativeLibraryDirectories.set(pathList, files);
+      }
+      //set nativeLibraryPathElements
+      Field nativeLibraryPathElements = pathList.getClass().getDeclaredField("nativeLibraryPathElements");
+      nativeLibraryPathElements.setAccessible(true);
+      Object[] originElements = (Object[]) nativeLibraryPathElements.get(pathList);
+      Method makePathElements =
+              pathList.getClass().getDeclaredMethod("makePathElements", List.class);
+      List list = new ArrayList();
+      list.add(pathDir);
+      makePathElements.setAccessible(true);
+      Object[] elements = (Object[]) makePathElements.
+              invoke(null, list);
+      Object newElements = Array.newInstance(elements.getClass().getComponentType(), originElements.length + elements.length + 1);
+      System.arraycopy(elements, 0, newElements, 0, elements.length);
+      System.arraycopy(originElements, 0, newElements, elements.length, originElements.length);
+      nativeLibraryPathElements.set(pathList, newElements);
+    } catch (Exception e) {
+      WXLogUtils.e(LOGTAG, e.getMessage());
+    }
+  }
+
+  public static void copyAndloadWeexCoreQJS() {
+    if(!WXSDKManager.getInstance().forceQJSOnly()) {
+      return;
+    }
+    WXEnvironment.CORE_QJS_SO_COPY_PATH = copyWeexCoreQJSSo();
+    if(!TextUtils.isEmpty(WXEnvironment.CORE_QJS_SO_COPY_PATH)) {
+      addNativeLibraryDirs(new File(WXEnvironment.CORE_QJS_SO_COPY_PATH));
+      System.loadLibrary(WXEnvironment.CORE_SO_NAME);
+    }
   }
 
   static boolean unZipSelectedFiles(String libName,
