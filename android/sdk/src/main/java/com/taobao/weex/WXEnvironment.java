@@ -645,8 +645,10 @@ public class WXEnvironment {
     if (!TextUtils.isEmpty(LIB_LD_PATH)) {
       return LIB_LD_PATH;
     }
-    if (WXSDKManager.getInstance().forceQJSOnly() && TextUtils.isEmpty(CORE_QJS_SO_COPY_PATH)){
+    int tryCopyCount = 3;
+    while (tryCopyCount > 0 && WXSDKManager.getInstance().forceQJSOnly() && TextUtils.isEmpty(CORE_QJS_SO_COPY_PATH)){
       CORE_QJS_SO_COPY_PATH = WXSoInstallMgrSdk.copyWeexCoreQJSSo();
+      tryCopyCount --;
     }
     ClassLoader classLoader = WXEnvironment.class.getClassLoader();
     try {
