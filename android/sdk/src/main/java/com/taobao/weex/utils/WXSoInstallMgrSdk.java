@@ -338,7 +338,6 @@ public class WXSoInstallMgrSdk {
 
   public static String copyWeexCoreQJSSo() {
     try {
-      WXLogUtils.e("jhy","enter copyWeexCoreQJSSo");
       String cacheFile = WXEnvironment.getApplication().getApplicationContext().getCacheDir().getPath();
       String dirName = "weexcore";
       File desDir = new File(cacheFile, dirName);
@@ -508,7 +507,6 @@ public class WXSoInstallMgrSdk {
   }
 
   public static void addNativeLibraryDirs(File pathDir) {
-    WXLogUtils.e("jhy","addNativeLibraryDirs");
     if (pathDir == null) {
       return;
     }
@@ -555,23 +553,19 @@ public class WXSoInstallMgrSdk {
       System.arraycopy(elements, 0, newElements, 0, elements.length);
       System.arraycopy(originElements, 0, newElements, elements.length, originElements.length);
       nativeLibraryPathElements.set(pathList, newElements);
-      WXLogUtils.e("jhy","addNativeLibraryDirs success");
     } catch (Exception e) {
       WXLogUtils.e(LOGTAG, e.getMessage());
     }
   }
 
   public static void copyAndloadWeexCoreQJS() {
-    WXLogUtils.e("jhy","enter copyAndloadWeexCoreQJS");
     if(!WXSDKManager.getInstance().forceQJSOnly()) {
       return;
     }
     WXEnvironment.CORE_QJS_SO_COPY_PATH = copyWeexCoreQJSSo();
     if(!TextUtils.isEmpty(WXEnvironment.CORE_QJS_SO_COPY_PATH)) {
-      WXLogUtils.e("jhy","CORE_QJS_SO_COPY_PATH != null");
       addNativeLibraryDirs(new File(WXEnvironment.CORE_QJS_SO_COPY_PATH));
       System.loadLibrary(WXEnvironment.CORE_SO_NAME);
-      WXLogUtils.e("jhy","System.loadLibrary success");
     }
   }
 

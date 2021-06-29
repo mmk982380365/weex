@@ -1818,7 +1818,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         boolean is_pre_init_mode = false;
         if(extraOption instanceof Map) {
           String key_run_in_main_process = "run_in_main_process";
-          if(WXSDKManager.getInstance().forceQJSOnly() || WXSDKEngine.getCoreSoName() == CORE_QJS_SO_NAME){
+          if((WXSDKManager.getInstance().forceQJSOnly() || WXSDKEngine.getCoreSoName() == CORE_QJS_SO_NAME) && instance.getJSEngineType() == IWXJSEngineManager.EngineType.JavaScriptCore){
             instance.setJSEngineType(IWXJSEngineManager.EngineType.QuickJS);
           }
           else {

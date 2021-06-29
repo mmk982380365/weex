@@ -644,6 +644,6 @@ public class WXSDKManager {
       setQJSOnly = true;
     }
     hasInited = true;
-    return true;
+    return setQJSOnly;
   }
 }

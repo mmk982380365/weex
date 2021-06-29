@@ -27,6 +27,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.taobao.weex.adapter.IDrawableLoader;
+import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXJSEngineManager;
@@ -105,6 +106,7 @@ import com.taobao.weex.utils.cache.RegisterCache;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import static com.taobao.weex.WXEnvironment.CORE_QJS_SO_NAME;
 import static com.taobao.weex.WXEnvironment.CORE_SO_NAME;
@@ -117,6 +119,7 @@ public class WXSDKEngine implements Serializable {
   private volatile static boolean mIsSoInit = false;
   private static final Object mLock = new Object();
   private static final String TAG = "WXSDKEngine";
+  private static IWXJSEngineManager.EngineType mDeaultEngineType;
 
   /**
    * Deprecated. Use {@link #initialize(Application, InitConfig)} instead.
@@ -665,10 +668,31 @@ public class WXSDKEngine implements Serializable {
     WXBridgeManager.getInstance().CompileQuickJSBin(key, Script, callback);
   }
 
+  private static int qjsRandom = new Random().nextInt(100);
+  public static Boolean checkUseQJS() {
+      boolean useQjs = false;
+      IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+      if (adapter != null) {
+        String value = adapter.getConfig("android_weex_common_config", "qjs_render_rate", "0");
+        int rate = Integer.valueOf(TextUtils.isEmpty(value) ? "0" : value);
+        if (rate >= qjsRandom) {
+          useQjs = true;
+        } else {
+          useQjs = false;
+        }
+        WXLogUtils.e(TAG,"weex qjs grey rate: " + value + ".is hited :" + useQjs);
+      }
+      return useQjs;
+  }
+
   public static IWXJSEngineManager.EngineType defaultEngineType() {
     if(WXSDKManager.getInstance().forceQJSOnly()) {
-      return IWXJSEngineManager.EngineType.QuickJS;
+      mDeaultEngineType = IWXJSEngineManager.EngineType.QuickJS;
+      WXLogUtils.e(TAG, "weex forceQJSOnly");
     }
-    else return IWXJSEngineManager.EngineType.JavaScriptCore;
+    else {
+      mDeaultEngineType = checkUseQJS() ? IWXJSEngineManager.EngineType.QuickJS : IWXJSEngineManager.EngineType.JavaScriptCore;
+    }
+    return mDeaultEngineType;
   }
 }
