@@ -2042,6 +2042,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
       if(jsEngineType != null) {
         Log.e("weex","engine_type :" + jsEngineType.engineName());
         mApmForInstance.addProperty("engine_type", jsEngineType.engineName());
+        mApmForInstance.addProperty("forceQjs",WXSDKManager.getInstance().forceQJSOnly());
       }
 
       mApmForInstance.onEnd();
