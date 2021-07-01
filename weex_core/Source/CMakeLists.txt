@@ -43,6 +43,10 @@ add_definitions(-DDOM_PARSER_LOG=0)
 #add_definitions(-DDEBUG=1)
 add_definitions(-DNDEBUG=1)
 
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Oz")
+
 message("ANDROID_PROJECT_DIR:" ${ANDROID_PROJECT_DIR})
 set(LOCAL_LIBRARIES_DIR ${ANDROID_PROJECT_DIR}/libs/${ANDROID_ABI})
 
