@@ -22,6 +22,7 @@
 
 #if defined __cplusplus
 
+#include "core/api/wx_api.h"
 #include <string>
 #include <map>
 #include <functional>
@@ -39,7 +40,7 @@ enum class EagleModeReturn {
 
 class RenderObject;
 
-class EagleRenderObject {
+class WX_EXPORT EagleRenderObject {
  public:
   friend class EagleBridge;
 
@@ -77,9 +78,9 @@ class EagleRenderObject {
   RenderObject* render_object_impl_;
 };
 
-class EagleBridge {
+class WX_EXPORT EagleBridge {
  public:
-  class WeexCoreHandler {
+  class WX_EXPORT WeexCoreHandler {
    public:
     EagleRenderObject GetEagleRenderObject(const std::string& type, const std::string& ref);
     bool CreatePage(const std::string& page_id, EagleRenderObject root);
@@ -160,7 +161,7 @@ class EagleBridge {
                                const std::string& options);
   };
 
-  class DataRenderHandler {
+  class WX_EXPORT DataRenderHandler {
    public:
     //如果plugin不存在则ReportException.
     virtual void CreatePage(const char* instanceId,
