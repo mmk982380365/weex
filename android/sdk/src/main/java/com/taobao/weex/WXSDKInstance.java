@@ -2883,5 +2883,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public interface UnicornJSInvoker {
     public void invokeCallback(String instanceId,
                                Object... args);
+    public void invokeMethod(final String instanceId,
+                             String method, final List<Object> params,
+                             Object... args);
   }
 }
