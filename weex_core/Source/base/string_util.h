@@ -29,13 +29,15 @@
 #endif
 #include "base/third_party/icu/icu_utf.h"
 #include "WeexApiValue.h"
+#include "core/api/wx_api.h"
+
 namespace weex {
 namespace base {
 
 constexpr int32_t kErrorCodePoint = 0xFFFD;
 
 template <typename T>
-std::string to_string(T value) {
+WX_EXPORT std::string to_string(T value) {
   std::ostringstream os;
   os << value;
   return os.str();

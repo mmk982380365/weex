@@ -25,6 +25,7 @@
 #include <android/log.h>
 #endif
 #include <mutex>
+#define EXPORT __attribute__((visibility("default")))
 
 namespace WeexCore {
 
@@ -41,7 +42,7 @@ enum class LogLevel : int {
   Performance,
 };
 
-void PrintLog(LogLevel level,
+EXPORT void PrintLog(LogLevel level,
               const char *tag,
               const char *file,
               unsigned long line,
@@ -98,7 +99,7 @@ class LogBase {
   bool m_debugMode = false;
 };
 
-class LogImplement {
+class EXPORT LogImplement {
  public:
   static LogImplement *getLog() {
     static std::once_flag once_flag;

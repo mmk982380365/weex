@@ -24,16 +24,17 @@
 #include <Serializing/IPCSerializer.h>
 #include "android/wrap/wx_js_object.h"
 #include "include/WeexApiHeader.h"
+#include "../../core/api/wx_api.h"
 
 namespace WeexCore {
 
-WeexByteArray* genWeexByteArray(const char* str, size_t strLen);
+WX_EXPORT WeexByteArray* genWeexByteArray(const char* str, size_t strLen);
 
-WeexString* genWeexString(const uint16_t* str, size_t length);
+WX_EXPORT WeexString* genWeexString(const uint16_t* str, size_t length);
 
 WeexString* jstring2WeexString(JNIEnv* env, jstring fromJString);
 
-VALUE_WITH_TYPE* getValueWithTypePtr();
+WX_EXPORT VALUE_WITH_TYPE* getValueWithTypePtr();
 void addParamsToIPCSerializer(IPCSerializer *serializer, VALUE_WITH_TYPE* param);
 std::vector<std::pair<std::string, std::string>> initFromParam(
     JNIEnv* env, jobject params,
@@ -47,7 +48,7 @@ void addParamsFromJArgs(std::vector<VALUE_WITH_TYPE*>& params,
                         VALUE_WITH_TYPE* param, JNIEnv* env,
                         std::unique_ptr<WXJSObject>& wx_js_object);
 void freeValueWithType(VALUE_WITH_TYPE* params);
-void freeParams(std::vector<VALUE_WITH_TYPE*>& params);
+WX_EXPORT void freeParams(std::vector<VALUE_WITH_TYPE*>& params);
 }  // namespace WeexCore
 
 #endif  // WEEX_PROJECT_PARAMS_UTILS_H
