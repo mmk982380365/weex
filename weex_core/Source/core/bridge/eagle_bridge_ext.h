@@ -27,13 +27,14 @@
 #include <functional>
 #include <set>
 #include <mutex>
+#include "core/api/wx_api.h"
 
 namespace WeexCore {
 namespace EagleExt {
 
 //this must stay in weex because weex_core_manager.h has inline static which can't be compiled into Eagle so.
 
-std::function<void(const char*, const char*)> CreatePageDownloadExec(const char* instanceId,
+        WX_EXPORT std::function<void(const char*, const char*)> CreatePageDownloadExec(const char* instanceId,
                                          const char* func,
                                          const char* script,
                                          int script_length,
@@ -42,7 +43,7 @@ std::function<void(const char*, const char*)> CreatePageDownloadExec(const char*
                                          const char* extendsApi);
 
 #ifdef OS_ANDROID
-void RefreshPageEagle(const char* page_id, const char* init_data);
+        WX_EXPORT void RefreshPageEagle(const char* page_id, const char* init_data);
 #endif
 
 }

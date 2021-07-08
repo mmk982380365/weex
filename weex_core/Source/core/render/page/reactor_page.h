@@ -24,14 +24,15 @@
 #include <string>
 #include <map>
 #include <functional>
+#include "core/api/wx_api.h"
 
 namespace WeexCore {
 
-void PostTaskOnComponentThread(const std::function<void()>& callback);
+WX_EXPORT void PostTaskOnComponentThread(const std::function<void()>& callback);
 
 class RenderObject;
 
-class ReactorPage {
+class WX_EXPORT ReactorPage {
 public:
     explicit ReactorPage(const std::string& page_id)
     : page_id_(page_id) {}

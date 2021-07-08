@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-
+#include "../core/api/wx_api.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,7 +63,7 @@ typedef struct wson_buffer{
 /**
  * create wson buffer
  * */
-wson_buffer* wson_buffer_new(void);
+WX_EXPORT wson_buffer* wson_buffer_new(void);
 
 void wson_buffer_require(wson_buffer *buffer, size_t size);
 /**
@@ -76,7 +76,7 @@ void wson_push_type_long(wson_buffer *buffer, int64_t num);
 void wson_push_type_double(wson_buffer *buffer, double num);
 void wson_push_type_float(wson_buffer *buffer, float num);
 void wson_push_type_string(wson_buffer *buffer, const void *src, int32_t length);
-void wson_push_type_uint8_string(wson_buffer *buffer, const uint8_t *src, int32_t length);
+WX_EXPORT void wson_push_type_uint8_string(wson_buffer *buffer, const uint8_t *src, int32_t length);
 void wson_push_type_null(wson_buffer *buffer);
 void wson_push_type_map(wson_buffer *buffer, uint32_t size);
 void wson_push_type_array(wson_buffer *buffer, uint32_t size);
@@ -101,7 +101,7 @@ void wson_push_bytes(wson_buffer *buffer, const void *src, int32_t length);
 /**
  * free  buffer
  * */
-void wson_buffer_free(wson_buffer *buffer);
+WX_EXPORT void wson_buffer_free(wson_buffer *buffer);
 
 
 /**
