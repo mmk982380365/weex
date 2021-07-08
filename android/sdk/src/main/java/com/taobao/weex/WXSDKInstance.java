@@ -1037,7 +1037,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     final IWXJscProcessManager wxJscProcessManager = WXSDKManager.getInstance().getWXJscProcessManager();
 
     if(wxJscProcessManager != null && wxJscProcessManager.shouldReboot()) {
-      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+      if (!WXBridgeManager.getInstance().isJSFrameworkInit()) {
+        return;
+      }
+        WXSDKManager.getInstance().postOnUiThread(new Runnable() {
         @Override
         public void run() {
           checkWhiteScreen();
@@ -1342,8 +1345,6 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   public void reloadPage(boolean reloadThis) {
-
-    WXSDKEngine.reload();
 
     if (reloadThis) {
       if (mContext != null)  {

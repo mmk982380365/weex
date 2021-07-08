@@ -390,7 +390,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   // setJSFrameworkInit and isJSFrameworkInit may use on diff thread
   // use volatile
   @RestrictTo(Scope.LIBRARY)
-  boolean isJSFrameworkInit() {
+  public boolean isJSFrameworkInit() {
     return mInit;
   }
 
@@ -1619,7 +1619,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     return isSkipFrameworkInit(instance);
   }
 
-  private boolean isSkipFrameworkInit(WXSDKInstance instance) {
+  public boolean isSkipFrameworkInit(WXSDKInstance instance) {
     if (instance == null) {
       return false;
     }
