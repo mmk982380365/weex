@@ -1344,7 +1344,23 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     return "";
   }
 
+  public Boolean disableReloadEngine() {
+    boolean disable = true;
+    IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+    if (adapter != null) {
+      disable = Boolean.parseBoolean(adapter
+              .getConfig("android_weex_common_config",
+                      "disable_reload_engine_in_reload_page",
+                      "true"));
+    }
+    return disable;
+  }
+
   public void reloadPage(boolean reloadThis) {
+
+    if(!disableReloadEngine()){
+      WXSDKEngine.reload();
+    }
 
     if (reloadThis) {
       if (mContext != null)  {
