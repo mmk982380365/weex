@@ -2287,10 +2287,73 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   public static long sInitFrameWorkTimeOrigin;
   public static StringBuilder sInitFrameWorkMsg = new StringBuilder();
 
+  private Boolean disableInitFramework() {
+    IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+    int frameworkInitCount = 10;
+    Boolean enableReinitCheck = true;
+    if (adapter != null) {
+      try {
+        String enableReinitCheckConfig = adapter.getConfig("android_weex_common_config", "enableReinitCheck", "true");
+        String frameworkInitCountConfig = adapter.getConfig("android_weex_common_config", "frameworkInitCount", "5");
+        enableReinitCheck = Boolean.parseBoolean(enableReinitCheckConfig);
+        frameworkInitCount = Integer.parseInt(frameworkInitCountConfig);
+      }catch (Throwable e){
+        WXLogUtils.e(e.getMessage());
+      }
+    }
+
+    boolean isBlackPhone = false;
+    try{
+      //先读取手机型号配置
+      String brand = Build.BRAND;
+      String brandListData = adapter.getConfig("android_weex_common_config", "ReinitCheckPhoneList", "['huawei','honor']");
+      WXLogUtils.e("this phone brand is = " + brand);
+      WXLogUtils.e("PhoneBlackList = " + brandListData);
+      JSONArray brandList = null;
+      try{
+        brandList = JSONArray.parseArray(brandListData);
+      }catch (Throwable e){
+        WXLogUtils.e(e.getMessage());
+        brandList = new JSONArray();
+      }
+
+      //读取系统版本配置
+      int sdkInt = Build.VERSION.SDK_INT;
+      String systemVersionData = adapter.getConfig("android_weex_common_config", "ReinitCheckSystemVersionList", "['23','24']");
+      WXLogUtils.e("this phone sdkInt is = " + sdkInt);
+      WXLogUtils.e("SystemVersionBlackList is  = " + systemVersionData);
+      JSONArray systemVersionArray = null;
+      try{
+        systemVersionArray = JSONArray.parseArray(systemVersionData);
+      }catch (Throwable e){
+        WXLogUtils.e(e.getMessage());
+        systemVersionArray = new JSONArray();
+      }
+      if (brandList.contains(brand.toLowerCase())){
+        String sdkString = Integer.toString(sdkInt);
+        if (systemVersionArray.contains(sdkString)){
+          isBlackPhone = true;
+          WXLogUtils.e("this phone in ReinitCheck black list.");
+        }
+      }
+    }catch (Throwable e){
+      WXLogUtils.e(e.getMessage());
+    }
+
+    if(isBlackPhone && enableReinitCheck && sInitFrameWorkCount > frameworkInitCount) {
+      WXLogUtils.e("init framework too many times!!");
+      return true;
+    }
+    return false;
+  }
+
   private void initFramework(String framework) {
     LogDetail logDetail = new LogDetail();
     logDetail.name("initFramework");
     logDetail.taskStart();
+    if(disableInitFramework()) {
+      return;
+    }
     if (WXSDKEngine.isSoInitialized() && !isJSFrameworkInit()) {
       if(!WXSDKManager.getInstance().canUseJSC()){
         WXSDKManager.getInstance().getJSCLoader().doLoad();
