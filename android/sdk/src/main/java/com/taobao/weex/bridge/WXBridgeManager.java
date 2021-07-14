@@ -1403,9 +1403,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
                 (domChanges == null || domChanges.isEmpty()) ? "{}" : JSON.toJSONString(domChanges));
       return;
     }
-    if(instance != null && instance.getUnicornJSInvoker() != null) {
-      instance.getUnicornJSInvoker().invokeMethod(instanceId,METHOD_FIRE_EVENT,params, ref, type, data, domChanges);
-    }
 
     if (callback == null) {
       addJSEventTask(METHOD_FIRE_EVENT, instanceId, params, ref, type, data, domChanges);
