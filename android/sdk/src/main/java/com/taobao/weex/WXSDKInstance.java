@@ -1037,7 +1037,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     final IWXJscProcessManager wxJscProcessManager = WXSDKManager.getInstance().getWXJscProcessManager();
 
     if(wxJscProcessManager != null && wxJscProcessManager.shouldReboot()) {
-      WXSDKManager.getInstance().postOnUiThread(new Runnable() {
+      if (!WXBridgeManager.getInstance().isJSFrameworkInit()) {
+        return;
+      }
+        WXSDKManager.getInstance().postOnUiThread(new Runnable() {
         @Override
         public void run() {
           checkWhiteScreen();
@@ -1341,9 +1344,23 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     return "";
   }
 
+  public Boolean disableReloadEngine() {
+    boolean disable = true;
+    IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+    if (adapter != null) {
+      disable = Boolean.parseBoolean(adapter
+              .getConfig("android_weex_common_config",
+                      "disable_reload_engine_in_reload_page",
+                      "true"));
+    }
+    return disable;
+  }
+
   public void reloadPage(boolean reloadThis) {
 
-    WXSDKEngine.reload();
+    if(!disableReloadEngine()){
+      WXSDKEngine.reload();
+    }
 
     if (reloadThis) {
       if (mContext != null)  {
