@@ -19,6 +19,7 @@
 package com.taobao.weex.bridge;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -274,6 +275,26 @@ public class WXModuleManager {
           data.put(IWXUserTrackAdapter.MONITOR_ARG, moduleStr + "." + methodStr);
           data.put(IWXUserTrackAdapter.MONITOR_ERROR_MSG, instance.getBundleUrl());
           userTrackAdapter.commit(instance.getContext(), null, IWXUserTrackAdapter.INVOKE_MODULE, null, data);
+
+          HashMap<String, Serializable> moduleArgs = new HashMap<String, Serializable>();
+          moduleArgs.put("containerType", "weex");
+          moduleArgs.put("ability", moduleStr);
+          moduleArgs.put("api", moduleStr + "." + methodStr);
+          if(!TextUtils.isEmpty(instance.getBundleUrl())){
+            Uri uri = Uri.parse(instance.getBundleUrl());
+            if(uri != null) {
+              try {
+                moduleArgs.put("bizId", uri.buildUpon().clearQuery().build().toString());
+              }catch (Throwable e){
+                WXLogUtils.e("callModuleMethod",e.getMessage());
+                moduleArgs.put("bizId", "unknown");
+              }
+            }
+          }else {
+            moduleArgs.put("bizId","unknown");
+          }
+          userTrackAdapter.commit(instance.getContext(), null, "PreInvokeApi", null, moduleArgs);
+
         }
         return dispatchCallModuleMethod(instance,wxModule,args,invoker);
       } else {
