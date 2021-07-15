@@ -2445,8 +2445,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           }
 
           execRegisterFailTask();
-          WXEnvironment.JsFrameworkInit = true;
-          sInitFrameWorkCount++;
+//          WXEnvironment.JsFrameworkInit = true;
+//          sInitFrameWorkCount++;
           WXLogUtils.e("initFrameWorkCount :"+ sInitFrameWorkCount);
           registerDomModule();
           trackComponentAndModulesTime();
