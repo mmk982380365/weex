@@ -1299,7 +1299,7 @@ base::android::ScopedLocalJavaRef<jobject> WXBridge::CallNativeModule(
       env, newJByteArray(env, options, options_length));
   auto jPageId = base::android::ScopedLocalJavaRef<jstring>(env, env->NewStringUTF(page_id));
 
-  if (!jModule.IsNull() && !jMethod.IsNull()) {
+  if (!jModule.IsNull() && !jMethod.IsNull() && !jni_object()) {
     return Java_WXBridge_callNativeModule(env, jni_object(), jPageId.Get(),
                                           jModule.Get(), jMethod.Get(),
                                           jArgString.Get(), jOptString.Get());
