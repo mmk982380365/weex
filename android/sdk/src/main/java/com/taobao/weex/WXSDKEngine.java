@@ -682,7 +682,7 @@ public class WXSDKEngine implements Serializable {
         }
         WXLogUtils.e(TAG,"weex qjs grey rate: " + value + ".is hited :" + useQjs);
       }
-      return true;
+      return useQjs;
   }
 
   public static IWXJSEngineManager.EngineType defaultEngineType() {
