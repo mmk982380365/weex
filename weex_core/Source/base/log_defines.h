@@ -197,8 +197,11 @@ class EXPORT LogImplement {
 #if defined(LOGV)
 #undef LOGV
 #endif
-
+#if USE_JSC
 #define WEEX_CORE_LOG_TAG "WeexCore"
+#else
+#define WEEX_CORE_LOG_TAG "WeexCoreQJS"
+#endif
 #define WEEX_CORE_FILENAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 #define WEEX_CORE_LOG(level, TAG, format, ...) \
         do{ \
