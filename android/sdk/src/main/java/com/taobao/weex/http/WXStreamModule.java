@@ -23,13 +23,11 @@ import static com.taobao.weex.http.WXHttpUtil.KEY_USER_AGENT;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.annotation.JSMethod;
@@ -152,21 +150,22 @@ public class WXStreamModule extends WXModule {
     int timeout = optionsObj.getIntValue("timeout");
     String enableReferer = optionsObj.getString("referer");
 
-        WXSDKInstance wxsdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-        if (wxsdkInstance != null) {
-            if (enableReferer != null && enableReferer.equals("true")) {
-                if (headers == null) {
-                    headers = new JSONObject();
-                }
-                headers.put("Referer",parseReferer(wxsdkInstance.getBundleUrl()));
-            }
-            if (wxsdkInstance.getStreamNetworkHandler() != null) {
-                String localUrl = wxsdkInstance.getStreamNetworkHandler().fetchLocal(url);
-                if (!TextUtils.isEmpty(localUrl)) {
-                    url = localUrl;
-                }
-            }
+    WXSDKInstance wxsdkInstance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if (wxsdkInstance != null) {
+      if(enableReferer != null && enableReferer.equals("true")){
+        Uri uri = Uri.parse(wxsdkInstance.getBundleUrl());
+        if(headers == null){
+          headers = new JSONObject();
         }
+        headers.put("Referer",uri.getScheme() + "://" + uri.getAuthority() + uri.getPath());
+      }
+      if (wxsdkInstance.getStreamNetworkHandler() != null) {
+        String localUrl = wxsdkInstance.getStreamNetworkHandler().fetchLocal(url);
+        if (!TextUtils.isEmpty(localUrl)) {
+          url = localUrl;
+        }
+      }
+    }
 
     if (method != null) method = method.toUpperCase(Locale.ROOT);
     Options.Builder builder = new Options.Builder()
@@ -219,46 +218,18 @@ public class WXStreamModule extends WXModule {
     }, progressCallback, instanceId, bundleURL);
   }
 
-    private String parseReferer(String url) {
-        try {
-            JSONArray whiteList = JSONArray.parseArray("[\"sellerId\", \"userId\", \"shopId\", \"pageId\"]");
-            IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
-            if (null != adapter) {
-                String config = adapter.getConfig("wx-x-page-url", "ParamsWhiteList", null);
-                if (!TextUtils.isEmpty(config)) {
-                    try {
-                        whiteList = JSONArray.parseArray(config);
-                    } catch (Exception e) {
-                        WXLogUtils.e(e.getMessage());
-                    }
-                }
-            }
-          Uri uri = Uri.parse(url);
-          Uri.Builder transedBuilder = Uri.parse(url).buildUpon().clearQuery();
-          for (String param : uri.getQueryParameterNames()) {
-            if (whiteList.contains(param)) {
-              transedBuilder.appendQueryParameter(param, uri.getQueryParameter(param));
-            }
-          }
-          return  transedBuilder.build().toString();
-        } catch (Exception e) {
-          WXLogUtils.e(e.getMessage());
-          return "";
-        }
-    }
-
-    Object parseData(String data, Options.Type type) throws JSONException {
-        if (type == Options.Type.json) {
-            return JSONObject.parse(data);
-        } else if (type == Options.Type.jsonp) {
-            if (data == null || data.isEmpty()) {
-                return new JSONObject();
-            }
-            int b = data.indexOf("(") + 1;
-            int e = data.lastIndexOf(")");
-            if (b == 0 || b >= e || e <= 0) {
-                return new JSONObject();
-            }
+  Object parseData(String data, Options.Type type) throws JSONException{
+    if( type == Options.Type.json){
+      return JSONObject.parse(data);
+    }else if( type == Options.Type.jsonp){
+      if(data == null || data.isEmpty()) {
+        return new JSONObject();
+      }
+      int b = data.indexOf("(")+1;
+      int e = data.lastIndexOf(")");
+      if(b ==0 || b >= e || e <= 0){
+        return new JSONObject();
+      }
 
       data = data.substring(b,e);
       return JSONObject.parse(data);
