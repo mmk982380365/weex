@@ -1544,6 +1544,9 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   }
 
   private void registerGlobalReceiver() {
+    if(mGlobalEventReceiver != null) {
+      return;
+    }
     mGlobalEventReceiver=new WXGlobalEventReceiver(this);
     try {
       getContext().registerReceiver(mGlobalEventReceiver, new IntentFilter(WXGlobalEventReceiver.EVENT_ACTION));
@@ -1559,6 +1562,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     // module listen Activity onActivityCreate
     WXModuleManager.onActivityStart(getInstanceId());
+    registerGlobalReceiver();
     if(mRootComp != null) {
       mRootComp.onActivityStart();
     }else{
@@ -1672,6 +1676,15 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     // notify onActivityResume callback to module
     WXModuleManager.onActivityStop(getInstanceId());
+
+    try {
+      if (mGlobalEventReceiver != null) {
+        getContext().unregisterReceiver(mGlobalEventReceiver);
+        mGlobalEventReceiver = null;
+      }
+    }catch (IllegalArgumentException e){
+      WXLogUtils.w(WXLogUtils.getStackTrace(e));
+    }
 
     if(mRootComp != null) {
       mRootComp.onActivityStop();
