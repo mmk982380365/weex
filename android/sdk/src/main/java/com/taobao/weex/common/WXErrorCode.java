@@ -278,6 +278,8 @@ public enum WXErrorCode {
 
   WX_ERR_HASH_MAP_TMP("-10010", "WX_ERR_HASH_MAP_TMP",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
+  WX_FORCEQJS_DEGRADE("-1008","degradeToH5|forceQJSMode",ErrorType.DEGRAD_ERROR, ErrorGroup.NATIVE),
+
   /**
    * TEST
    */
