@@ -2104,7 +2104,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
                 Uri uri = Uri.parse(getBundleUrl());
                 String url = uri.getScheme() + "://" + uri.getHost() + uri.getPath();
                 for (Object path : degradeList) {
-                    if (url.contains(String.valueOf(path))) {
+                    if (TextUtils.equals(url,String.valueOf(path))) {
                         return true;
                     }
                 }
