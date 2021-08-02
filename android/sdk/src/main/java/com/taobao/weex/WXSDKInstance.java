@@ -2101,8 +2101,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
             String result = adapter.getConfig("android_weex_common_config", "qjs_degrade_list", "[]");
             JSONArray degradeList = JSONArray.parseArray(result);
             if (degradeList != null && getBundleUrl() != null) {
+                Uri uri = Uri.parse(getBundleUrl());
+                String url = uri.getScheme() + "://" + uri.getHost() + uri.getPath();
                 for (Object path : degradeList) {
-                    if (getBundleUrl().contains(String.valueOf(path))) {
+                    if (TextUtils.equals(url,String.valueOf(path))) {
                         return true;
                     }
                 }
