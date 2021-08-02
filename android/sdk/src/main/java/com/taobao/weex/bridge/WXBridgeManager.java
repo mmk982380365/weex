@@ -2293,7 +2293,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     Boolean enableReinitCheck = true;
     if (adapter != null) {
       try {
-        String enableReinitCheckConfig = adapter.getConfig("android_weex_common_config", "enableReinitCheck", "true");
+        String enableReinitCheckConfig = adapter.getConfig("android_weex_common_config", "enableReinitCheck", "false");
         String frameworkInitCountConfig = adapter.getConfig("android_weex_common_config", "frameworkInitCount", "5");
         enableReinitCheck = Boolean.parseBoolean(enableReinitCheckConfig);
         frameworkInitCount = Integer.parseInt(frameworkInitCountConfig);
@@ -2301,14 +2301,15 @@ public class WXBridgeManager implements Callback, BactchExecutor {
         WXLogUtils.e(e.getMessage());
       }
     }
+    if(!enableReinitCheck) {
+      return false;
+    }
 
     boolean isBlackPhone = false;
     try{
       //先读取手机型号配置
       String brand = Build.BRAND;
-      String brandListData = adapter.getConfig("android_weex_common_config", "ReinitCheckPhoneList", "['huawei','honor']");
-      WXLogUtils.e("this phone brand is = " + brand);
-      WXLogUtils.e("PhoneBlackList = " + brandListData);
+      String brandListData = adapter.getConfig("android_weex_common_config", "ReinitCheckPhoneList", "[]");
       JSONArray brandList = null;
       try{
         brandList = JSONArray.parseArray(brandListData);
@@ -2319,9 +2320,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
       //读取系统版本配置
       int sdkInt = Build.VERSION.SDK_INT;
-      String systemVersionData = adapter.getConfig("android_weex_common_config", "ReinitCheckSystemVersionList", "['23','24']");
-      WXLogUtils.e("this phone sdkInt is = " + sdkInt);
-      WXLogUtils.e("SystemVersionBlackList is  = " + systemVersionData);
+      String systemVersionData = adapter.getConfig("android_weex_common_config", "ReinitCheckSystemVersionList", "[]");
       JSONArray systemVersionArray = null;
       try{
         systemVersionArray = JSONArray.parseArray(systemVersionData);
