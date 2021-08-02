@@ -1024,6 +1024,10 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
     logDetail.taskStart();
 
+        if(needDegradeOnForceQJSMode()) {
+            onRenderError(WXErrorCode.WX_FORCEQJS_DEGRADE.getErrorCode(),WXErrorCode.WX_FORCEQJS_DEGRADE.getErrorMsg());
+            return;
+        }
 
     if (isPreInitMode()){
       getApmForInstance().onStage(WXInstanceApm.KEY_PAGE_STAGES_LOAD_BUNDLE_START);
@@ -2085,18 +2089,43 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
     }
   }
 
-  public synchronized void destroy() {
-    if(!isDestroy()) {
-      if(mReactorPageManager != null){
-         mReactorPageManager.unregisterJSContext();
-         mReactorPageManager = null;
-      }
-      if (mInstanceRecorder != null && mInstanceRecorder.needRecord()) {
-        mInstanceRecorder.uploadRecord();
-      }
-      if(mParentInstance != null){
-         mParentInstance = null;
-      }
+    public Boolean needDegradeOnForceQJSMode() {
+        IWXConfigAdapter adapter = WXSDKManager.getInstance().getWxConfigAdapter();
+        if (!TextUtils.equals(WXSDKEngine.getCoreSoName(), WXEnvironment.CORE_QJS_SO_NAME)) {
+            return false;
+        }
+        if (adapter == null) {
+            return false;
+        }
+        try {
+            String result = adapter.getConfig("android_weex_common_config", "qjs_degrade_list", "[]");
+            JSONArray degradeList = JSONArray.parseArray(result);
+            if (degradeList != null && getBundleUrl() != null) {
+                for (Object path : degradeList) {
+                    if (getBundleUrl().contains(String.valueOf(path))) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            WXLogUtils.e(e.getMessage());
+        }
+        return false;
+    }
+
+
+    public synchronized void destroy() {
+        if (!isDestroy()) {
+            if (mReactorPageManager != null) {
+                mReactorPageManager.unregisterJSContext();
+                mReactorPageManager = null;
+            }
+            if (mInstanceRecorder != null && mInstanceRecorder.needRecord()) {
+                mInstanceRecorder.uploadRecord();
+            }
+            if (mParentInstance != null) {
+                mParentInstance = null;
+            }
 
       IWXJSEngineManager.EngineType jsEngineType = getJSEngineType();
       if(jsEngineType != null) {
