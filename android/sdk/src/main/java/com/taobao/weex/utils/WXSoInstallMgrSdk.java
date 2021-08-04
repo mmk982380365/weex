@@ -31,6 +31,8 @@ import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXErrorCode;
+
+import dalvik.system.BaseDexClassLoader;
 import dalvik.system.PathClassLoader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -512,10 +514,10 @@ public class WXSoInstallMgrSdk {
     }
     try {
       //set nativeLibraryDirectories
-      PathClassLoader pathClassLoader = (PathClassLoader) WXEnvironment.class.getClassLoader();
+      BaseDexClassLoader classLoader = (BaseDexClassLoader) WXEnvironment.class.getClassLoader();
       Field declaredField = Class.forName("dalvik.system.BaseDexClassLoader").getDeclaredField("pathList");
       declaredField.setAccessible(true);
-      Object pathList = declaredField.get(pathClassLoader);
+      Object pathList = declaredField.get(classLoader);
       // 获取当前类的属性
       Field nativeLibraryDirectories = pathList.getClass().getDeclaredField(
               "nativeLibraryDirectories");
