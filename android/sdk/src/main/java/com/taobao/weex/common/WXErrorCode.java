@@ -276,6 +276,8 @@ public enum WXErrorCode {
 
   WX_DEGRAD_EAGLE_RENDER_ERROR ("Eagle_-1007", "degradeToH5|eagleRenderErr", ErrorType.DEGRAD_ERROR, ErrorGroup.NATIVE),
 
+  WX_DEGRAD_WAIT_INIT_TIMEOUT ("-1009", "degradeToH5|waitInitTimeout", ErrorType.DEGRAD_ERROR, ErrorGroup.NATIVE),
+
   WX_ERR_HASH_MAP_TMP("-10010", "WX_ERR_HASH_MAP_TMP",ErrorType.NATIVE_ERROR,ErrorGroup.NATIVE),
 
   /**
