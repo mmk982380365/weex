@@ -133,6 +133,7 @@ public class WXInstanceApm {
     public static final String KEY_PAGE_STATS_LAYOUT_TIME = "wxLayoutTime";
     public static final String KEY_PAGE_STATS_SCRIPT_USE_QJS_BYTE_CODE = "wxScriptUseQJSByteCode";
     public static final String KEY_PAGE_STATS_API_USE_QJS_BYTE_CODE = "wxApiUseQJSByteCode";
+    public static final String KEY_PAGE_STATS_WAIT_INIT_TIME = "wxWaitInitTime";
 
     /************** value *****************/
     public static final String VALUE_ERROR_CODE_DEFAULT = "0";
