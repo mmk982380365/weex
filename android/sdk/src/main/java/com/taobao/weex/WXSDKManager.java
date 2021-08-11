@@ -158,9 +158,11 @@ public class WXSDKManager {
   }
 
   public synchronized void setInitListener(IInitListener listener) {
-    mInitListeners.add(listener);
     if(WXSDKEngine.isInitialized()) {
       listener.onInitSuccess();
+    }
+    else {
+      mInitListeners.add(listener);
     }
   }
 
@@ -170,10 +172,11 @@ public class WXSDKManager {
     }
   }
 
-  public void notifyInitSuccess() {
+  public synchronized void notifyInitSuccess() {
     for (IInitListener listener: mInitListeners) {
       listener.onInitSuccess();
     }
+    mInitListeners.clear();
   }
 
   public void setNeedInitV8(boolean need) {
