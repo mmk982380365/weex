@@ -171,6 +171,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
   private Map<String,String> mContainerInfo;
 
+  private WXSDKManager.IInitListener mInitListener;
+
   public boolean isNewFsEnd = false;
 
   private List<JSONObject> componentsInfoExceedGPULimit  = new LinkedList<>();
@@ -268,6 +270,21 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void removeLayerOverFlowListener(String ref) {
     if (mLayerOverFlowListeners != null)
       mLayerOverFlowListeners.remove(ref);
+  }
+
+  public void setInitListener(WXSDKManager.IInitListener initListener) {
+    if(mInitListener != null) {
+      WXSDKManager.getInstance().removeInitListener(mInitListener);
+    }
+    this.mInitListener = initListener;
+    WXSDKManager.getInstance().setInitListener(mInitListener);
+  }
+
+  public void removeInitListener(){
+    if(mInitListener != null) {
+      WXSDKManager.getInstance().removeInitListener(mInitListener);
+      mInitListener = null;
+    }
   }
 
   /**
@@ -2118,7 +2135,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
 
     public synchronized void destroy() {
         if (!isDestroy()) {
-            if (mReactorPageManager != null) {
+          removeInitListener();
+          if (mReactorPageManager != null) {
                 mReactorPageManager.unregisterJSContext();
                 mReactorPageManager = null;
             }

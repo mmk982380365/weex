@@ -114,6 +114,7 @@ public class WXSDKManager {
   // Tell weexv8 to initialize v8, default is true.
   private boolean mNeedInitV8 = true;
   private volatile int mJsEngineType = 0;
+  private List<IInitListener> mInitListeners;
 
   //add when instance create,rm when instance destroy, not like WXRenderManager
   private Map<String,WXSDKInstance> mAllInstanceMap;
@@ -132,6 +133,7 @@ public class WXSDKManager {
     mWXWorkThreadManager = new WXWorkThreadManager();
     mWXAnalyzerList = new CopyOnWriteArrayList<>();
     mAllInstanceMap = new HashMap<>();
+    mInitListeners = new ArrayList<>();
   }
 
   /**
@@ -153,6 +155,28 @@ public class WXSDKManager {
     if (mStatisticsListener != null) {
       mStatisticsListener.onSDKEngineInitialize();
     }
+  }
+
+  public synchronized void setInitListener(IInitListener listener) {
+    if(WXSDKEngine.isInitialized()) {
+      listener.onInitSuccess();
+    }
+    else {
+      mInitListeners.add(listener);
+    }
+  }
+
+  public synchronized void removeInitListener(IInitListener listener) {
+    if(mInitListeners.contains(listener)) {
+      mInitListeners.remove(listener);
+    }
+  }
+
+  public synchronized void notifyInitSuccess() {
+    for (IInitListener listener: mInitListeners) {
+      listener.onInitSuccess();
+    }
+    mInitListeners.clear();
   }
 
   public void setNeedInitV8(boolean need) {
@@ -556,6 +580,10 @@ public class WXSDKManager {
     if(mCrashInfo!=null){
       mCrashInfo.addCrashInfo(key,value);
     }
+  }
+
+  public interface IInitListener {
+    public void onInitSuccess();
   }
 
   public void setTracingAdapter(ITracingAdapter adapter) {
