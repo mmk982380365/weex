@@ -283,6 +283,7 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void removeInitListener(){
     if(mInitListener != null) {
       WXSDKManager.getInstance().removeInitListener(mInitListener);
+      mInitListener = null;
     }
   }
 
