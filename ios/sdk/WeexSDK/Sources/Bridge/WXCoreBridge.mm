@@ -168,7 +168,7 @@ namespace WeexCore
     }
     
     static WeexByteArray *generator_bytes_array(const char *str, size_t len) {
-        auto *result = (WeexByteArray *)calloc(1, (len + sizeof(WeexByteArray));
+        auto *result = (WeexByteArray *)calloc(1, (len + sizeof(WeexByteArray)));
         do {
             if (!result) {
                 break;

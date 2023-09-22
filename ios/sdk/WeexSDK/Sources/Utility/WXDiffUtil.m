@@ -79,9 +79,9 @@ typedef enum : NSUInteger {
     int oldSize = (int)(oldArray.count + 1);
     int newSize = (int)(newArray.count + 1);
     
-    int **matrix = calloc(1, (oldSize * sizeof(int *));
+    int **matrix = calloc(1, (oldSize * sizeof(int *)));
     for (int i = 0; i < oldSize; i++) {
-        matrix[i] = calloc(1, (newSize * sizeof(int));
+        matrix[i] = calloc(1, (newSize * sizeof(int)));
     }
     
     matrix[0][0] = 0;

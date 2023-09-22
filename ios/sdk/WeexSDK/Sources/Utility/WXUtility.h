@@ -47,7 +47,7 @@ case code:{\
 
 #define WX_ALLOC_FLIST(_ppFree, _count) \
 do {\
-    _ppFree = (void *)calloc(1, (sizeof(void *) * (_count));\
+    _ppFree = (void *)calloc(1, (sizeof(void *) * (_count)));\
     memset(_ppFree, 0, sizeof(void *) * (_count));\
 } while(0)
 
