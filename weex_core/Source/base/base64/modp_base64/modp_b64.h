@@ -43,7 +43,7 @@ extern "C" {
  * \code
  * char* src = ...;
  * int srclen = ...; //the length of number of bytes in src
- * char* dest = (char*) malloc(modp_b64_encode_len);
+ * char* dest = (char*) calloc(1, (modp_b64_encode_len);
  * int len = modp_b64_encode(dest, src, sourcelen);
  * if (len == -1) {
  *   printf("Error\n");
@@ -71,7 +71,7 @@ int modp_b64_encode(char* dest, const char* str, int len);
  * \code
  * char* src = ...;
  * int srclen = ...; // or if you don't know use strlen(src)
- * char* dest = (char*) malloc(modp_b64_decode_len(srclen));
+ * char* dest = (char*) calloc(1, (modp_b64_decode_len(srclen));
  * int len = modp_b64_decode(dest, src, sourcelen);
  * if (len == -1) { error }
  * \endcode

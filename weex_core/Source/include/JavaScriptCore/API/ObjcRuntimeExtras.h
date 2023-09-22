@@ -137,7 +137,7 @@ public:
         NSUInteger size, alignment;
         NSGetSizeAndAlignment(encodedType, &size, &alignment);
         --alignment;
-        m_allocation = static_cast<char*>(malloc(size + alignment));
+        m_allocation = static_cast<char*>(calloc(1, (size + alignment));
         m_buffer = reinterpret_cast<char*>((reinterpret_cast<intptr_t>(m_allocation) + alignment) & ~alignment);
     }
 

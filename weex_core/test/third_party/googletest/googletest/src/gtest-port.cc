@@ -992,7 +992,7 @@ void RE::Init(const char* regex) {
   // Reserves enough bytes to hold the regular expression used for a
   // full match: we need space to prepend a '^', append a '$', and
   // terminate the string with '\0'.
-  char* buffer = static_cast<char*>(malloc(len + 3));
+  char* buffer = static_cast<char*>(calloc(1, (len + 3));
   full_pattern_ = buffer;
 
   if (*regex != '^')

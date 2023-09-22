@@ -43,7 +43,7 @@ static inline std::string jString2Str(JNIEnv *env, const jstring &jstr) {
   jsize alen = env->GetArrayLength(barr);
   jbyte *ba = env->GetByteArrayElements(barr, JNI_FALSE);
   if (alen > 0) {
-    rtn = (char *) malloc(alen + 1);
+    rtn = (char *) calloc(1, (alen + 1);
     memcpy(rtn, ba, alen);
     rtn[alen] = 0;
   }
@@ -78,7 +78,7 @@ static std::string jByteArray2Str(JNIEnv *env, jbyteArray barr) {
   jsize alen = env->GetArrayLength(barr);
   jbyte *ba = env->GetByteArrayElements(barr, JNI_FALSE);
   if (alen > 0) {
-    rtn = (char *) malloc(alen + 1);
+    rtn = (char *) calloc(1, (alen + 1);
     memcpy(rtn, ba, alen);
     rtn[alen] = 0;
   }

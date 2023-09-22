@@ -1156,7 +1156,7 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a, CGFloat b ,double precision){
                 somethingWrong = YES;
                 break;
             }
-            char* buf = (char*)malloc(len + 5);
+            char* buf = (char*)calloc(1, (len + 5);
             if (buf == NULL) {
                 somethingWrong = YES;
                 break;

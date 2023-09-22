@@ -89,7 +89,7 @@ PlatformBridgeInMultiSo::GetExposedFunctions() {
                                             DestroyInstance,
                                             UpdateGlobalConfig,
                                             UpdateInitFrameworkParams};
-  auto functions = (CoreSideFunctionsOfPlatformBridge *)malloc(
+  auto functions = (CoreSideFunctionsOfPlatformBridge *)calloc(1, (
       sizeof(CoreSideFunctionsOfPlatformBridge));
   memset(functions, 0, sizeof(CoreSideFunctionsOfPlatformBridge));
   memcpy(functions, &temp, sizeof(CoreSideFunctionsOfPlatformBridge));

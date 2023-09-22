@@ -93,7 +93,7 @@ PlatformExposeFunctions *AndroidBridgeInMultiSo::GetExposedFunctions() {
                                   CallInvokeLayoutBefore,
                                   CallInvokeLayoutAfter};
   auto functions =
-      (PlatformExposeFunctions *)malloc(sizeof(PlatformExposeFunctions));
+      (PlatformExposeFunctions *)calloc(1, (sizeof(PlatformExposeFunctions));
   memset(functions, 0, sizeof(PlatformExposeFunctions));
   memcpy(functions, &temp, sizeof(PlatformExposeFunctions));
   return functions;

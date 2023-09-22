@@ -61,7 +61,7 @@ FunctionsExposedByJS *ScriptBridgeInMultiSo::GetExposedFunctions() {
       ExecJSService,         ExecTimeCallback,   ExecJS,
       ExecJSWithResult,      ExecJSWithCallback, CreateInstance,     ExecJSOnInstance,
       DestroyInstance,       UpdateGlobalConfig,  UpdateInitFrameworkParams, SetLogType, JsAction};
-  auto functions = (FunctionsExposedByJS *)malloc(sizeof(FunctionsExposedByJS));
+  auto functions = (FunctionsExposedByJS *)calloc(1, (sizeof(FunctionsExposedByJS));
   memset(functions, 0, sizeof(FunctionsExposedByJS));
   memcpy(functions, &temp, sizeof(FunctionsExposedByJS));
   return functions;

@@ -25,7 +25,7 @@
 
 InitFrameworkArgs::InitFrameworkArgs(std::vector<INIT_FRAMEWORK_PARAMS *> &params) {
     for (auto param : params) {
-        auto init_framework_params = (INIT_FRAMEWORK_PARAMS *) malloc(sizeof(INIT_FRAMEWORK_PARAMS));
+        auto init_framework_params = (INIT_FRAMEWORK_PARAMS *) calloc(1, (sizeof(INIT_FRAMEWORK_PARAMS));
 
         if (init_framework_params == nullptr) {
             return;
@@ -54,7 +54,7 @@ InitFrameworkArgs::InitFrameworkArgs(IPCArguments *arguments, size_t startCount)
 
         const IPCByteArray *ba_type = arguments->getByteArray(i);
 
-        auto init_framework_params = (INIT_FRAMEWORK_PARAMS *) malloc(sizeof(INIT_FRAMEWORK_PARAMS));
+        auto init_framework_params = (INIT_FRAMEWORK_PARAMS *) calloc(1, (sizeof(INIT_FRAMEWORK_PARAMS));
 
         if (init_framework_params == nullptr) {
             return;

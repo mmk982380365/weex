@@ -245,7 +245,7 @@ namespace wson {
            && !cache.identifer.isNull()){
             return cache.identifer;
         }
-        UChar* destination = static_cast<UChar*>(malloc(length*sizeof(UChar) + sizeof(UChar)));
+        UChar* destination = static_cast<UChar*>(calloc(1, (length*sizeof(UChar) + sizeof(UChar)));
         memset((void*)destination, 0, length*sizeof(UChar) + sizeof(UChar));
         memcpy((void*)destination, (void*)utf16, length*sizeof(UChar));
         Identifier identifier = Identifier::fromString(vm, destination, length);

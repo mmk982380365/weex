@@ -28,7 +28,7 @@
 namespace WeexCore {
 
 WeexByteArray* genWeexByteArray(const char* str, size_t strLen) {
-  auto* ret = (WeexByteArray*)malloc(strLen + sizeof(WeexByteArray));
+  auto* ret = (WeexByteArray*)calloc(1, (strLen + sizeof(WeexByteArray));
 
   if (ret == nullptr) return nullptr;
 
@@ -43,7 +43,7 @@ WeexByteArray* genWeexByteArray(const char* str, size_t strLen) {
 INIT_FRAMEWORK_PARAMS* genInitFrameworkParams(const char* type,
                                               const char* value) {
   auto* init_framework_params =
-      (INIT_FRAMEWORK_PARAMS*)malloc(sizeof(INIT_FRAMEWORK_PARAMS));
+      (INIT_FRAMEWORK_PARAMS*)calloc(1, (sizeof(INIT_FRAMEWORK_PARAMS));
 
   if (init_framework_params == nullptr) return nullptr;
 
@@ -57,7 +57,7 @@ INIT_FRAMEWORK_PARAMS* genInitFrameworkParams(const char* type,
 
 WeexString* genWeexString(const uint16_t* str, size_t length) {
   size_t byteSize = length * sizeof(uint16_t);
-  auto* string = (WeexString*)malloc(byteSize + sizeof(WeexString));
+  auto* string = (WeexString*)calloc(1, (byteSize + sizeof(WeexString));
   if (string == nullptr) return nullptr;
 
   memset(string, 0, byteSize + sizeof(WeexString));
@@ -78,7 +78,7 @@ WeexString* jstring2WeexString(JNIEnv* env, jstring fromJString) {
 }
 
 VALUE_WITH_TYPE* getValueWithTypePtr() {
-  auto* param = (VALUE_WITH_TYPE*)malloc(sizeof(VALUE_WITH_TYPE));
+  auto* param = (VALUE_WITH_TYPE*)calloc(1, (sizeof(VALUE_WITH_TYPE));
   if (param == nullptr) return nullptr;
 
   memset(param, 0, sizeof(VALUE_WITH_TYPE));

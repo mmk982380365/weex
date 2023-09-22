@@ -60,7 +60,7 @@ std::string char2String(const char* str) {
 
 WeexString *genWeexStringSS(const uint16_t *str, size_t length) {
     size_t byteSize = length * sizeof(uint16_t);
-    auto *string = (WeexString *) malloc(byteSize + sizeof(WeexString));
+    auto *string = (WeexString *) calloc(1, (byteSize + sizeof(WeexString));
     if (string == nullptr)
         return nullptr;
 
@@ -70,7 +70,7 @@ WeexString *genWeexStringSS(const uint16_t *str, size_t length) {
     return string;
 }
 WeexByteArray *genWeexByteArraySS(const char *str, size_t strLen) {
-    auto *ret = (WeexByteArray *) malloc(strLen + sizeof(WeexByteArray));
+    auto *ret = (WeexByteArray *) calloc(1, (strLen + sizeof(WeexByteArray));
 
     if (ret == nullptr)
         return nullptr;

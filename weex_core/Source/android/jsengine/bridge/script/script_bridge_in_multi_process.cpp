@@ -130,7 +130,7 @@ namespace weex {
                         case IPCType::STRING: {
                             const IPCString *ipcstr = arguments->getString(i);
                             size_t size = ipcstr->length * sizeof(uint16_t);
-                            auto temp = (WeexString *) malloc(size + sizeof(WeexString));
+                            auto temp = (WeexString *) calloc(1, (size + sizeof(WeexString));
                             memset(temp, 0, size + sizeof(WeexString));
                             temp->length = ipcstr->length;
                             memcpy(temp->content, ipcstr->content, size);
@@ -141,7 +141,7 @@ namespace weex {
                         case IPCType::JSONSTRING: {
                             const IPCString *ipcstr = arguments->getString(i);
                             size_t size = ipcstr->length * sizeof(uint16_t);
-                            auto temp = (WeexString *) malloc(size + sizeof(WeexString));
+                            auto temp = (WeexString *) calloc(1, (size + sizeof(WeexString));
                             memset(temp, 0, size + sizeof(WeexString));
                             temp->length = ipcstr->length;
                             memcpy(temp->content, ipcstr->content, size);
@@ -152,7 +152,7 @@ namespace weex {
                         case IPCType::BYTEARRAY: {
                             const IPCByteArray *array = arguments->getByteArray(i);
                             size_t size = array->length * sizeof(char);
-                            auto temp = (WeexByteArray *) malloc(size + sizeof(WeexByteArray));
+                            auto temp = (WeexByteArray *) calloc(1, (size + sizeof(WeexByteArray));
                             memset(temp, 0, size + sizeof(WeexByteArray));
                             temp->length = array->length;
                             memcpy(temp->content, array->content, size);
@@ -253,7 +253,7 @@ namespace weex {
                     const IPCByteArray *ba = arguments->getByteArray(1 + i);
                     const IPCByteArray *ba_type = arguments->getByteArray(i);
                     auto init_framework_params =
-                            (INIT_FRAMEWORK_PARAMS *) malloc(sizeof(INIT_FRAMEWORK_PARAMS));
+                            (INIT_FRAMEWORK_PARAMS *) calloc(1, (sizeof(INIT_FRAMEWORK_PARAMS));
                     if (init_framework_params == nullptr) {
                         break;
                     }
@@ -323,7 +323,7 @@ namespace weex {
                     const IPCByteArray *ba = arguments->getByteArray(1 + i);
                     const IPCByteArray *ba_type = arguments->getByteArray(i);
                     auto init_framework_params =
-                            (INIT_FRAMEWORK_PARAMS *) malloc(sizeof(INIT_FRAMEWORK_PARAMS));
+                            (INIT_FRAMEWORK_PARAMS *) calloc(1, (sizeof(INIT_FRAMEWORK_PARAMS));
                     if (init_framework_params == nullptr) {
                         break;
                     }
@@ -464,7 +464,7 @@ namespace weex {
                     const IPCByteArray* ba = arguments->getByteArray(1 + i);
                     const IPCByteArray* ba_type = arguments->getByteArray(i);
                     auto init_framework_params =
-                            (INIT_FRAMEWORK_PARAMS*)malloc(sizeof(INIT_FRAMEWORK_PARAMS));
+                            (INIT_FRAMEWORK_PARAMS*)calloc(1, (sizeof(INIT_FRAMEWORK_PARAMS));
                     if (init_framework_params == nullptr) {
                         break;
                     }

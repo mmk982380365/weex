@@ -38,7 +38,7 @@ void WeexObjectHolder::initFromIPCArguments(IPCArguments *arguments, size_t star
 
         const IPCByteArray *ba_type = arguments->getByteArray(i);
 
-        auto init_framework_params = (INIT_FRAMEWORK_PARAMS *) malloc(sizeof(INIT_FRAMEWORK_PARAMS));
+        auto init_framework_params = (INIT_FRAMEWORK_PARAMS *) calloc(1, (sizeof(INIT_FRAMEWORK_PARAMS));
 
         if (init_framework_params == nullptr) {
             return;

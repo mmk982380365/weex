@@ -71,7 +71,7 @@ public:
             }
         };
 
-        Block* block = static_cast<Block*>(malloc(sizeof(Block)));
+        Block* block = static_cast<Block*>(calloc(1, (sizeof(Block)));
         block->isa = _NSConcreteMallocBlock;
 
         enum {

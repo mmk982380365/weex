@@ -57,7 +57,7 @@ static jint InitAppFramework(JNIEnv* env, jobject jcaller, jstring jinstanceid,
 
       jdouble jDoubleObj = env->CallDoubleMethod(jDataObj.Get(), method_id);
       const auto size = sizeof(jDoubleObj) + 1;
-      char * charData = (char *) malloc(size);
+      char * charData = (char *) calloc(1, (size);
       if(charData == nullptr){
         continue;
       }

@@ -567,7 +567,7 @@ FunctionsExposedByCore *ScriptBridgeInMultiSo::GetExposedFunctions() {
                                  UpdateComponentData,
                                  Log};
   auto functions =
-      (FunctionsExposedByCore *) malloc(sizeof(FunctionsExposedByCore));
+      (FunctionsExposedByCore *) calloc(1, (sizeof(FunctionsExposedByCore));
   memset(functions, 0, sizeof(FunctionsExposedByCore));
   memcpy(functions, &temp, sizeof(FunctionsExposedByCore));
   return functions;

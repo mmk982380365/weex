@@ -70,15 +70,15 @@ static inline uint32_t msg_buffer_varint_Zig(int32_t value)
 }
 
  wson_buffer* wson_buffer_new(void){
-    wson_buffer* ptr = malloc(sizeof(wson_buffer));
-    ptr->data = malloc(sizeof(int8_t)*WSON_BUFFER_SIZE);
+    wson_buffer* ptr = calloc(1, (sizeof(wson_buffer));
+    ptr->data = calloc(1, (sizeof(int8_t)*WSON_BUFFER_SIZE);
     ptr->position = 0;
     ptr->length = WSON_BUFFER_SIZE;
     return ptr;
 }
 
 wson_buffer* wson_buffer_from(void* data, uint32_t length){
-    wson_buffer* ptr = malloc(sizeof(wson_buffer));
+    wson_buffer* ptr = calloc(1, (sizeof(wson_buffer));
     ptr->data = data;
     ptr->position = 0;
     ptr->length = length;

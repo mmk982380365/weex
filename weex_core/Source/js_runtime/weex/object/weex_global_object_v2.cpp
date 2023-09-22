@@ -107,7 +107,7 @@ WeexGlobalObjectV2::initWxEnvironment(std::vector<INIT_FRAMEWORK_PARAMS *> &para
         std::string &&type = std::string(param->type->content);
         std::string &&value = std::string(param->value->content);
         if (isSave) {
-            auto init_framework_params = (INIT_FRAMEWORK_PARAMS *) malloc(sizeof(INIT_FRAMEWORK_PARAMS));
+            auto init_framework_params = (INIT_FRAMEWORK_PARAMS *) calloc(1, (sizeof(INIT_FRAMEWORK_PARAMS));
 
             if (init_framework_params == nullptr) {
                 return;

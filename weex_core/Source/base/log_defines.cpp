@@ -62,7 +62,7 @@ LogFlattenHelper &LogFlattenHelper::set(const char *fmt, va_list args) {
     return *this;
   }
   if (len > (int) mSmallBuf.size())
-    mLargeBuf = static_cast<char *>(malloc(len));
+    mLargeBuf = static_cast<char *>(calloc(1, (len));
   int rv;
   if (mLargeBuf) {
     rv = vsnprintf(mLargeBuf, len, fmt, args);

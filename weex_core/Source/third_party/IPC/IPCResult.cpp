@@ -166,7 +166,7 @@ size_t ValueResult<T>::getByteArrayLength()
 ByteArrayResult::ByteArrayResult(const char* data, size_t length):m_length(length)
 {
     if(length > 0){
-        m_data = (char*)malloc(length*sizeof(char));
+        m_data = (char*)calloc(1, (length*sizeof(char));
         memcpy(m_data,  data, length);
     }else{
         m_data = nullptr;

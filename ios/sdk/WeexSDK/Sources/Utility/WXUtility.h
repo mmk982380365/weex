@@ -30,7 +30,7 @@ static const CGFloat WXDefaultScreenWidth = 750.0;
 
 #define WX_ENUMBER_CASE(_invoke, idx, code, obj, _type, op, _flist) \
 case code:{\
-    _type *_tmp = malloc(sizeof(_type));\
+    _type *_tmp = calloc(1, (sizeof(_type));\
     memset(_tmp, 0, sizeof(_type));\
     *_tmp = [obj op];\
     [_invoke setArgument:_tmp atIndex:(idx) + 2];\
@@ -47,7 +47,7 @@ case code:{\
 
 #define WX_ALLOC_FLIST(_ppFree, _count) \
 do {\
-    _ppFree = (void *)malloc(sizeof(void *) * (_count));\
+    _ppFree = (void *)calloc(1, (sizeof(void *) * (_count));\
     memset(_ppFree, 0, sizeof(void *) * (_count));\
 } while(0)
 

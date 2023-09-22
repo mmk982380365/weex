@@ -51,7 +51,7 @@ class Water {
   // operator new and operator delete help us control water allocation.
   void* operator new(size_t allocation_size) {
     allocated_++;
-    return malloc(allocation_size);
+    return calloc(1, (allocation_size);
   }
 
   void operator delete(void* block, size_t /* allocation_size */) {

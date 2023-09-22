@@ -76,7 +76,7 @@ ExeJsArgs::ExeJsArgs(IPCArguments *arguments, size_t startCount) {
 }
 
 VALUE_WITH_TYPE *ExeJsArgs::getValueWithTypePtr() {
-    auto *param = (VALUE_WITH_TYPE *) malloc(sizeof(VALUE_WITH_TYPE));
+    auto *param = (VALUE_WITH_TYPE *) calloc(1, (sizeof(VALUE_WITH_TYPE));
     if (param == nullptr)
         return nullptr;
 

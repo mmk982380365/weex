@@ -323,7 +323,7 @@ WeexByteArray *getArgumentAsWeexByteArrayJSON(ExecState *state, int argument) {
 
 WeexString *genWeexStringSS(const uint16_t *str, size_t length) {
     size_t byteSize = length * sizeof(uint16_t);
-    auto *string = (WeexString *) malloc(byteSize + sizeof(WeexString));
+    auto *string = (WeexString *) calloc(1, (byteSize + sizeof(WeexString));
     if (string == nullptr)
         return nullptr;
 
@@ -333,7 +333,7 @@ WeexString *genWeexStringSS(const uint16_t *str, size_t length) {
     return string;
 }
 WeexByteArray *genWeexByteArraySS(const char *str, size_t strLen) {
-    auto *ret = (WeexByteArray *) malloc(strLen + sizeof(WeexByteArray));
+    auto *ret = (WeexByteArray *) calloc(1, (strLen + sizeof(WeexByteArray));
 
     if (ret == nullptr)
         return nullptr;
@@ -429,7 +429,7 @@ void FillVectorOfInitFramework(std::vector<INIT_FRAMEWORK_PARAMS *> &params,
         const IPCByteArray *ba = arguments->getByteArray(1 + i);
         const IPCByteArray *ba_type = arguments->getByteArray(i);
         auto init_framework_params =
-                (INIT_FRAMEWORK_PARAMS *) malloc(sizeof(INIT_FRAMEWORK_PARAMS));
+                (INIT_FRAMEWORK_PARAMS *) calloc(1, (sizeof(INIT_FRAMEWORK_PARAMS));
         if (init_framework_params == nullptr) {
             break;
         }
