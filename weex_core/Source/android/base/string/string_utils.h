@@ -20,7 +20,6 @@
 #define _STRING_UTILS_H_
 
 #include <jni.h>
-#include <malloc.h>
 #include <iostream>
 #include <sstream>
 #include <string>
