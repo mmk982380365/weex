@@ -38,7 +38,7 @@
  *  myStrlen = udat_format(dfmt, myDate, NULL, myStrlen, NULL, &status);
  *  if (status==U_BUFFER_OVERFLOW_ERROR){
  *      status=U_ZERO_ERROR;
- *      myString=(UChar*)malloc(sizeof(UChar) * (myStrlen+1) );
+ *      myString=(UChar*)calloc(1, sizeof(UChar) * (myStrlen+1) );
  *      udat_format(dfmt, myDate, myString, myStrlen+1, NULL, &status);
  *  }
  * \endcode
@@ -58,7 +58,7 @@
  *      myStrlen = udat_format(df, myDateArr[i], NULL, myStrlen, NULL, &status);
  *      if(status == U_BUFFER_OVERFLOW_ERROR){
  *          status = U_ZERO_ERROR;
- *          myString = (UChar*)malloc(sizeof(UChar) * (myStrlen+1) );
+ *          myString = (UChar*)calloc(1, sizeof(UChar) * (myStrlen+1) );
  *          udat_format(df, myDateArr[i], myString, myStrlen+1, NULL, &status);
  *          printf("%s\n", u_austrcpy(buffer, myString) );
  *          free(myString);
@@ -81,7 +81,7 @@
  *  myStrlen = udat_format(dfmt, myDate, NULL, myStrlen, &pos, &status);
  *  if (status==U_BUFFER_OVERFLOW_ERROR){
  *      status=U_ZERO_ERROR;
- *      myString=(UChar*)malloc(sizeof(UChar) * (myStrlen+1) );
+ *      myString=(UChar*)calloc(1, sizeof(UChar) * (myStrlen+1) );
  *      udat_format(dfmt, myDate, myString, myStrlen+1, &pos, &status);
  *  }
  *  printf("date format: %s\n", u_austrcpy(buffer, myString));

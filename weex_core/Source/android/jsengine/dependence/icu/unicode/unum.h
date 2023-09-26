@@ -74,7 +74,7 @@
  *    if(status==U_BUFFER_OVERFLOW_ERROR){
  *       status=U_ZERO_ERROR;
  *       resultlength=reslenneeded+1;
- *       result=(UChar*)malloc(sizeof(UChar) * resultlength);
+ *       result=(UChar*)calloc(1, sizeof(UChar) * resultlength);
  *       unum_format(nf, a[i], result, resultlength, &pos, &status);
  *    }
  *    printf( " Example 2: %s\n", austrdup(result));

@@ -17,7 +17,6 @@
  * under the License.
  */
 
-#include <malloc.h>
 #include "ipc_string_result.h"
 
 

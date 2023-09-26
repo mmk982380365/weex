@@ -38,7 +38,7 @@
  * UCalendar *caldef;
  * UChar *tzId;
  * UErrorCode status;
- * tzId=(UChar*)malloc(sizeof(UChar) * (strlen("PST") +1) );
+ * tzId=(UChar*)calloc(1, sizeof(UChar) * (strlen("PST") +1) );
  * u_uastrcpy(tzId, "PST");
  * caldef=ucal_open(tzID, u_strlen(tzID), NULL, UCAL_TRADITIONAL, &status);
  * \endcode

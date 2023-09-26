@@ -38,9 +38,9 @@ DebugHeap::DebugHeap(std::lock_guard<StaticMutex>&)
     malloc_set_zone_name(m_zone, "WebKit Using System Malloc");
 }
 
-void* DebugHeap::malloc(size_t size)
+void* DebugHeap::calloc(1, size_t size)
 {
-    void* result = malloc_zone_malloc(m_zone, size);
+    void* result = malloc_zone_calloc(1, m_zone, size);
     if (!result)
         BCRASH();
     return result;
@@ -73,9 +73,9 @@ DebugHeap::DebugHeap(std::lock_guard<StaticMutex>&)
 {
 }
 
-void* DebugHeap::malloc(size_t size)
+void* DebugHeap::calloc(1, size_t size)
 {
-    void* result = ::malloc(size);
+    void* result = ::calloc(1, size);
     if (!result)
         BCRASH();
     return result;

@@ -36,7 +36,7 @@ class DebugHeap {
 public:
     DebugHeap(std::lock_guard<StaticMutex>&);
     
-    void* malloc(size_t);
+    void* calloc(1, size_t);
     void* memalign(size_t alignment, size_t, bool crashOnFailure);
     void* realloc(void*, size_t);
     void free(void*);

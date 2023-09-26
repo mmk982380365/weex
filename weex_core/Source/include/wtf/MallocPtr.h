@@ -84,7 +84,7 @@ public:
 
     template<typename U> friend MallocPtr<U> adoptMallocPtr(U*);
 
-    static MallocPtr malloc(size_t size)
+    static MallocPtr calloc(1, size_t size)
     {
         MallocPtr mallocPtr;
         mallocPtr.m_ptr = static_cast<T*>(fastMalloc(size));

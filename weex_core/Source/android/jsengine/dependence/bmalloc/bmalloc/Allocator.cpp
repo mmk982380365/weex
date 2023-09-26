@@ -53,7 +53,7 @@ Allocator::~Allocator()
 void* Allocator::tryAllocate(size_t size)
 {
     if (m_debugHeap)
-        return m_debugHeap->malloc(size);
+        return m_debugHeap->calloc(1, size);
 
     if (size <= smallMax)
         return allocate(size);
@@ -183,7 +183,7 @@ NO_INLINE void* Allocator::allocateLogSizeClass(size_t size)
 void* Allocator::allocateSlowCase(size_t size)
 {
     if (m_debugHeap)
-        return m_debugHeap->malloc(size);
+        return m_debugHeap->calloc(1, size);
 
     if (size <= maskSizeClassMax) {
         size_t sizeClass = bmalloc::maskSizeClass(size);

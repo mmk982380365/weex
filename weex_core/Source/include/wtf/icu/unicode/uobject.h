@@ -121,7 +121,7 @@ public:
     /**
      * Override for ICU4C C++ memory management.
      * simple, non-class types are allocated using the macros in common/cmemory.h
-     * (uprv_malloc(), uprv_free(), uprv_realloc());
+     * (uprv_calloc(1, ), uprv_free(), uprv_realloc());
      * they or something else could be used here to implement C++ new/delete
      * for ICU4C C++ classes
      * @stable ICU 2.4
@@ -138,7 +138,7 @@ public:
     /**
      * Override for ICU4C C++ memory management.
      * simple, non-class types are allocated using the macros in common/cmemory.h
-     * (uprv_malloc(), uprv_free(), uprv_realloc());
+     * (uprv_calloc(1, ), uprv_free(), uprv_realloc());
      * they or something else could be used here to implement C++ new/delete
      * for ICU4C C++ classes
      * @stable ICU 2.4

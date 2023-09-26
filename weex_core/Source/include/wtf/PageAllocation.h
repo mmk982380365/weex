@@ -38,7 +38,6 @@
 #endif
 
 #if OS(WINDOWS)
-#include <malloc.h>
 #include <windows.h>
 #endif
 

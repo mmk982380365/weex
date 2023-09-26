@@ -36,7 +36,7 @@ WX_EXPORT void mbscavenge();
     
 void* mbmalloc(size_t size)
 {
-    return bmalloc::api::malloc(size);
+    return bmalloc::api::calloc(1, size);
 }
 
 void* mbmemalign(size_t alignment, size_t size)

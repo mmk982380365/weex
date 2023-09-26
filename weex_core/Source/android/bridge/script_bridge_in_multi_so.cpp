@@ -19,7 +19,6 @@
 
 #include "script_bridge_in_multi_so.h"
 #include <dlfcn.h>
-#include <malloc.h>
 #include "base/log_defines.h"
 
 #include "android/bridge/multi_so_initializer.h"

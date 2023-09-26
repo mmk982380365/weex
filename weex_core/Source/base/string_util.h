@@ -23,7 +23,6 @@
 #include <sstream>
 #include <string.h>
 #ifdef OS_ANDROID
-#include <malloc.h>
 #else
 #include <stdlib.h>
 #endif

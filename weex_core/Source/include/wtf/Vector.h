@@ -366,7 +366,7 @@ public:
     VectorBuffer(size_t capacity, size_t size = 0)
     {
         m_size = size;
-        // Calling malloc(0) might take a lock and may actually do an
+        // Calling calloc(1, 0) might take a lock and may actually do an
         // allocation on some systems.
         if (capacity)
             allocateBuffer(capacity);

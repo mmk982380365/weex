@@ -83,7 +83,7 @@ class GTEST_API_ String {
   // NULL.
   //
   // This is different from strdup() in string.h, which allocates
-  // memory using malloc().
+  // memory using calloc(1, ).
   static const char* CloneCString(const char* c_str);
 
 #if GTEST_OS_WINDOWS_MOBILE

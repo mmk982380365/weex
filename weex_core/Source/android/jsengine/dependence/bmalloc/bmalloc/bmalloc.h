@@ -38,7 +38,7 @@ inline void* tryMalloc(size_t size)
 }
 
 // Crashes on failure.
-inline void* malloc(size_t size)
+inline void* calloc(size_t n, size_t size)
 {
     return Cache::allocate(size);
 }
