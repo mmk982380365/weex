@@ -429,11 +429,11 @@
  * Attribute to mark functions as malloc-like
  * @internal
  */
-#if defined(__GNUC__) && __GNUC__>=3
-#    define U_MALLOC_ATTR __attribute__ ((__malloc__))
-#else
-#    define U_MALLOC_ATTR
-#endif
+// #if defined(__GNUC__) && __GNUC__>=3
+// #    define U_MALLOC_ATTR __attribute__ ((__malloc__))
+// #else
+// #    define U_MALLOC_ATTR
+// #endif
 
 /**
  * \def U_ALLOC_SIZE_ATTR
