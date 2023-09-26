@@ -81,7 +81,7 @@ elseif("${ANDROID_ABI}" STREQUAL "x86_64")
     set(WTF_CPU_X86_64 1)
 endif ()
 
-set(USE_SYSTEM_MALLOC 1)
+set(USE_SYSTEM_MALLOC 0)
 set(WEEXJSSERVER_NAME weexjss)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
