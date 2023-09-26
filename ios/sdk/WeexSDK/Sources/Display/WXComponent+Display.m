@@ -146,10 +146,10 @@ typedef NS_ENUM(NSInteger, WXComponentBorderRecord) {
         __strong WXComponent* sself = wself;
         if (sself) {
             if (bounds.size.width == 0) {
-                bounds.size.width = 1
+                bounds.size.width = 1;
             }
             if (bounds.size.height == 0) {
-                bounds.size.height = 1
+                bounds.size.height = 1;
             }
             UIGraphicsBeginImageContextWithOptions(bounds.size, [sself _bitmapOpaqueWithSize:bounds.size] , 0.0);
             UIImage *image = [sself drawRect:bounds];
