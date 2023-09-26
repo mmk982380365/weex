@@ -668,9 +668,9 @@
 #include <WebKitAdditions/AdditionalFeatureDefines.h>
 #endif
 
-#if OS(WINDOWS)
-#define USE_SYSTEM_MALLOC 1
-#endif
+// #if OS(WINDOWS)
+// #define USE_SYSTEM_MALLOC 1
+// #endif
 
 #if !defined(USE_JSVALUE64) && !defined(USE_JSVALUE32_64)
 #if (CPU(X86_64) && (OS(UNIX) || OS(WINDOWS))) \

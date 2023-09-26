@@ -53,7 +53,7 @@ public:
         if (m_markSet)
             m_markSet->remove(this);
 
-        if (EncodedJSValue* base = mallocBase())
+        if (EncodedJSValue* base = callocBase())
             fastFree(base);
     }
 
@@ -76,7 +76,7 @@ public:
     void append(JSValue v)
     {
         ASSERT(m_size <= m_capacity);
-        if (m_size == m_capacity || mallocBase())
+        if (m_size == m_capacity || callocBase())
             return slowAppend(v);
 
         slotFor(m_size) = JSValue::encode(v);
@@ -117,7 +117,7 @@ private:
         return m_buffer[item];
     }
         
-    EncodedJSValue* mallocBase()
+    EncodedJSValue* callocBase()
     {
         if (m_buffer == m_inlineBuffer)
             return 0;
