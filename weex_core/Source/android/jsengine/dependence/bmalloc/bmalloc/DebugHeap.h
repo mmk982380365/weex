@@ -27,7 +27,7 @@
 #include "StaticMutex.h"
 #include <mutex>
 #if BOS(DARWIN)
-#include <malloc/malloc.h>
+// #include <malloc/malloc.h>
 #endif
 
 namespace bmalloc {

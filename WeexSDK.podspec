@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
                     "dev" => "dev@weex.apache.org"
                    }
   s.platform     = :ios
-  s.ios.deployment_target = '9.0'
+  s.ios.deployment_target = '12.0'
 
   # use for public
   # s.source =  {
