@@ -953,10 +953,11 @@ static BOOL bNeedRemoveEvents = YES;
 
 - (UIImage *)imageFromLayer:(CALayer *)layer
 {
-    UIGraphicsBeginImageContextWithOptions(layer.frame.size, NO, 0);
-    [layer renderInContext:UIGraphicsGetCurrentContext()];
-    UIImage *outputImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
+    CGSize imageSize = layer.frame.size;
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:imageSize];
+    UIImage *outputImage = [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+        [layer renderInContext:rendererContext.CGContext];
+    }];
     return outputImage;
 }
 
